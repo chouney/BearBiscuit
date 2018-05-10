@@ -4,6 +4,8 @@
 
 package com.xkr.util;
 
+import java.util.Objects;
+
 /**
  * 驼峰与下划线之间互转工具类
  * author xkr
@@ -70,6 +72,18 @@ public class CamelCaseUtil {
         }
         s = toCamelCase(s);
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    /**
+     * 开头小写
+     * @param s 驼峰
+     * @return
+     */
+    public static String toLowwerCamelCase(String s){
+        if(Objects.isNull(s) || s.length() < 3){
+            return s;
+        }
+        return s.substring(0, 1).toLowerCase() + s.substring(1);
     }
 
 }

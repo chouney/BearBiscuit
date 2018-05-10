@@ -19,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.validation.constraints.Min;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -77,9 +81,21 @@ public class TestController {
         return new BasicResult(ErrorStatus.OK);
     }
 
-    @RequestMapping(value = "/test4", method = {RequestMethod.GET})
+    /**
+     * 文件上传测试
+     * @param reqFile
+     * @return
+     */
+    @RequestMapping(value = "/test4", method = {RequestMethod.GET,RequestMethod.POST})
     @ResponseBody
-    public BasicResult index4(Model model) {
+    public BasicResult index4(@RequestParam(name = "file") MultipartFile reqFile) {
+        File file = new File(System.getProperty("java.io.tmpdir")+"/"+reqFile.getOriginalFilename());
+        try (FileOutputStream outputStream = new FileOutputStream(file)){
+            outputStream.write(reqFile.getBytes());
+            upLoadApiService.upload(UpLoadApiService.COMPRESS_FILE_TYPE,file);
+        } catch (IOException | UpException e) {
+            e.printStackTrace();
+        }
         return new BasicResult(ErrorStatus.OK);
     }
 

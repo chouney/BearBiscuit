@@ -1,9 +1,12 @@
 package com.xkr.service.api;
 
+import com.xkr.common.FileTypeEnum;
+import com.xkr.core.compress.UnCompressProcessorFacade;
 import com.xkr.domain.dto.FileInfoDTO;
 import com.xkr.domain.dto.FolderItemDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;
+import com.xkr.util.FileUtil;
 import main.java.com.UpYun;
 import main.java.com.upyun.UpException;
 import org.apache.shiro.SecurityUtils;
@@ -37,9 +40,12 @@ public class UpLoadApiService {
     @Autowired
     private UpYun upYun;
 
-    public static final int COMPRESS_FILE_TYPE = 1;
+    @Autowired
+    private UnCompressProcessorFacade compressProcessorFacade;
 
-    public static final int IMAGE_FILE_TYPE = 2;
+    public static final int COMPRESS_FILE_TYPE = 0;
+
+    public static final int IMAGE_FILE_TYPE = 1;
 
     @Value("${upyun.root.path}")
     private String rootPath;
@@ -67,13 +73,13 @@ public class UpLoadApiService {
      * @throws UpException
      */
     public FileInfoDTO getFileInto(String filePath) throws IOException, UpException {
-        Map<String, String> map ;
+        Map<String, String> map;
         try {
             map = upYun.getFileInfo(filePath);
             if (CollectionUtils.isEmpty(map)) {
                 return null;
             }
-        }catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             return null;
         }
         return new FileInfoDTO(map);
@@ -81,6 +87,7 @@ public class UpLoadApiService {
 
     /**
      * 返回目录信息
+     *
      * @param dicPath
      * @return
      */
@@ -99,25 +106,43 @@ public class UpLoadApiService {
     }
 
 
-
     /**
      * 文件上传
+     *
      * @param fileType
      * @return
      */
-    public boolean upload(int fileType,File uploadFile) throws IOException, UpException {
+    public boolean upload(int fileType, File uploadFile) throws IOException, UpException {
         if (COMPRESS_FILE_TYPE == fileType) {
+            FileTypeEnum fileTypeEnum = FileUtil.getFileType(uploadFile);
+            if (fileTypeEnum == null || fileTypeEnum.getProcessorClazz() == null) {
+                //todo 格式异常
+                return false;
+            }
             //上传压缩文件
-            XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
-            if(Objects.isNull(user)){
+//            XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
+            XkrUser user = new XkrUser();
+            user.setId(124124124L); // TODO: 2018/5/10 test
+            if (Objects.isNull(user)) {
                 throw new UnauthenticatedException("user not login");
             }
-            boolean isSuccess ;
-            isSuccess = uploadCompressFile(String.valueOf(user.getId()),uploadFile,true);
-            //todo 解压缩并上传
-
+            boolean isSuccess;
+            File unCompressDic =  compressProcessorFacade.unCompressFile(uploadFile,fileTypeEnum.getProcessorClazz());
+            if(Objects.isNull(unCompressDic)){
+                return false;
+            }
+            isSuccess = uploadUnCompressDic(String.valueOf(user.getId()),unCompressDic);
+            if(!isSuccess){
+                return false;
+            }
+            isSuccess = uploadCompressFile(String.valueOf(user.getId()), uploadFile, true);
+            if(!isSuccess){
+                //若失败则删除解压缩上传文件
+                String uncomDicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, String.valueOf(user.getId()), unCompressDic.getName());
+                deleteFile(uncomDicPath,true);
+            }
             return isSuccess;
-        }else if(IMAGE_FILE_TYPE == fileType){
+        } else if (IMAGE_FILE_TYPE == fileType) {
             return uploadImageFile(uploadFile);
         }
         return false;
@@ -127,6 +152,7 @@ public class UpLoadApiService {
 
     /**
      * 图片上传
+     *
      * @param imageFile
      * @return
      * @throws IOException
@@ -134,17 +160,18 @@ public class UpLoadApiService {
      */
     private boolean uploadImageFile(File imageFile) throws IOException, UpException {
         LocalDateTime date = LocalDateTime.now();
-        String picPath = String.format(IMAGE_FILE_PATH_FORMAT,date.getYear(),date.getMonthValue(),date.getDayOfMonth(),
-                date.getHour(),date.getMinute(),date.getSecond(),imageFile.getName());
-        boolean isSuccess = upYun.writeFile(picPath,imageFile,true);
-        if(!isSuccess){
-            deleteFile(picPath,false);
+        String picPath = String.format(IMAGE_FILE_PATH_FORMAT, date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+                date.getHour(), date.getMinute(), date.getSecond(), imageFile.getName());
+        boolean isSuccess = upYun.writeFile(picPath, imageFile, true);
+        if (!isSuccess) {
+            deleteFile(picPath, false);
         }
         return isSuccess;
     }
 
     /**
      * 压缩文件上传
+     *
      * @param userId
      * @param file
      * @param auto
@@ -158,15 +185,16 @@ public class UpLoadApiService {
             throw new UpFileExistException("file already exist");
         }
         upYun.setContentMD5(UpYun.md5(file));
-        boolean isSuccess =  upYun.writeFile(filePath, file, auto);
-        if(!isSuccess){
-            deleteFile(filePath,false);
+        boolean isSuccess = upYun.writeFile(filePath, file, auto);
+        if (!isSuccess) {
+            deleteFile(filePath, false);
         }
         return isSuccess;
     }
 
     /**
      * 文件夹上传
+     *
      * @param userId
      * @param dictionary
      * @return
@@ -184,13 +212,13 @@ public class UpLoadApiService {
         boolean isSuccess = true;
         try {
             isSuccess = doUploadUnCompressDic(dicPath, dictionary);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            deleteFile(dicPath,true);
-            isSuccess=false;
+            deleteFile(dicPath, true);
+            isSuccess = false;
         }
-        if(!isSuccess){
-            deleteFile(dicPath,true);
+        if (!isSuccess) {
+            deleteFile(dicPath, true);
         }
         return isSuccess;
     }
@@ -198,6 +226,7 @@ public class UpLoadApiService {
 
     /**
      * 同上
+     *
      * @param dicPath
      * @param dictionary
      * @return
@@ -217,7 +246,7 @@ public class UpLoadApiService {
                 if (file.isDirectory()) {
                     upYun.mkDir(subPath, true);
                     doUploadUnCompressDic(subPath, file);
-                }else {
+                } else {
                     upYun.writeFile(subPath, file, true);
                 }
             } catch (IOException | UpException e) {
@@ -230,20 +259,21 @@ public class UpLoadApiService {
 
     /**
      * 文件删除
+     *
      * @param path
      * @param isDictionary
      */
     @Async
-    public void deleteFile(String path,boolean isDictionary) throws IOException, UpException {
+    public void deleteFile(String path, boolean isDictionary) throws IOException, UpException {
         if (Objects.isNull(getFileInto(path))) {
             return;
         }
-        if(isDictionary){
+        if (isDictionary) {
             List<FolderItemDTO> folderItemDTOS = getDirInfo(path);
             folderItemDTOS.forEach(folderItemDTO -> {
-                String subPath = path+"/"+folderItemDTO.getName();
+                String subPath = path + "/" + folderItemDTO.getName();
                 try {
-                    deleteFile(subPath,folderItemDTO.isFolder());
+                    deleteFile(subPath, folderItemDTO.isFolder());
                 } catch (IOException | UpException e) {
                     e.printStackTrace();
                 }
