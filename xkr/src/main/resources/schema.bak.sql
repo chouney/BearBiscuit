@@ -20,7 +20,6 @@ CREATE TABLE xkr_resource(
 	`id` bigint(20) UNSIGNED NOT NULL COMMENT '资源id',
 	`class_id` bigint(20) UNSIGNED NOT NULL COMMENT '栏目id',
 	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
-	`keyword` varchar(255) NOT NULL DEFAULT '' COMMENT '关键词,由;分割,长度限制50字内',
 	`cost` int(10) UNSIGNED NOT NULL COMMENT '资源积分',
 	`status` tinyint(4) NOT NULL COMMENT '资源状态:1为正常,2为未审核,3为冻结,4为删除',
 	`report` tinyint(4) NOT NULL COMMENT '举报状态：0为正常,1为被举报',

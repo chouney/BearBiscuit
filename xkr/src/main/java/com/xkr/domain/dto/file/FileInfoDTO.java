@@ -1,4 +1,4 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.file;
 
 import com.xkr.util.DateUtil;
 import org.springframework.format.datetime.DateFormatter;

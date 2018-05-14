@@ -108,6 +108,28 @@
         </dependency>
 
 
+        <!-- elastic search-->
+        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch -->
+        <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
+        <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>6.2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+            <version>6.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>6.2.4</version>
+        </dependency>
+
+
         <!--在用maven 编译，打包过程中回出现javax.servlet找不到的情况，所以需要在这里配置-->
         <!--<dependency>
             <groupId>javax.servlet</groupId>
@@ -140,13 +162,6 @@
             <version>1.10</version>
         </dependency>
 
-        <!--
-           包含支持UI模版（Velocity，FreeMarker，JasperReports），
-           邮件服务，
-           脚本服务(JRuby)，
-           缓存Cache（EHCache），
-           任务计划Scheduling（uartz）。
-        -->
 
 
         <dependency>

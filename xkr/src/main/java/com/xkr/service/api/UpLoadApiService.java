@@ -2,8 +2,8 @@ package com.xkr.service.api;
 
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
-import com.xkr.domain.dto.FileInfoDTO;
-import com.xkr.domain.dto.FolderItemDTO;
+import com.xkr.domain.dto.file.FileInfoDTO;
+import com.xkr.domain.dto.file.FolderItemDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;
 import com.xkr.util.FileUtil;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,8 +38,11 @@ import java.util.stream.Collectors;
 @Service
 public class UpLoadApiService {
 
-    @Autowired
+    @Resource(name = "fileYun")
     private UpYun upYun;
+
+    @Resource(name = "imageYun")
+    private UpYun imageYun;
 
     @Autowired
     private UnCompressProcessorFacade compressProcessorFacade;
@@ -120,9 +124,7 @@ public class UpLoadApiService {
                 return false;
             }
             //上传压缩文件
-//            XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
-            XkrUser user = new XkrUser();
-            user.setId(124124124L); // TODO: 2018/5/10 test
+            XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
             if (Objects.isNull(user)) {
                 throw new UnauthenticatedException("user not login");
             }
@@ -162,7 +164,7 @@ public class UpLoadApiService {
         LocalDateTime date = LocalDateTime.now();
         String picPath = String.format(IMAGE_FILE_PATH_FORMAT, date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                 date.getHour(), date.getMinute(), date.getSecond(), imageFile.getName());
-        boolean isSuccess = upYun.writeFile(picPath, imageFile, true);
+        boolean isSuccess = imageYun.writeFile(picPath, imageFile, true);
         if (!isSuccess) {
             deleteFile(picPath, false);
         }

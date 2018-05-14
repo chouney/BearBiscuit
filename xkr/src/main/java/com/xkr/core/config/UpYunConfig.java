@@ -16,8 +16,11 @@ public class UpYunConfig {
     @Value("${upyun.cdn.host}")
     private String host;
 
-    @Value("${upyun.bucket}")
-    private String bucket;
+    @Value("${upyun.bucket.file}")
+    private String fileBucket;
+
+    @Value("${upyun.bucket.image}")
+    private String imageBucket;
 
     @Value("${upyun.opt.user}")
     private String optUser;
@@ -34,9 +37,18 @@ public class UpYunConfig {
     @Value("${upyun.root.path}")
     private String rootPath;
 
-    @Bean
-    public UpYun getUpYun(){
-        UpYun upYun =  new UpYun(bucket,optUser,optPassword);
+    @Bean(name = "fileYun")
+    public UpYun getFileUpYun(){
+        UpYun upYun =  new UpYun(fileBucket,optUser,optPassword);
+        upYun.setApiDomain(UpYun.ED_AUTO);
+        upYun.setDebug(debug);
+        upYun.setTimeout(timeout);
+        return upYun;
+    }
+
+    @Bean(name = "imageYun")
+    public UpYun getImageUpYun(){
+        UpYun upYun =  new UpYun(imageBucket,optUser,optPassword);
         upYun.setApiDomain(UpYun.ED_AUTO);
         upYun.setDebug(debug);
         upYun.setTimeout(timeout);
