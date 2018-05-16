@@ -7,6 +7,7 @@ package com.xkr.common;
  */
 public class Const {
 
+
     public static final String SESSION_COOKIE_NAME = "XKRSID";
 
     public static final String SESSION_LOGIN_TYPE_KEY = "login_type";

@@ -1,5 +1,6 @@
 package com.xkr.service.api;
 
+import com.google.common.collect.Lists;
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
 import com.xkr.domain.dto.file.FileInfoDTO;
@@ -11,7 +12,6 @@ import main.java.com.UpYun;
 import main.java.com.upyun.UpException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -97,7 +97,7 @@ public class UpLoadApiService {
      */
     public List<FolderItemDTO> getDirInfo(String dicPath) {
         if (Objects.isNull(dicPath)) {
-            return Lists.emptyList();
+            return Lists.newArrayList();
         }
         try {
             List<UpYun.FolderItem> folderItems = upYun.readDir(dicPath);
@@ -106,7 +106,7 @@ public class UpLoadApiService {
         } catch (IOException | UpException e) {
             e.printStackTrace();
         }
-        return Lists.emptyList();
+        return Lists.newArrayList();
     }
 
 

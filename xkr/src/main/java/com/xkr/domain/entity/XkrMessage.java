@@ -1,10 +1,13 @@
 package com.xkr.domain.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_message")
-public class XkrMessage {
+public class XkrMessage extends BaseEntity implements Serializable{
+
+    private static final long serialVersionUID = 8853423226373183851L;
     /**
      * 消息id
      */
@@ -13,7 +16,7 @@ public class XkrMessage {
     private Long id;
 
     /**
-     * 消息来源id类型
+     * 消息来源id类型,1用户id,2管理员id
      */
     @Column(name = "from_type_code")
     private Byte fromTypeCode;
@@ -25,7 +28,7 @@ public class XkrMessage {
     private Long fromId;
 
     /**
-     * 消息目标id类型
+     * 消息目标id类型,1用户id,2管理员id
      */
     @Column(name = "to_type_code")
     private Byte toTypeCode;
@@ -42,7 +45,7 @@ public class XkrMessage {
     private String content;
 
     /**
-     * 消息状态
+     * 消息状态,1为未读,2为已读,3为删除
      */
     private Byte status;
 

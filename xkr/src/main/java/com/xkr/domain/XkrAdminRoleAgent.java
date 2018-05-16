@@ -1,9 +1,8 @@
 package com.xkr.domain;
 
+import com.google.common.collect.Lists;
 import com.xkr.dao.mapper.XkrAdminRoleMapper;
-import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrAdminRole;
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,7 +26,7 @@ public class XkrAdminRoleAgent {
 
     public List<XkrAdminRole> getAdminRoleByIds(List<Integer> ids) {
         if (CollectionUtils.isEmpty(ids)) {
-            return Lists.emptyList();
+            return Lists.newArrayList();
         }
         return xkrAdminRoleMapper.selectByIds(ids);
     }

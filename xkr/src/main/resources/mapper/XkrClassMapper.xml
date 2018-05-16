@@ -14,4 +14,25 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
+
+  <sql id="class_field" >
+    id,parent_class_id,path,class_name,status,create_time,update_time,ext
+  </sql>
+
+  <select id="getAllChildClassByClassId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT <include refid="class_field"/>
+    FROM xkr_class WHERE path like concat('%', #{classId},'%') and status = 1;
+  </select>
+
+  <select id="getAll" resultMap="BaseResultMap">
+    SELECT <include refid="class_field"/>
+    FROM xkr_class WHERE status = 1
+  </select>
+
+  <update id="deleteClassByClassId" parameterType="java.lang.Long" >
+    UPDATE xkr_class
+    SET status = 2 WHERE path like concat('%', #{classId},'%')
+  </update>
+
+
 </mapper>

@@ -19,7 +19,7 @@ public class XkrAdminPermission {
     private String permissionName;
 
     /**
-     * 权限状态
+     * 权限状态 1正常2删除
      */
     private Byte status;
 

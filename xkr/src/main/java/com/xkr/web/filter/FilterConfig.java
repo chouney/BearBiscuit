@@ -64,13 +64,17 @@ public class FilterConfig {
         //<!-- 过滤链定义，从上向下顺序执行，一般将 /**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
         filterChainDefinitionMap.put("/**/login", "anon");
-        filterChainDefinitionMap.put("/user/reg", "anon");
-        //配置记住我或认证通过可以访问的地址
-//        filterChainDefinitionMap.put("/console/**", "admin");
-//        filterChainDefinitionMap.put("/member/**", "custom");
-        filterChainDefinitionMap.put("/admin/**", "adminLogin");
-        filterChainDefinitionMap.put("/user/**", "userLogin");
         filterChainDefinitionMap.put("/test/**", "anon");
+        filterChainDefinitionMap.put("/api/user/reg", "anon");
+        filterChainDefinitionMap.put("/api/admin/**", "adminLogin");
+        filterChainDefinitionMap.put("/api/res/**", "userLogin");
+        filterChainDefinitionMap.put("/api/common/**", "userLogin");
+        filterChainDefinitionMap.put("/api/msg/**", "userLogin");
+        filterChainDefinitionMap.put("/api/user/**", "userLogin");
+        filterChainDefinitionMap.put("/api/cls/**", "userLogin");
+        filterChainDefinitionMap.put("/api/comment/**", "userLogin");
+        filterChainDefinitionMap.put("/api/remark/**", "userLogin");
+        filterChainDefinitionMap.put("/api/payment/**", "userLogin");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;

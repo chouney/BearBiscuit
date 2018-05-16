@@ -1,4 +1,5 @@
-import com.xkr.Application;
+package com.xkr;
+
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;

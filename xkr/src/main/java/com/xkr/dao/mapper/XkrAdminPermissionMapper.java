@@ -9,4 +9,6 @@ import java.util.List;
 @Service
 public interface XkrAdminPermissionMapper extends CustomerMapper<XkrAdminPermission> {
     List<XkrAdminPermission> selectByIds(List<Integer> ids);
+
+    List<XkrAdminPermission> getAll();
 }

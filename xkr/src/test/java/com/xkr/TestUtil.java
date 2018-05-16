@@ -1,3 +1,5 @@
+package com.xkr;
+
 import com.xkr.util.CamelCaseUtil;
 import com.xkr.util.DateUtil;
 import com.xkr.util.UuidUtil;

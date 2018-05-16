@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.xkr.domain.dto.search.BaseIndexDTO;
 import com.xkr.domain.dto.search.SearchResultDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
+import com.xkr.util.ArgUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -21,10 +22,9 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
-import org.hamcrest.MatcherAssert;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -35,8 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
 
 /**
  * @author chriszhang
@@ -61,9 +59,9 @@ public class SearchApiService {
             final IndexResponse response = client.index(request);
 
             if (response.getResult() == DocWriteResponse.Result.CREATED) {
-                MatcherAssert.assertThat(response.getVersion(), is(1L));
+                ArgUtil.assertEquals(response.getVersion(),1L);
             } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
-                MatcherAssert.assertThat(response.getVersion(), is(greaterThan(1L)));
+                ArgUtil.assertNotEquals(response.getVersion(), 1L);
             }
             return true;
         } catch (final IOException e) {

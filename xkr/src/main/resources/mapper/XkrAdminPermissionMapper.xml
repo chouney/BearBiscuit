@@ -30,4 +30,10 @@
     </if>
   </select>
 
+  <select id="getAll"  resultMap="BaseResultMap">
+    SELECT <include refid="permission_field"/>
+    FROM xkr_admin_permission
+    WHERE status = 1
+  </select>
+
 </mapper>

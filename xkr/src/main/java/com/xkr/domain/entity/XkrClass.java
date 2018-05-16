@@ -30,7 +30,7 @@ public class XkrClass {
     private String className;
 
     /**
-     * 分类状态
+     * 分类状态 1正常,2删除
      */
     private Byte status;
 

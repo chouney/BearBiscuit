@@ -3,16 +3,12 @@ package com.xkr.domain;
 import com.xkr.common.UserStatusEnum;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrUserMapper;
-import com.xkr.domain.entity.XkrAdminRole;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.util.PasswordUtil;
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Objects;
 
 /**

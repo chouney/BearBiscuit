@@ -1,12 +1,10 @@
 package com.xkr.core.shiro.admin;
 
-import com.xkr.domain.XkrAdminPermissionAgent;
+import com.google.common.collect.Lists;
 import com.xkr.domain.XkrAdminRoleAgent;
-import com.xkr.domain.entity.XkrAdminPermission;
 import com.xkr.domain.entity.XkrAdminRole;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -28,7 +26,7 @@ public class AdminRolePermissionResolver implements RolePermissionResolver {
 
     @Override
     public Collection<Permission> resolvePermissionsInRole(String roleString) {
-        List<Permission> permissions =Lists.emptyList();
+        List<Permission> permissions = Lists.newArrayList();
 
         XkrAdminRole xkrAdminRole = adminRoleAgent.getAdminRoleById(Integer.valueOf(roleString));
         if(Objects.isNull(xkrAdminRole)){
