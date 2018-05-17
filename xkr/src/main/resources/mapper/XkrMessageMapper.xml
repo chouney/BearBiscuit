@@ -23,8 +23,8 @@
   </sql>
 
   <update id="updateMessageStatus" parameterType="java.util.Map">
-    UPDATE xkr_message SET status = #{status}
-    where id in 
+    UPDATE xkr_message SET status = #{status}, update_time = now()
+    where id IN
     <foreach collection="messageIds" item="id" separator="," open="(" close=")">
       #{id}
     </foreach>

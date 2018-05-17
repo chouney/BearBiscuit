@@ -5,11 +5,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
+import com.xkr.domain.dto.ListMessageDTO;
 import com.xkr.domain.dto.MessageDTO;
 import com.xkr.service.MessageService;
 import com.xkr.web.model.BasicResult;
+import com.xkr.web.model.vo.ListMessageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,13 +47,13 @@ public class MessageController {
                                       @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
                                       @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         try {
-            Page page = PageHelper.startPage(pageNum,size,true);
-            List<MessageDTO> result = messageService.getToUserMessage(type, Long.valueOf(userId));
-            Map<String,Object> data = ImmutableMap.of(
-                    "msgList",result,
-                    "count",page.getTotal()
-            );
-            return new BasicResult(data);
+            ListMessageDTO result = messageService.getToUserMessage(type, Long.valueOf(userId), pageNum, size);
+
+            ListMessageVO vo = new ListMessageVO();
+
+            BeanUtils.copyProperties(result,vo);
+
+            return new BasicResult<>(vo);
         } catch (Exception e) {
             logger.error("MessageController getUserMessage error ,userId:{}", userId, e);
         }

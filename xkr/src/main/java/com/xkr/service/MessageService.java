@@ -1,9 +1,12 @@
 package com.xkr.service;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xkr.common.LoginEnum;
 import com.xkr.domain.XkrMessageAgent;
+import com.xkr.domain.dto.ListMessageDTO;
 import com.xkr.domain.dto.MessageDTO;
 import com.xkr.domain.entity.XkrMessage;
 import org.slf4j.Logger;
@@ -46,12 +49,13 @@ public class MessageService {
         messageAgent.saveToUserMessage(fromUserType, fromUserId, LoginEnum.CUSTOMER, userId, content);
     }
 
-    public List<MessageDTO> getToUserMessage(int frontType, long userId) {
-        List<MessageDTO> result = Lists.newArrayList();
+    public ListMessageDTO getToUserMessage(int frontType, long userId,int pageNum,int size) {
+        ListMessageDTO result = new ListMessageDTO();
         if (userId < 0L) {
             return result;
         }
         List<XkrMessage> list;
+        Page page = PageHelper.startPage(pageNum,size,true);
 
         if (MESSAGE_FRONT_TYPE_UNREAD == frontType) {
             list = messageAgent.getUnReadToUserMessage(userId);
@@ -62,8 +66,10 @@ public class MessageService {
             MessageDTO dto = new MessageDTO();
             dto.setDate(xkrMessage.getUpdateTime());
             dto.setMsg(xkrMessage.getContent());
-            result.add(dto);
+            result.getMsgList().add(dto);
         });
+
+        result.setTotalCount((int) page.getTotal());
 
         return result;
     }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
+ * 解压缩封装类
  * @author chriszhang
  * @version 1.0
  * @date 2018/5/9

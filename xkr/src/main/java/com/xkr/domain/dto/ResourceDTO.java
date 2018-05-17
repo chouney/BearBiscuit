@@ -1,8 +1,6 @@
-package com.xkr.domain.dto.search;
+package com.xkr.domain.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.serializer.ToStringSerializer;
+import com.xkr.domain.dto.search.BaseIndexDTO;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +10,7 @@ import java.util.Date;
  * @version 1.0
  * @date 2018/5/11
  */
-public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
+public class ResourceDTO implements Serializable{
 
     private static final long serialVersionUID = -8130347410235272476L;
 
@@ -21,6 +19,9 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
      "content":"内容简要",
      "resourceId":"资源id",
      "classId":"栏目id",
+     "className":"栏目",
+     "rootClassId":"根栏目id",
+     "rootClassName":"根栏目",
      "userName":"会员账号",
      "userId":"会员id",
      "updateTime":"更新时间",
@@ -40,6 +41,12 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
 
     private Long classId;
 
+    private String className;
+
+    private Long rootClassId;
+
+    private String rootClassName;
+
     private String userName;
 
     private Long userId;
@@ -53,15 +60,6 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
     private Integer report;
 
     private Date updateTime;
-
-    public ResourceIndexDTO() {
-        super("xkr", "resource");
-    }
-
-    @Override
-    public String getIndexKey() {
-        return String.valueOf(this.resourceId);
-    }
 
     public Long getResourceId() {
         return resourceId;
@@ -93,6 +91,30 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
 
     public void setClassId(Long classId) {
         this.classId = classId;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public Long getRootClassId() {
+        return rootClassId;
+    }
+
+    public void setRootClassId(Long rootClassId) {
+        this.rootClassId = rootClassId;
+    }
+
+    public String getRootClassName() {
+        return rootClassName;
+    }
+
+    public void setRootClassName(String rootClassName) {
+        this.rootClassName = rootClassName;
     }
 
     public String getUserName() {

@@ -75,6 +75,15 @@ public class ClassDaoTestCase extends BaseDaoTest{
     }
 
     @Test
+    public void testGetClassByClassIds(){
+        List<Long> classIds = ImmutableList.of(
+                1L,4124124214124L,12312125125125L
+        );
+        List<XkrClass> list = xkrClassMapper.getClassByClassIds(classIds);
+        assertEquals(3,list.size());
+    }
+
+    @Test
     public void testDeleteClassByClassId(){
         Long id = 4124124214124L;
         xkrClassMapper.deleteClassByClassId(id);

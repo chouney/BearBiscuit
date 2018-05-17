@@ -1,5 +1,9 @@
 package com.xkr.domain.dto.search;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,8 +11,9 @@ import java.util.Date;
  * @version 1.0
  * @date 2018/5/11
  */
-public class OrderIndexDTO extends BaseIndexDTO {
+public class OrderIndexDTO extends BaseIndexDTO implements Serializable{
 
+    private static final long serialVersionUID = 138246468905165630L;
     /**
      * "orderId":"账单id",
      * ”payAmount“:"充值金额,元",
@@ -19,7 +24,6 @@ public class OrderIndexDTO extends BaseIndexDTO {
      * "payId":"第三方订单号"
      * "status":1 //支付状态
      */
-
     private Long orderId;
 
     private String payAmount;

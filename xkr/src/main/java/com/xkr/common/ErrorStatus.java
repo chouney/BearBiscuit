@@ -16,6 +16,12 @@ public enum ErrorStatus {
     NOT_FOUND(404,"资源未找到"),
     ERROR(500,"服务器异常"),
 
+    RESOURCE_NOT_FOUND(10404,"资源未找到"),
+    RESOURCE_FREEZED(10400,"资源已被冻结"),
+    RESOURCE_USER_FREEZED(10401,"您无此权限"),
+    RESOURCE_PAY_FAILED(10402,"财富值不足"),
+
+
 
     ;
     private int code;

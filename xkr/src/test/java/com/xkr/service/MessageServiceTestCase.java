@@ -56,9 +56,9 @@ public class MessageServiceTestCase extends MockServiceTest {
         Mockito.when(messageAgent.getAllToUserMessage(Mockito.anyLong())).thenReturn(messages);
         Mockito.when(messageAgent.getUnReadToUserMessage(Mockito.anyLong())).thenReturn(messages2);
 
-        System.out.println(JSON.toJSONString(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_ALL,1L)));
-        Assert.equals(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_ALL,1L).size(),2);
-        Assert.equals(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_UNREAD,1L).size(),1);
+        System.out.println(JSON.toJSONString(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_ALL,1L,1,10)));
+        Assert.equals(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_ALL,1L,1,10).getTotalCount(),2);
+        Assert.equals(messageService.getToUserMessage(MessageService.MESSAGE_FRONT_TYPE_UNREAD,1L,1,10).getTotalCount(),1);
     }
 
 }

@@ -55,6 +55,9 @@ public class UserShiroRealm extends AuthorizingRealm {
             throw new UnknownAccountException();
         }
 
+        if((byte)XkrUserAgent.USER_STATUS_FREEZED == xkrUser.getStatus()){
+            throw new LockedAccountException();
+        }
         //todo 账号status判断;
 
         //加密方式;

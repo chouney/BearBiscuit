@@ -1,5 +1,7 @@
 package com.xkr.domain.dto.search;
 
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,8 +9,9 @@ import java.util.Date;
  * @version 1.0
  * @date 2018/5/11
  */
-public class CommentIndexDTO extends BaseIndexDTO {
+public class CommentIndexDTO extends BaseIndexDTO implements Serializable{
 
+    private static final long serialVersionUID = -4029774414056704378L;
     /**
      * "commentId":"评论id",
      * "resId":"资源id",
@@ -20,7 +23,6 @@ public class CommentIndexDTO extends BaseIndexDTO {
      * "updateTime":"更新时间",
      * "status":"评论状态"
      */
-
     private Long commentId;
 
     private Long resourceId;

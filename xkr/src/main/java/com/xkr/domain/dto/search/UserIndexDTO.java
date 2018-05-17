@@ -1,5 +1,8 @@
 package com.xkr.domain.dto.search;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+
 import java.util.Date;
 
 /**
@@ -16,7 +19,6 @@ public class UserIndexDTO extends BaseIndexDTO {
      * "createTime":"注册时间",
      * "status":"会员状态"
      */
-
     private Long userId;
 
     private String userName;

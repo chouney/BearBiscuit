@@ -9,6 +9,8 @@ import java.util.List;
 @Service
 public interface XkrClassMapper extends CustomerMapper<XkrClass> {
 
+    List<XkrClass> getClassByClassIds(List<Long> classIds);
+
     List<XkrClass> getAllChildClassByClassId(Long classId);
 
     List<XkrClass> getAll();

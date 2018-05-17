@@ -19,6 +19,15 @@
     id,parent_class_id,path,class_name,status,create_time,update_time,ext
   </sql>
 
+  <select id="getClassByClassIds" parameterType="java.util.List" resultMap="BaseResultMap">
+    SELECT <include refid="class_field"/>
+    FROM xkr_class WHERE id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    and status = 1;
+  </select>
+
   <select id="getAllChildClassByClassId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     SELECT <include refid="class_field"/>
     FROM xkr_class WHERE path like concat('%', #{classId},'%') and status = 1;
@@ -31,7 +40,7 @@
 
   <update id="deleteClassByClassId" parameterType="java.lang.Long" >
     UPDATE xkr_class
-    SET status = 2 WHERE path like concat('%', #{classId},'%')
+    SET status = 2 , update_time = now() WHERE path like concat('%', #{classId},'%')
   </update>
 
 

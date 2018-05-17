@@ -1,16 +1,25 @@
 package com.xkr.domain;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrClassMapper;
+import com.xkr.domain.dto.ClassMenuDTO;
 import com.xkr.domain.entity.XkrClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author chriszhang
@@ -39,18 +48,44 @@ public class XkrClassAgent {
     public static final int CLASS_STATUS_DELETED = 2;
 
 
+    private LoadingCache<Long, List<XkrClass>> childClassCache = CacheBuilder
+            .newBuilder()
+            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .build(new CacheLoader<Long, List<XkrClass>>() {
+                @Override
+                public List<XkrClass> load(Long key) throws Exception {
+                    return xkrClassMapper.getAllChildClassByClassId(key);
+                }
+            });
+
+    public XkrClass getClassById(Long classId){
+        if(Objects.isNull(classId)){
+            logger.info("XkrClassAgent getClassById param classId invalid null");
+            return null;
+        }
+        return xkrClassMapper.selectByPrimaryKey(classId);
+    }
+
+    public List<XkrClass> getClassByIds(List<Long> classIds){
+        if(CollectionUtils.isEmpty(classIds)){
+            logger.info("XkrClassAgent getClassByIds param classId invalid null");
+            return null;
+        }
+        return xkrClassMapper.getClassByClassIds(classIds);
+    }
+
     public List<XkrClass> getAllChildClassByClassId(Long classId){
         List<XkrClass> list = Lists.newArrayList();
         if(Objects.isNull(classId)){
             logger.info("XkrClassAgent getAllChildClassByClassId param classId invalid null");
             return list;
         }
-        list = xkrClassMapper.getAllChildClassByClassId(classId);
+        try {
+            list = childClassCache.get(classId);
+        } catch (ExecutionException e) {
+            logger.error("ClassService getAllChildClassByClassId error, will return empty list,error:",e);
+        }
         return list;
-    }
-
-    public List<XkrClass> getAllClass(){
-        return xkrClassMapper.getAll();
     }
 
     public boolean updateClassNameByClassId(Long classId,String className){
@@ -61,7 +96,12 @@ public class XkrClassAgent {
         XkrClass xkrClass = new XkrClass();
         xkrClass.setId(classId);
         xkrClass.setClassName(className);
-        return xkrClassMapper.updateByPrimaryKeySelective(xkrClass) == 1;
+        xkrClass.setUpdateTime(new Date());
+        if(xkrClassMapper.updateByPrimaryKeySelective(xkrClass) == 1){
+            childClassCache.cleanUp();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -74,7 +114,11 @@ public class XkrClassAgent {
             logger.info("XkrClassAgent deleteClassByClassId param classId invalid null");
             return false;
         }
-        return xkrClassMapper.deleteClassByClassId(classId) == 1;
+        if(xkrClassMapper.deleteClassByClassId(classId) == 1){
+            childClassCache.cleanUp();
+            return true;
+        }
+        return false;
     }
 
 
@@ -96,7 +140,11 @@ public class XkrClassAgent {
             xkrClass.setClassName(parentClass.getPath()+"-"+classId);
             xkrClass.setParentClassId(parendClassId);
         }
-        return xkrClassMapper.insert(xkrClass) == 1;
+        if(xkrClassMapper.insert(xkrClass) == 1){
+            childClassCache.cleanUp();
+            return true;
+        }
+        return false;
     }
 
 }

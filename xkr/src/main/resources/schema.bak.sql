@@ -23,10 +23,10 @@ CREATE TABLE xkr_resource(
 	`cost` int(10) UNSIGNED NOT NULL COMMENT '资源积分',
 	`status` tinyint(4) NOT NULL COMMENT '资源状态:1为正常,2为未审核,3为冻结,4为删除',
 	`report` tinyint(4) NOT NULL COMMENT '举报状态：0为正常,1为被举报',
-	`file_size` bigint(20) UNSIGNED NOT NULL COMMENT '文件大小',
+	`file_size` varchar(64) NOT NULL COMMENT '文件大小',
 	`title` varchar(255) NOT NULL COMMENT '文件标题,80字内',
 	`detail` TEXT  NOT NULL COMMENT '资源详情，5000字内',
-	`resource_url` varchar(255) NOT NULL COMMENT '资源url',
+	`resource_url` varchar(255) NOT NULL COMMENT '资源uri,表示资源根目录(md5加密后文件)',
 	`download_count` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '下载量',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -61,14 +61,14 @@ CREATE TABLE xkr_resource_user(
 	`id` bigint(20) UNSIGNED NOT NULL COMMENT 'id',
 	`resource_id` bigint(20) UNSIGNED NOT NULL COMMENT '资源id',
 	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
-	`status` tinyint(4) NOT NULL COMMENT '用户资源状态,已支付',
+	`status` tinyint(4) NOT NULL COMMENT '用户资源状态,1已支付',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段，存储download_count，resource_url等',
 	PRIMARY KEY (`id`),
 	INDEX `idx_res_sta` (`resource_id`,`status`,`update_time`),
 	INDEX `idx_user_sta` (`user_id`,`status`,`update_time`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户资源表';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户资源支付表';
 
 
 DROP TABLE IF EXISTS `xkr_login_token`;

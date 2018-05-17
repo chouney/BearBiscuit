@@ -48,7 +48,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         properties.setProperty("reasonable", "true");
         properties.setProperty("supportMethodsArguments", "true");
         properties.setProperty("returnPageInfo", "check");
-        properties.setProperty("params", "count=countSql");
+        properties.setProperty("params", "count=countSql;");
         pageHelper.setProperties(properties);
 
         //添加插件

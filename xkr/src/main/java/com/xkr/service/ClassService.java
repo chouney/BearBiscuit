@@ -1,8 +1,5 @@
 package com.xkr.service;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.xkr.domain.XkrClassAgent;
@@ -12,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author chriszhang
@@ -31,74 +27,43 @@ public class ClassService {
     @Autowired
     private XkrClassAgent classAgent;
 
-    private LoadingCache<String, List<ClassMenuDTO>> allClassCache = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(60, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, List<ClassMenuDTO>>() {
-                @Override
-                public List<ClassMenuDTO> load(String key) throws Exception {
-                    List<ClassMenuDTO> result = Lists.newArrayList();
-
-                    List<XkrClass> xkrClassList;
-
-                    xkrClassList = classAgent.getAllChildClassByClassId(Long.valueOf(key));
-
-
-                    build(result, xkrClassList);
-
-                    return result;
-                }
-            });
-
     public List<ClassMenuDTO> getAllClass() {
-        try {
-            return allClassCache.get(String.valueOf(XkrClassAgent.ROOT_CLASS_ID));
-        } catch (ExecutionException e) {
-            logger.error("ClassService getAllClass error, will return empty list,error:",e);
-        }
-        return Lists.newArrayList();
-    }
-
-    public List<ClassMenuDTO> getAllChildClassByClassId(Long classId) {
         List<ClassMenuDTO> list = Lists.newArrayList();
-        if(Objects.isNull(classId)){
-            logger.error("ClassService getAllChildClassByClassId invalid null param, will return empty list");
-            return list;
-        }
 
-        try {
-            return allClassCache.get(String.valueOf(classId));
-        } catch (ExecutionException e) {
-            logger.error("ClassService getAllChildClassByClassId error, will return empty list,error:",e);
-        }
+        List<XkrClass> xkrClasses = classAgent.getAllChildClassByClassId((long) XkrClassAgent.ROOT_CLASS_ID);
+
+        build(list, xkrClasses);
+
         return list;
     }
 
-    public boolean updateClassNameById(Long classId,String className){
-        if(classAgent.updateClassNameByClassId(classId,className)){
-            //清空缓存
-            allClassCache.cleanUp();
-            return true;
+    public ClassMenuDTO getAllChildClassByClassId(Long classId) {
+        List<ClassMenuDTO> list = Lists.newArrayList();
+        if (Objects.isNull(classId)) {
+            logger.error("ClassService getAllChildClassByClassId invalid null param, will return empty list");
+            return null;
         }
-        return false;
+
+        List<XkrClass> xkrClasses = classAgent.getAllChildClassByClassId(classId);
+
+        build(list, xkrClasses);
+
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0);
     }
 
-    public boolean deleteClassByClassId(Long classId){
-        if(classAgent.deleteClassByClassId(classId)){
-            //清空缓存
-            allClassCache.cleanUp();
-            return true;
-        }
-        return false;
+    public boolean updateClassNameById(Long classId, String className) {
+        return classAgent.updateClassNameByClassId(classId, className);
     }
 
-    public boolean saveNewClass(String className, Long parentClassId){
-        if(classAgent.saveNewClass(className,parentClassId)){
-            //清空缓存
-            allClassCache.cleanUp();
-            return true;
-        }
-        return false;
+    public boolean deleteClassByClassId(Long classId) {
+        return classAgent.deleteClassByClassId(classId);
+    }
+
+    public boolean saveNewClass(String className, Long parentClassId) {
+        return classAgent.saveNewClass(className, parentClassId);
     }
 
 

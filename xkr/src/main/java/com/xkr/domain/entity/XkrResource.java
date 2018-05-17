@@ -25,11 +25,6 @@ public class XkrResource {
     private Long userId;
 
     /**
-     * 关键词,由;分割,长度限制50字内
-     */
-    private String keyword;
-
-    /**
      * 资源积分
      */
     private Integer cost;
@@ -48,7 +43,7 @@ public class XkrResource {
      * 文件大小
      */
     @Column(name = "file_size")
-    private Long fileSize;
+    private String fileSize;
 
     /**
      * 文件标题,80字内
@@ -56,7 +51,7 @@ public class XkrResource {
     private String title;
 
     /**
-     * 资源url
+     * 资源uri,表示资源根目录(md5加密后文件名(带后缀的))
      */
     @Column(name = "resource_url")
     private String resourceUrl;
@@ -80,7 +75,7 @@ public class XkrResource {
     private Date updateTime;
 
     /**
-     * 扩展字段，存储内容简要等,file_size等
+     * 扩展字段，存储(md5加密后文件名(不带后缀的))
      */
     private String ext;
 
@@ -144,24 +139,6 @@ public class XkrResource {
     }
 
     /**
-     * 获取关键词,由;分割,长度限制50字内
-     *
-     * @return keyword - 关键词,由;分割,长度限制50字内
-     */
-    public String getKeyword() {
-        return keyword;
-    }
-
-    /**
-     * 设置关键词,由;分割,长度限制50字内
-     *
-     * @param keyword 关键词,由;分割,长度限制50字内
-     */
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
-
-    /**
      * 获取资源积分
      *
      * @return cost - 资源积分
@@ -220,7 +197,7 @@ public class XkrResource {
      *
      * @return file_size - 文件大小
      */
-    public Long getFileSize() {
+    public String getFileSize() {
         return fileSize;
     }
 
@@ -229,7 +206,7 @@ public class XkrResource {
      *
      * @param fileSize 文件大小
      */
-    public void setFileSize(Long fileSize) {
+    public void setFileSize(String fileSize) {
         this.fileSize = fileSize;
     }
 

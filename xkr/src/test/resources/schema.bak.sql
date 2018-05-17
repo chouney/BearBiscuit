@@ -33,6 +33,15 @@ CREATE TABLE xkr_resource(
 	PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
+insert into xkr_resource values('1','10','100','1','1','0','11','title','detail','resource_url',
+1,now(),now(),'{}');
+insert into xkr_resource values('2','12','102','2','1','0','11','title','detail','resource_url',
+																		1,now(),now(),'{}');
+insert into xkr_resource values('3','13','103','3','1','0','11','title','detail','resource_url',
+																		1,now(),now(),'{}');
+insert into xkr_resource values('4','14','104','4','1','0','11','title','detail','resource_url',
+																		1,now(),now(),'{}');
+
 DROP TABLE IF EXISTS xkr_user;
 CREATE TABLE xkr_user(
 	id bigint(20) UNSIGNED NOT NULL ,
@@ -61,6 +70,10 @@ CREATE TABLE xkr_resource_user(
 	PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
+insert into xkr_resource_user VALUES ('1','10','100','1',now(),now(),'{}');
+insert into xkr_resource_user VALUES ('2','12','102','1',now(),now(),'{}');
+insert into xkr_resource_user VALUES ('3','13','103','1',now(),now(),'{}');
+insert into xkr_resource_user VALUES ('4','14','104','1',now(),now(),'{}');
 
 DROP TABLE IF EXISTS xkr_login_token;
 CREATE TABLE xkr_login_token(

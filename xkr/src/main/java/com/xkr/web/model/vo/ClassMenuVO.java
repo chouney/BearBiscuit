@@ -1,4 +1,4 @@
-package com.xkr.domain.dto;
+package com.xkr.web.model.vo;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.ToStringSerializer;
@@ -12,15 +12,16 @@ import java.util.List;
  * @version 1.0
  * @date 2018/5/16
  */
-public class ClassMenuDTO implements Serializable{
+public class ClassMenuVO implements Serializable{
 
-    private static final long serialVersionUID = 9078845808780395079L;
+    private static final long serialVersionUID = 8235865000438668222L;
 
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long classId;
 
     private String className;
 
-    private List<ClassMenuDTO> child = Lists.newArrayList();
+    private List<ClassMenuVO> child = Lists.newArrayList();
 
     public Long getClassId() {
         return classId;
@@ -38,11 +39,11 @@ public class ClassMenuDTO implements Serializable{
         this.className = className;
     }
 
-    public List<ClassMenuDTO> getChild() {
+    public List<ClassMenuVO> getChild() {
         return child;
     }
 
-    public void setChild(List<ClassMenuDTO> child) {
+    public void setChild(List<ClassMenuVO> child) {
         this.child = child;
     }
 }

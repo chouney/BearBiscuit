@@ -2,13 +2,14 @@ package com.xkr.service.api;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.xkr.domain.dto.search.BaseIndexDTO;
-import com.xkr.domain.dto.search.SearchResultDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.util.ArgUtil;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -24,16 +25,13 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 
 /**
@@ -59,7 +57,7 @@ public class SearchApiService {
             final IndexResponse response = client.index(request);
 
             if (response.getResult() == DocWriteResponse.Result.CREATED) {
-                ArgUtil.assertEquals(response.getVersion(),1L);
+                ArgUtil.assertEquals(response.getVersion(), 1L);
             } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
                 ArgUtil.assertNotEquals(response.getVersion(), 1L);
             }
@@ -71,10 +69,93 @@ public class SearchApiService {
         return false;
     }
 
+    public <T extends BaseIndexDTO> void getAndBuildIndexDTOByIndexId(T targetDTO, String index, String type, String docId) {
+        if (!BaseIndexDTO.class.isAssignableFrom(targetDTO.getClass()) || StringUtils.isEmpty(index)
+                || StringUtils.isEmpty(type) || StringUtils.isEmpty(docId)) {
+            throw new IllegalArgumentException("error argument");
+        }
+        try {
+            GetRequest getRequest = new GetRequest(index, type, docId);
+            GetResponse getResponse = client.get(getRequest);
+            if(getResponse.isExists()){
+                BeanUtils.populate(targetDTO,getResponse.getSourceAsMap());
+            }
+        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
-    public SearchResultListDTO searchByKeyWordInField(String keyword, Map<String, Float> fieldWeight, Map<String,Object> filterFieldValues,
-                                             Pair<Date,Date> rangeDate, String dateKey,
-                                             String sortKey, Set<String> hightField, int offset, int size) {
+    public <T> SearchResultListDTO<T> searchByFilterField(Class<T> resultIndexDTO, Map<String, Object> filterFieldValues,
+                                                          Pair<Date, Date> rangeDate, String dateKey,
+                                                          String sortKey, int offset, int size) {
+        if (offset < 0 || size < 0) {
+            throw new IllegalArgumentException("error argument");
+        }
+        try {
+
+
+            SearchSourceBuilder builder = new SearchSourceBuilder()
+                    .timeout(TimeValue.timeValueMinutes(2));
+
+            //排序
+            if (!StringUtils.isEmpty(sortKey)) {
+                builder.sort(sortKey, SortOrder.DESC);
+            }
+            //分页
+            builder.from(offset).size(size);
+
+            //设置查询命令
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+            //进行条件过滤
+            if (!CollectionUtils.isEmpty(filterFieldValues)) {
+                filterFieldValues.forEach((k, v) -> {
+                    if (Collection.class.isAssignableFrom(v.getClass())) {
+                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
+                    } else {
+                        boolQueryBuilder.filter(QueryBuilders.termQuery(k, v));
+                    }
+                });
+            }
+
+            //进行时间删选
+            if (Objects.nonNull(rangeDate) && !StringUtils.isEmpty(dateKey)) {
+
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(dateKey);
+                if (Objects.nonNull(rangeDate.getLeft())) {
+                    rangeQueryBuilder.gte(rangeDate.getLeft().getTime());
+                }
+                if (Objects.nonNull(rangeDate.getRight())) {
+                    rangeQueryBuilder.lte(rangeDate.getRight().getTime());
+                }
+                boolQueryBuilder.filter(rangeQueryBuilder);
+            }
+
+            builder.query(boolQueryBuilder);
+
+            SearchRequest request = new SearchRequest()
+                    .source(builder);
+
+
+            SearchResponse response = client.search(request);
+
+            SearchHits hits = response.getHits();
+
+            SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
+
+            buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
+
+            return resultListDTO;
+
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public <T> SearchResultListDTO<T> searchByKeyWordInField(Class<T> resultIndexDTO, String keyword, Map<String, Float> fieldWeight, Map<String, Object> filterFieldValues,
+                                                             Pair<Date, Date> rangeDate, String dateKey,
+                                                             String sortKey, Set<String> hightField, int offset, int size) {
         if (offset < 0 || size < 0) {
             throw new IllegalArgumentException("error argument");
         }
@@ -86,7 +167,7 @@ public class SearchApiService {
 
             //高亮
             HighlightBuilder highlightBuilder = new HighlightBuilder();
-            if(!CollectionUtils.isEmpty(hightField)){
+            if (!CollectionUtils.isEmpty(hightField)) {
                 hightField.forEach(highlightBuilder::field);
                 builder.highlighter(highlightBuilder);
 
@@ -103,9 +184,9 @@ public class SearchApiService {
 //            builder.explain(true);
 
             //如果字段为空
-            if(CollectionUtils.isEmpty(fieldWeight)){
+            if (CollectionUtils.isEmpty(fieldWeight)) {
                 fieldWeight = ImmutableMap.of(
-                        "*",1F
+                        "*", 1F
                 );
             }
 
@@ -114,17 +195,24 @@ public class SearchApiService {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
             //进行条件过滤
-            if(!CollectionUtils.isEmpty(filterFieldValues)){
-                filterFieldValues.forEach((k,v)-> boolQueryBuilder.filter(QueryBuilders.termQuery(k,v)));
+            if (!CollectionUtils.isEmpty(filterFieldValues)) {
+                filterFieldValues.forEach((k, v) -> {
+                    if (Collection.class.isAssignableFrom(v.getClass())) {
+                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
+                    } else {
+                        boolQueryBuilder.filter(QueryBuilders.termQuery(k, v));
+                    }
+                });
             }
-            //进行时间删选
-            if(Objects.nonNull(rangeDate) && !StringUtils.isEmpty(dateKey)){
 
+
+            //进行时间删选
+            if (Objects.nonNull(rangeDate) && !StringUtils.isEmpty(dateKey)) {
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(dateKey);
-                if(Objects.nonNull(rangeDate.getLeft())){
+                if (Objects.nonNull(rangeDate.getLeft())) {
                     rangeQueryBuilder.gte(rangeDate.getLeft().getTime());
                 }
-                if(Objects.nonNull(rangeDate.getRight())){
+                if (Objects.nonNull(rangeDate.getRight())) {
                     rangeQueryBuilder.lte(rangeDate.getRight().getTime());
                 }
                 boolQueryBuilder.filter(rangeQueryBuilder);
@@ -147,25 +235,39 @@ public class SearchApiService {
 
             SearchHits hits = response.getHits();
 
-            SearchResultListDTO resultListDTO = new SearchResultListDTO();
+            SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
-            hits.forEach(hit->{
-                SearchResultDTO resultDTO = new SearchResultDTO();
-                resultDTO.setResultMap(hit.getSourceAsMap());
-                Map<String,String> highlightMap = Maps.newHashMap();
-                hit.getHighlightFields().forEach((k,v)->{
-                    if(v.getFragments().length>0){
-                        highlightMap.put(k,v.getFragments()[0].string());
-                    }
-                });
-                resultDTO.setHighLightMap(highlightMap);
-                resultListDTO.getSearchResultDTO().add(resultDTO);
-            });
-            resultListDTO.setTotalCount(hits.getTotalHits());
+            buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
+
             return resultListDTO;
 
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> void buildSearchResultListDTO(SearchResultListDTO<T> resultListDTO, Class<T> resultIndexDTO, SearchHits hits) {
+        hits.forEach(hit -> {
+            try {
+                T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
+                BeanUtils.populate(targetObject, hit.getSourceAsMap());
+                hit.getHighlightFields().forEach((k, v) -> {
+                    if (v.getFragments().length > 0) {
+                        try {
+                            BeanUtils.setProperty(targetObject, k, v.getFragments()[0].string());
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                resultListDTO.getSearchResultDTO().add(targetObject);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                // TODO: 2018/5/11 log
+
+            }
+        });
+        resultListDTO.setTotalCount(hits.getTotalHits());
+
     }
 }

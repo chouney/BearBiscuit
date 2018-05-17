@@ -1,6 +1,6 @@
 package com.xkr.web.model;
 
-import com.google.common.collect.ImmutableMap;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import org.chris.redbud.validator.result.ValidError;
@@ -8,14 +8,13 @@ import org.chris.redbud.validator.result.ValidError;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
  * @version 1.0
  * @date 2018/5/7
  */
-public class BasicResult implements Serializable{
+public class BasicResult<T extends Serializable> implements Serializable{
 
     private static final long serialVersionUID = -5107846354144554659L;
 
@@ -23,34 +22,34 @@ public class BasicResult implements Serializable{
 
     private String msg = ErrorStatus.OK.getDesc();
 
-    private Map<String,Object> data;
+    private T data ;
 
     private Map<String,Object> ext;
 
     public BasicResult(ErrorStatus status) {
         this.code = status.getCode();
         this.msg = status.getDesc();
-        this.data = ImmutableMap.of();
+        this.data = (T) new JSONObject();
         this.ext = Maps.newHashMap();
     }
 
     public BasicResult(List<ValidError> errors) {
         this.code = ErrorStatus.PARAM_ERROR.getCode();
         this.msg = ErrorStatus.PARAM_ERROR.getDesc();
-        this.data = ImmutableMap.of("error", errors.stream().map(ValidError::toString).collect(Collectors.toList()));
+        this.data = (T) new JSONObject();
         this.ext = Maps.newHashMap();
     }
 
-    public BasicResult(Map<String,Object> data) {
+    public BasicResult(T data) {
         this.data = data;
     }
 
-    public BasicResult(Map<String,Object> data, Map<String,Object> ext) {
+    public BasicResult(T data, Map<String,Object> ext) {
         this.data = data;
         this.ext = ext;
     }
 
-    public BasicResult(ErrorStatus status, Map<String,Object> data, Map<String,Object> ext) {
+    public BasicResult(ErrorStatus status, T data, Map<String,Object> ext) {
         this.code = status.getCode();
         this.msg = status.getDesc();
         this.data = data;
@@ -73,11 +72,11 @@ public class BasicResult implements Serializable{
         this.msg = msg;
     }
 
-    public Map<String,Object> getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Map<String,Object> data) {
+    public void setData(T data) {
         this.data = data;
     }
 

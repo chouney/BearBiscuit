@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
+import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
 import com.xkr.service.api.SearchApiService;
@@ -117,14 +118,23 @@ public class TestController {
         return new BasicResult(ErrorStatus.OK);
     }
 
+    @RequestMapping(value = "/getIndex", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult index5(String id) throws URISyntaxException, IOException, UpException {
+        ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
+        searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,"xkr","resource",id);
+        ImmutableMap result = ImmutableMap.of("searchHit", resourceIndexDTO);
+        return new BasicResult<>(result);
+    }
+
     @RequestMapping(value = "/seachIndex", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult index3(String keyword) throws URISyntaxException, IOException, UpException {
-        SearchResultListDTO hits = searchApiService.searchByKeyWordInField(
+        SearchResultListDTO hits = searchApiService.searchByKeyWordInField(UserIndexDTO.class,
                 keyword, ImmutableMap.of("userName",1F,"email",1F),null,new ImmutablePair<>(null,new Date()),"createTime",null,
                 ImmutableSet.of("userName","email","userId"),0,10);
-        Map result = ImmutableMap.of("searchHit", hits);
-        return new BasicResult(result);
+        ImmutableMap result = ImmutableMap.of("searchHit", hits);
+        return new BasicResult<>(result);
     }
 
     /**
