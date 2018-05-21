@@ -75,8 +75,7 @@ public class XkrResourceAgent {
                 xkrResourceMapper.updateByPrimaryKeySelective(resource);
                 //更新索引
                 ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-                searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,resourceIndexDTO.getIndexName(),
-                        resourceIndexDTO.getTypeName(),resourceIndexDTO.getIndexKey());
+                searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,String.valueOf(resource.getId()));
                 resourceIndexDTO.setDownloadCount(notification.getValue());
                 searchApiService.upsertIndex(resourceIndexDTO);
             })
@@ -113,7 +112,7 @@ public class XkrResourceAgent {
             buildResourceIndexDTO(resourceIndexDTO, resource);
 
             if (!searchApiService.upsertIndex(resourceIndexDTO)) {
-                logger.warn("ResourceService saveNewResource buildIndex failed, resourceIndexDTO:{}", JSON.toJSONString(resourceIndexDTO));
+                logger.error("ResourceService saveNewResource buildIndex failed, resourceIndexDTO:{}", JSON.toJSONString(resourceIndexDTO));
             }
 
             return resource;
@@ -188,8 +187,7 @@ public class XkrResourceAgent {
         if(xkrResourceMapper.updateByPrimaryKeySelective(resource) == 1){
             //更新索引
             ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-            searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,resourceIndexDTO.getIndexName(),
-                    resourceIndexDTO.getTypeName(),resourceIndexDTO.getIndexKey());
+            searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,String.valueOf(resource.getId()));
             resourceIndexDTO.setReport(REPORT_INVALID);
             searchApiService.upsertIndex(resourceIndexDTO);
 

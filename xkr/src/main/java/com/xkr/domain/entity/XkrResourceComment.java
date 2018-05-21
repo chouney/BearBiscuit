@@ -3,8 +3,8 @@ package com.xkr.domain.entity;
 import java.util.Date;
 import javax.persistence.*;
 
-@Table(name = "xkr_resouce_comment")
-public class XkrResouceComment {
+@Table(name = "xkr_resource_comment")
+public class XkrResourceComment {
     /**
      * 评论id
      */

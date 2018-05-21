@@ -100,7 +100,7 @@ public class UserTestController {
                     String userToken) {
         try {
             String salt = secureRandomNumberGenerator.nextBytes().toHex();
-            xkrUserAgent.createUserAccount(userName, userToken, salt, email);
+            xkrUserAgent.createUserAccount(userName, userToken, email);
             return new BasicResult(ErrorStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,7 +1,5 @@
 package com.xkr.domain.dto;
 
-import com.xkr.domain.dto.search.BaseIndexDTO;
-
 import java.io.Serializable;
 import java.util.Date;
 

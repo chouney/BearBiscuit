@@ -31,12 +31,6 @@ public class XkrAboutRemark {
     private Long parentRemarkId;
 
     /**
-     * 根留言id
-     */
-    @Column(name = "root_remark_id")
-    private Long rootRemarkId;
-
-    /**
      * 留言状态
      */
     private Byte status;
@@ -133,24 +127,6 @@ public class XkrAboutRemark {
      */
     public void setParentRemarkId(Long parentRemarkId) {
         this.parentRemarkId = parentRemarkId;
-    }
-
-    /**
-     * 获取根留言id
-     *
-     * @return root_remark_id - 根留言id
-     */
-    public Long getRootRemarkId() {
-        return rootRemarkId;
-    }
-
-    /**
-     * 设置根留言id
-     *
-     * @param rootRemarkId 根留言id
-     */
-    public void setRootRemarkId(Long rootRemarkId) {
-        this.rootRemarkId = rootRemarkId;
     }
 
     /**

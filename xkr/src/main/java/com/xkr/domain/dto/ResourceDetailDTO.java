@@ -14,7 +14,7 @@ import java.util.Objects;
  * @version 1.0
  * @date 2018/5/17
  */
-public class ResourceDetailDTO implements Serializable{
+public class ResourceDetailDTO extends BaseDTO implements Serializable{
 
     private static final long serialVersionUID = -6709344003733973179L;
 

@@ -122,7 +122,7 @@ public class TestController {
     @ResponseBody
     public BasicResult index5(String id) throws URISyntaxException, IOException, UpException {
         ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-        searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,"xkr","resource",id);
+        searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,id);
         ImmutableMap result = ImmutableMap.of("searchHit", resourceIndexDTO);
         return new BasicResult<>(result);
     }

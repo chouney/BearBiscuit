@@ -69,13 +69,12 @@ public class SearchApiService {
         return false;
     }
 
-    public <T extends BaseIndexDTO> void getAndBuildIndexDTOByIndexId(T targetDTO, String index, String type, String docId) {
-        if (!BaseIndexDTO.class.isAssignableFrom(targetDTO.getClass()) || StringUtils.isEmpty(index)
-                || StringUtils.isEmpty(type) || StringUtils.isEmpty(docId)) {
+    public <T extends BaseIndexDTO> void getAndBuildIndexDTOByIndexId(T targetDTO, String docId) {
+        if (!BaseIndexDTO.class.isAssignableFrom(targetDTO.getClass()) || StringUtils.isEmpty(docId)) {
             throw new IllegalArgumentException("error argument");
         }
         try {
-            GetRequest getRequest = new GetRequest(index, type, docId);
+            GetRequest getRequest = new GetRequest(targetDTO.getIndexName(), targetDTO.getTypeName(), docId);
             GetResponse getResponse = client.get(getRequest);
             if(getResponse.isExists()){
                 BeanUtils.populate(targetDTO,getResponse.getSourceAsMap());

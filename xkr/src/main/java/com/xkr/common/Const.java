@@ -7,6 +7,7 @@ package com.xkr.common;
  */
 public class Const {
 
+    public static final String CAPTCHA_SESSION_KEY = "KAPTCHA_SESSION_KEY";
 
     public static final String SESSION_COOKIE_NAME = "XKRSID";
 
@@ -15,5 +16,9 @@ public class Const {
     public static final String CSRF_TOKEN_PREFIX = "csrf_";
 
     public static final String CSRF_TOKEN_PARAM = "token";
+
+    public static final int USER_ACCOUNT_VERIFY_TYPE_REG = 1;
+
+    public static final int USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD = 2;
 
 }

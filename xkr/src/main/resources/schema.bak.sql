@@ -101,8 +101,8 @@ CREATE TABLE xkr_class(
 	INDEX `idx_sta` (`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='栏目表';
 
-DROP TABLE IF EXISTS `xkr_resouce_comment`;
-CREATE TABLE xkr_resouce_comment(
+DROP TABLE IF EXISTS `xkr_resource_comment`;
+CREATE TABLE xkr_resource_comment(
 	`id` bigint(20) UNSIGNED NOT NULL COMMENT '评论id',
 	`resource_id` bigint(20) UNSIGNED NOT NULL COMMENT '资源id',
 	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
@@ -125,14 +125,13 @@ CREATE TABLE xkr_about_remark(
 	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
 	`user_type_code` tinyint(4) NOT NULL COMMENT '账号类型,管理员或用户',
 	`parent_remark_id` bigint(20) UNSIGNED NOT NULL COMMENT '父留言id',
-	`root_remark_id` bigint(20) UNSIGNED NOT NULL COMMENT '根留言id',
 	`content` TEXT  NOT NULL COMMENT '留言内容，5000字内',
 	`status` tinyint(4) NOT NULL COMMENT '留言状态',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段,包含qq号,手机号',
 	PRIMARY KEY (`id`),
-	INDEX `idx_sta_up_rt` (`status`,`update_time`,`root_remark_id`)
+	INDEX `idx_sta_up` (`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='留言表';
 
 

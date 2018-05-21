@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @date 2018/5/16
  */
-public class ClassMenuDTO implements Serializable{
+public class ClassMenuDTO extends BaseDTO implements Serializable{
 
     private static final long serialVersionUID = 9078845808780395079L;
 

@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @date 2018/5/17
  */
-public class ListResourceDTO implements Serializable{
+public class ListResourceDTO extends BaseDTO implements Serializable{
 
     private static final long serialVersionUID = -3102169549302568639L;
 

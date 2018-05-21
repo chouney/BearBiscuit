@@ -22,8 +22,19 @@
     id,user_name,user_token,salt,email,wealth,total_recharge,status,create_time,update_time,ext
   </sql>
 
+  <select id="getUserByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT  <include refid="user_fields"/>
+    FROM xkr_user WHERE id IN
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    <if test="status!=null">
+      AND status = #{status}
+    </if>
+  </select>
+
   <select id="selectByUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
-    SELECT *
+    SELECT  <include refid="user_fields"/>
     FROM xkr_user WHERE user_name = #{userLogin}
   </select>
 

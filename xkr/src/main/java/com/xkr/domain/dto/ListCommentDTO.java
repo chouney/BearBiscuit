@@ -1,7 +1,6 @@
 package com.xkr.domain.dto;
 
 import com.google.common.collect.Lists;
-import com.xkr.domain.dto.MessageDTO;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,20 +10,21 @@ import java.util.List;
  * @version 1.0
  * @date 2018/5/17
  */
-public class ListMessageDTO extends BaseDTO implements Serializable{
+public class ListCommentDTO extends BaseDTO implements Serializable{
 
-    private static final long serialVersionUID = 7780806491663427234L;
 
-    private List<MessageDTO> msgList = Lists.newArrayList();
+    private static final long serialVersionUID = 581854703324399835L;
+
+    private List<CommentDTO> comments = Lists.newArrayList();
 
     private int totalCount;
 
-    public List<MessageDTO> getMsgList() {
-        return msgList;
+    public List<CommentDTO> getComments() {
+        return comments;
     }
 
-    public void setMsgList(List<MessageDTO> msgList) {
-        this.msgList = msgList;
+    public void setComments(List<CommentDTO> comments) {
+        this.comments = comments;
     }
 
     public int getTotalCount() {

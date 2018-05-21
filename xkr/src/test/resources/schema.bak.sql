@@ -103,8 +103,8 @@ CREATE TABLE xkr_class(
 	PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
-DROP TABLE IF EXISTS xkr_resouce_comment;
-CREATE TABLE xkr_resouce_comment(
+DROP TABLE IF EXISTS xkr_resource_comment;
+CREATE TABLE xkr_resource_comment(
 	id bigint(20) UNSIGNED NOT NULL ,
 	resource_id bigint(20) UNSIGNED NOT NULL ,
 	user_id bigint(20) UNSIGNED NOT NULL ,
@@ -125,7 +125,6 @@ CREATE TABLE xkr_about_remark(
 	user_id bigint(20) UNSIGNED NOT NULL ,
 	user_type_code tinyint(4) NOT NULL ,
 	parent_remark_id bigint(20) UNSIGNED NOT NULL ,
-	root_remark_id bigint(20) UNSIGNED NOT NULL ,
 	content TEXT  NOT NULL ,
 	status tinyint(4) NOT NULL ,
 	create_time DATETIME DEFAULT CURRENT_TIMESTAMP ,

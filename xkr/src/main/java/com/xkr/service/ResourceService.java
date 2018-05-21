@@ -137,6 +137,7 @@ public class ResourceService {
                     String.format(UpLoadApiService.getCompressFilePathFormat(),resource.getUserId(),resource.getResourceUrl()),
                     optUser,optPassword,null));
         } catch (UpException e) {
+            logger.error("ResourceService build response token failed",e);
             throw new RuntimeException("generate download token failed",e);
         }
 
