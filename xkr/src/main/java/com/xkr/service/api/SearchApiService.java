@@ -8,18 +8,22 @@ import com.xkr.util.ArgUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -69,6 +73,56 @@ public class SearchApiService {
         return false;
     }
 
+    public boolean bulkUpdateResourceIndexClassId(String typeName, List<Long> docIds, Long newClassId) {
+        if (CollectionUtils.isEmpty(docIds) || Objects.isNull(newClassId)) {
+            return false;
+        }
+        BulkRequest request = new BulkRequest();
+        try {
+            docIds.forEach(docId -> {
+                Map<String, Object> jsonMap = new HashMap<>();
+                jsonMap.put("classId", newClassId);
+                jsonMap.put("updateTime", new Date());
+                UpdateRequest updateRequest = new UpdateRequest("xkr", typeName, String.valueOf(docId))
+                        .doc(jsonMap);
+                request.add(updateRequest);
+            });
+
+            BulkResponse responses = client.bulk(request);
+            return RestStatus.OK.equals(responses.status());
+        } catch (IOException e) {
+            // TODO: 2018/5/11 log
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean bulkUpdateIndexStatus(String typeName, List<Long> docIds, Integer status) {
+        if (CollectionUtils.isEmpty(docIds) || Objects.isNull(status)) {
+            return false;
+        }
+        BulkRequest request = new BulkRequest();
+        try {
+            docIds.forEach(docId -> {
+                Map<String, Object> jsonMap = new HashMap<>();
+                jsonMap.put("status", status);
+                if ("comment".equals(typeName) || "resource".equals(typeName)) {
+                    jsonMap.put("updateTime", new Date());
+                }
+                UpdateRequest updateRequest = new UpdateRequest("xkr", typeName, String.valueOf(docId))
+                        .doc(jsonMap);
+                request.add(updateRequest);
+            });
+
+            BulkResponse responses = client.bulk(request);
+            return RestStatus.OK.equals(responses.status());
+        } catch (IOException e) {
+            // TODO: 2018/5/11 log
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public <T extends BaseIndexDTO> void getAndBuildIndexDTOByIndexId(T targetDTO, String docId) {
         if (!BaseIndexDTO.class.isAssignableFrom(targetDTO.getClass()) || StringUtils.isEmpty(docId)) {
             throw new IllegalArgumentException("error argument");
@@ -76,17 +130,17 @@ public class SearchApiService {
         try {
             GetRequest getRequest = new GetRequest(targetDTO.getIndexName(), targetDTO.getTypeName(), docId);
             GetResponse getResponse = client.get(getRequest);
-            if(getResponse.isExists()){
-                BeanUtils.populate(targetDTO,getResponse.getSourceAsMap());
+            if (getResponse.isExists()) {
+                BeanUtils.populate(targetDTO, getResponse.getSourceAsMap());
             }
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
 
-    public <T> SearchResultListDTO<T> searchByFilterField(Class<T> resultIndexDTO, Map<String, Object> filterFieldValues,
-                                                          Pair<Date, Date> rangeDate, String dateKey,
-                                                          String sortKey, int offset, int size) {
+    public <T extends BaseIndexDTO> SearchResultListDTO<T> searchByFilterField(Class<T> resultIndexDTO, Map<String, Object> filterFieldValues,
+                                                                                     Pair<Date, Date> rangeDate, String dateKey,
+                                                                                     String sortKey, int offset, int size) {
         if (offset < 0 || size < 0) {
             throw new IllegalArgumentException("error argument");
         }
@@ -109,6 +163,9 @@ public class SearchApiService {
             //进行条件过滤
             if (!CollectionUtils.isEmpty(filterFieldValues)) {
                 filterFieldValues.forEach((k, v) -> {
+                    if (StringUtils.isEmpty(k) || Objects.isNull(v)) {
+                        return;
+                    }
                     if (Collection.class.isAssignableFrom(v.getClass())) {
                         boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
                     } else {
@@ -132,7 +189,11 @@ public class SearchApiService {
 
             builder.query(boolQueryBuilder);
 
-            SearchRequest request = new SearchRequest()
+            T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
+
+
+            SearchRequest request = new SearchRequest(targetObject.getIndexKey())
+                    .types(targetObject.getTypeName())
                     .source(builder);
 
 
@@ -142,7 +203,7 @@ public class SearchApiService {
 
             SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
-            buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
+            buildSearchResultListDTO(resultListDTO, targetObject, hits);
 
             return resultListDTO;
 
@@ -152,9 +213,9 @@ public class SearchApiService {
     }
 
 
-    public <T> SearchResultListDTO<T> searchByKeyWordInField(Class<T> resultIndexDTO, String keyword, Map<String, Float> fieldWeight, Map<String, Object> filterFieldValues,
-                                                             Pair<Date, Date> rangeDate, String dateKey,
-                                                             String sortKey, Set<String> hightField, int offset, int size) {
+    public <T extends BaseIndexDTO> SearchResultListDTO<T> searchByKeyWordInField(Class<T> resultIndexDTO, String keyword, Map<String, Float> fieldWeight, Map<String, Object> filterFieldValues,
+                                                                                  Pair<Date, Date> rangeDate, String dateKey,
+                                                                                  String sortKey, Set<String> hightField, int offset, int size) {
         if (offset < 0 || size < 0) {
             throw new IllegalArgumentException("error argument");
         }
@@ -196,6 +257,9 @@ public class SearchApiService {
             //进行条件过滤
             if (!CollectionUtils.isEmpty(filterFieldValues)) {
                 filterFieldValues.forEach((k, v) -> {
+                    if (StringUtils.isEmpty(k) || Objects.isNull(v)) {
+                        return;
+                    }
                     if (Collection.class.isAssignableFrom(v.getClass())) {
                         boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
                     } else {
@@ -216,17 +280,22 @@ public class SearchApiService {
                 }
                 boolQueryBuilder.filter(rangeQueryBuilder);
             }
+            //关键词搜索
+            if (!StringUtils.isEmpty(keyword)) {
+                boolQueryBuilder.should(QueryBuilders.multiMatchQuery(keyword,
+                        fieldWeight.keySet().toArray(new String[fieldWeight.size()])).
+                        fields(fieldWeight));
+            }
 
-            boolQueryBuilder.should(QueryBuilders.multiMatchQuery(keyword,
-                    fieldWeight.keySet().toArray(new String[fieldWeight.size()])).
-                    fields(fieldWeight));
+            T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
 
 
             boolQueryBuilder.minimumShouldMatch(1);
 
             builder.query(boolQueryBuilder);
 
-            SearchRequest request = new SearchRequest()
+            SearchRequest request = new SearchRequest(targetObject.getIndexName())
+                    .types(targetObject.getTypeName())
                     .source(builder);
 
 
@@ -236,7 +305,7 @@ public class SearchApiService {
 
             SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
-            buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
+            buildSearchResultListDTO(resultListDTO, targetObject, hits);
 
             return resultListDTO;
 
@@ -245,10 +314,9 @@ public class SearchApiService {
         }
     }
 
-    private <T> void buildSearchResultListDTO(SearchResultListDTO<T> resultListDTO, Class<T> resultIndexDTO, SearchHits hits) {
+    private <T> void buildSearchResultListDTO(SearchResultListDTO<T> resultListDTO, T targetObject, SearchHits hits) {
         hits.forEach(hit -> {
             try {
-                T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
                 BeanUtils.populate(targetObject, hit.getSourceAsMap());
                 hit.getHighlightFields().forEach((k, v) -> {
                     if (v.getFragments().length > 0) {

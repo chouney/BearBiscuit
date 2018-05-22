@@ -49,7 +49,7 @@ public class XkrUser implements Serializable{
     private Long totalRecharge;
 
     /**
-     * 用户状态1为正常,2为未激活,3为冻结
+     * 用户状态1为正常,2为未激活,3为冻结,4删除
      */
     private Byte status;
 

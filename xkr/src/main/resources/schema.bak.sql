@@ -77,7 +77,7 @@ CREATE TABLE xkr_login_token(
 	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
 	`login_token` varchar(255) NOT NULL COMMENT '登录token',
 	`client_ip` varchar(64) NOT NULL COMMENT '客户端ip',
-	`status` tinyint(4) NOT NULL COMMENT 'token状态',
+	`status` tinyint(4) NOT NULL COMMENT 'token状态1正常',
 	`login_count` int(10) UNSIGNED NOT NULL COMMENT '登录次数',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',

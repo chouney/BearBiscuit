@@ -15,5 +15,7 @@ public interface XkrClassMapper extends CustomerMapper<XkrClass> {
 
     List<XkrClass> getAll();
 
+    XkrClass getClassById(Long classId);
+
     Integer deleteClassByClassId(Long classId);
 }

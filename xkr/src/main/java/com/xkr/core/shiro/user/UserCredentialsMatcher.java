@@ -1,11 +1,15 @@
 package com.xkr.core.shiro.user;
 
+import com.xkr.domain.XkrLoginTokenAgent;
+import com.xkr.domain.entity.XkrLoginToken;
+import com.xkr.domain.entity.XkrUser;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

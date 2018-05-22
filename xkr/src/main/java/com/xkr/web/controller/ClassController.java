@@ -1,8 +1,7 @@
 package com.xkr.web.controller;
 
-import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
-import com.xkr.domain.dto.ClassMenuDTO;
+import com.xkr.domain.dto.clazz.ClassMenuDTO;
 import com.xkr.service.ClassService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.ClassMenuVO;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**

@@ -7,6 +7,8 @@ package com.xkr.common;
  */
 public class Const {
 
+    public static final String SESSION_LOGIN_TOKEN_KEY = "SESSION_LOGIN_TOKEN_KEY";
+
     public static final String CAPTCHA_SESSION_KEY = "KAPTCHA_SESSION_KEY";
 
     public static final String SESSION_COOKIE_NAME = "XKRSID";

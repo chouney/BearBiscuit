@@ -3,13 +3,12 @@ package com.xkr.service;
 import com.alibaba.fastjson.JSON;
 import com.xkr.MockServiceTest;
 import com.xkr.domain.XkrClassAgent;
-import com.xkr.domain.dto.ClassMenuDTO;
+import com.xkr.domain.dto.clazz.ClassMenuDTO;
 import com.xkr.domain.entity.XkrClass;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.util.List;
 

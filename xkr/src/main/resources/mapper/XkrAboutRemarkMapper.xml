@@ -20,5 +20,23 @@
     id,user_id,user_type_code,parent_remark_id,content,status
     create_time,update_time,ext
   </sql>
+  <select id="getAllList"  resultMap="BaseResultMap">
+    SELECT <include refid="about_remark_field"/>
+    FROM xkr_about_remark WHERE status in (1,2)
+  </select>
+
+  <select id="getRemarkById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT  <include refid="about_remark_field"/>
+    FROM xkr_about_remark WHERE id = #{id}
+    AND status in (1,2)
+  </select>
+
+  <update id="batchUpdateRemarkByIds" parameterType="java.util.Map">
+    UPDATE xkr_about_remark SET status = #{status}, update_time = now()
+    where id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </update>
 
 </mapper>

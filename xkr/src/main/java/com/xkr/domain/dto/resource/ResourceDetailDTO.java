@@ -1,6 +1,7 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.resource;
 
 import com.google.common.collect.Maps;
+import com.xkr.domain.dto.BaseDTO;
 import com.xkr.domain.entity.XkrClass;
 
 import java.io.Serializable;

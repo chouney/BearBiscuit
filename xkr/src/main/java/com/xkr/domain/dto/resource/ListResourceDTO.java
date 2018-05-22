@@ -1,7 +1,7 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.resource;
 
 import com.google.common.collect.Lists;
-import com.xkr.domain.dto.search.ResourceIndexDTO;
+import com.xkr.domain.dto.BaseDTO;
 
 import java.io.Serializable;
 import java.util.List;

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.cache.RemedyCacheLoader;
 import com.xkr.dao.mapper.XkrResourceMapper;
+import com.xkr.domain.dto.resource.ResourceStatusEnum;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.entity.XkrResource;
 import com.xkr.domain.entity.XkrUser;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
@@ -53,14 +56,6 @@ public class XkrResourceAgent {
 
     public static final int REPORT_INVALID = 1;
 
-    public static final int STATUS_NORMAL = 1;
-
-    public static final int STATUS_UNVERIFIED = 2;
-
-    public static final int STATUS_FREEZED = 3;
-
-    public static final int STATUS_DELETED = 4;
-
     //下载量缓存
     private LoadingCache<Long, Integer> downloadCountCache = CacheBuilder
             .newBuilder()
@@ -75,18 +70,63 @@ public class XkrResourceAgent {
                 xkrResourceMapper.updateByPrimaryKeySelective(resource);
                 //更新索引
                 ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-                searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,String.valueOf(resource.getId()));
+                searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO, String.valueOf(resource.getId()));
                 resourceIndexDTO.setDownloadCount(notification.getValue());
                 searchApiService.upsertIndex(resourceIndexDTO);
             })
             .build(new RemedyCacheLoader<Long, Integer>() {
                 @Override
                 public Integer load(Long key) throws Exception {
-                    XkrResource resource = xkrResourceMapper.selectByPrimaryKey(key);
+                    XkrResource resource = xkrResourceMapper.getResourceById(ImmutableMap.of(
+                            "id",key,
+                            "statuses", ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList())
+                    ));
                     return Objects.isNull(resource) ? 0 : resource.getDownloadCount();
                 }
             });
 
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchUpdateResourceClassByIds(List<Long> resourceIds,Long newClassId){
+        if (CollectionUtils.isEmpty(resourceIds) || Objects.isNull(newClassId)) {
+            return false;
+        }
+        boolean isSuccess = xkrResourceMapper.batchUpdateResourceClassByIds(ImmutableMap.of(
+                "list",resourceIds,"classId",newClassId
+        )) == 1;
+        if(isSuccess){
+            if (!searchApiService.bulkUpdateResourceIndexClassId("resource", resourceIds, newClassId)) {
+                logger.error("XkrResourceAgent batchUpdateResourceClassByIds failed ,resourceIds:{},newClassId:{}", JSON.toJSONString(resourceIds),newClassId);
+                throw new RuntimeException();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean batchUpdateResourceByIds(List<Long> resourceIds, ResourceStatusEnum status) {
+        if (CollectionUtils.isEmpty(resourceIds) || Objects.isNull(status)) {
+            return false;
+        }
+        boolean isSuccess = false;
+        if (ResourceStatusEnum.STATUS_PHYSICAL_DELETED.equals(status)) {
+            isSuccess = xkrResourceMapper.batchDeleteResourceByIds(resourceIds) == 1;
+        } else if (ResourceStatusEnum.TOUPDATE_STATUSED.contains(status)) {
+            isSuccess = xkrResourceMapper.batchUpdateResourceByIds(ImmutableMap.of(
+                    "list", resourceIds, "status", status.getCode()
+            )) == 1;
+        }
+        if (isSuccess) {
+            if (!searchApiService.bulkUpdateIndexStatus("resource", resourceIds, status.getCode())) {
+                logger.error("XkrResourceAgent batchUpdateResourceByIds failed ,resourceIds:{},status:{}", JSON.toJSONString(resourceIds),status);
+                throw new RuntimeException();
+            }
+        }
+        return isSuccess;
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public XkrResource saveNewResource(String title, String deital, Integer cost, Long classId, Long userId,
                                        String compressMd5, String unCompressMd5, String fileSize) {
         Long resourceId = idGenerator.generateId();
@@ -98,7 +138,7 @@ public class XkrResourceAgent {
         resource.setFileSize(fileSize);
         resource.setId(resourceId);
         resource.setReport((byte) REPORT_NORMAL);
-        resource.setStatus((byte) STATUS_UNVERIFIED);
+        resource.setStatus((byte) ResourceStatusEnum.STATUS_UNVERIFIED.getCode());
         resource.setUserId(userId);
         JSONObject ext = new JSONObject();
         ext.put(ResourceService.EXT_MD5_UNCOMPRESS_FILE_KEY, unCompressMd5);
@@ -113,6 +153,7 @@ public class XkrResourceAgent {
 
             if (!searchApiService.upsertIndex(resourceIndexDTO)) {
                 logger.error("ResourceService saveNewResource buildIndex failed, resourceIndexDTO:{}", JSON.toJSONString(resourceIndexDTO));
+                throw new RuntimeException();
             }
 
             return resource;
@@ -121,73 +162,84 @@ public class XkrResourceAgent {
         return null;
     }
 
-    public XkrResource getResourceById(Long resId) {
+    public XkrResource getResourceById(Long resId,List<Integer> statuses) {
         if (Objects.isNull(resId)) {
             return null;
         }
-        return xkrResourceMapper.selectByPrimaryKey(resId);
+        return xkrResourceMapper.getResourceById(ImmutableMap.of(
+                "id",resId,"statuses",statuses
+        ));
     }
 
-    public List<XkrResource> getResourceListByIds(List<Long> resIds) {
+    public XkrResource getResourceById(Long resId) {
+                return getResourceById(resId,ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
+    }
+
+    public List<XkrResource> getResourceListByIds(List<Long> resIds,List<Integer> statuses) {
         if (CollectionUtils.isEmpty(resIds)) {
             return Lists.newArrayList();
         }
         Map<String, Object> params = ImmutableMap.of(
-                "status", STATUS_NORMAL,
+                "statuses",statuses,
                 "ids", resIds
         );
         return xkrResourceMapper.getResourceByIds(params);
 
     }
 
+    public List<XkrResource> getResourceListByIds(List<Long> resIds) {
+        return getResourceListByIds(resIds,ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
-    public List<XkrResource> getResourceListByClassIds(List<Long> classIds) {
+    }
+
+
+    public List<XkrResource> getResourceListByClassIds(List<Long> classIds,List<Integer> statuses) {
         if (CollectionUtils.isEmpty(classIds)) {
             return Lists.newArrayList();
         }
         Map<String, Object> params = ImmutableMap.of(
-                "status", STATUS_NORMAL,
+                "statuses", statuses,
                 "classIds", classIds
         );
         return xkrResourceMapper.getResourceByClassIds(params);
 
     }
 
-    public List<XkrResource> getResourceByUserId(Long userId, int status) {
+    public List<XkrResource> getResourceByUserId(Long userId,List<Integer> statuses) {
         if (Objects.isNull(userId)) {
             return Lists.newArrayList();
         }
         Map<String, Object> params = ImmutableMap.of(
-                "status", status,
+                "statuses", statuses,
                 "userId", userId
         );
         return xkrResourceMapper.getResourceByUserId(params);
     }
 
-    public boolean updateDownloadCountById(Long resourceId){
+    public boolean updateDownloadCountById(Long resourceId) {
         if (Objects.isNull(resourceId)) {
             return false;
         }
         try {
-            downloadCountCache.put(resourceId,downloadCountCache.get(resourceId)+1);
+            downloadCountCache.put(resourceId, downloadCountCache.get(resourceId) + 1);
             return true;
         } catch (ExecutionException e) {
-            logger.error("XkrResourceAgent updateDownloadCountById error on loading cache ,will use oldValue ,resourceId:{}",resourceId,e);
+            logger.error("XkrResourceAgent updateDownloadCountById error on loading cache ,will use oldValue ,resourceId:{}", resourceId, e);
         }
         return false;
     }
 
-    public boolean reportIllegalResource(Long resourceId){
-        if(Objects.isNull(resourceId)){
+    public boolean reportIllegalResource(Long resourceId) {
+        if (Objects.isNull(resourceId)) {
             return false;
         }
         XkrResource resource = new XkrResource();
         resource.setId(resourceId);
         resource.setReport((byte) REPORT_INVALID);
-        if(xkrResourceMapper.updateByPrimaryKeySelective(resource) == 1){
+        if (xkrResourceMapper.updateByPrimaryKeySelective(resource) == 1) {
             //更新索引
             ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-            searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,String.valueOf(resource.getId()));
+            searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO, String.valueOf(resource.getId()));
             resourceIndexDTO.setReport(REPORT_INVALID);
             searchApiService.upsertIndex(resourceIndexDTO);
 

@@ -15,4 +15,25 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
+  <sql id="admin_opt_log">
+    id,admin_account_id,opt_module,opt_detail,client_ip,status
+    create_time,update_time,ext
+  </sql>
+
+  <select id="getAllOptLogByAdminAccount"  resultMap="BaseResultMap">
+    SELECT <include refid="admin_opt_log"/>
+    FROM xkr_admin_opt_log WHERE status = 1
+    <if test="adminAccountId!=null">
+      AND admin_account_id = #{adminAccountId}
+    </if>
+  </select>
+
+  <update id="batchUpdateOptLogByIds" parameterType="java.util.Map">
+    UPDATE xkr_admin_opt_log SET status = #{status}, update_time = now()
+    where id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </update>
+
 </mapper>

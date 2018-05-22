@@ -7,6 +7,7 @@ import com.xkr.common.ErrorStatus;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrResourceCommentMapper;
 import com.xkr.domain.dto.ResponseDTO;
+import com.xkr.domain.dto.comment.CommentStatusEnum;
 import com.xkr.domain.dto.search.CommentIndexDTO;
 import com.xkr.domain.entity.XkrResource;
 import com.xkr.domain.entity.XkrResourceComment;
@@ -16,10 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
@@ -42,20 +47,69 @@ public class XkrResourceCommentAgent {
     @Autowired
     private IdGenerator idGenerator;
 
-    public static final int STATUS_NORMAL = 1;
 
-    public static final int STATUS_TOVERIFY = 2;
+    public boolean batchUpdateCommentByIds(List<Long> commentIds, CommentStatusEnum status){
+        if(CollectionUtils.isEmpty(commentIds) || Objects.isNull(status)){
+            return false;
+        }
+        boolean isSuccess = false;
+        if(CommentStatusEnum.TOUPDATE_STATUSED.contains(status)){
+            isSuccess = xkrResourceCommentMapper.batchUpdateCommentByIds(ImmutableMap.of(
+                    "list",commentIds,"status",status.getCode()
+            )) == 1;
+        }
+        if(isSuccess){
+            if (!searchApiService.bulkUpdateIndexStatus("comment", commentIds, status.getCode())) {
+                logger.error("XkrResourceCommentAgent batchUpdateCommentrByIds failed ,commentIds:{},status:{}", JSON.toJSONString(commentIds),status);
+            }
+        }
+        return isSuccess;
+    }
 
-    public static final int STATUS_DELETED = 3;
+    public boolean updateCommentById(Long commentId,String content){
+        if(Objects.isNull(commentId) || StringUtils.isEmpty(content)){
+            return false;
+        }
+        XkrResourceComment xkrResourceComment = new XkrResourceComment();
+        xkrResourceComment.setId(commentId);
+        xkrResourceComment.setContent(content);
+        xkrResourceComment.setUpdateTime(new Date());
+        return xkrResourceCommentMapper.updateByPrimaryKeySelective(xkrResourceComment) == 1;
+    }
 
+    public List<XkrResourceComment> getCommentsByIds(List<Long> commentIds){
+        return getCommentsByIds(commentIds,CommentStatusEnum.NON_DELETE_STATUSED.stream().map(CommentStatusEnum::getCode).collect(Collectors.toList()));
+    }
 
-    public List<XkrResourceComment> getCommentsByResourceId(Long resourceId, int status) {
+    public List<XkrResourceComment> getCommentsByIds(List<Long> commentIds,List<Integer> statuses){
+        if(CollectionUtils.isEmpty(commentIds)){
+            return Lists.newArrayList();
+        }
+        return xkrResourceCommentMapper.getCommentsByIds(ImmutableMap.of(
+                "list",commentIds,"statuses",statuses
+        ));
+    }
+
+    public XkrResourceComment getCommentById(Long commentId){
+        if (Objects.isNull(commentId)) {
+            return null;
+        }
+        return xkrResourceCommentMapper.getCommentById(ImmutableMap.of(
+                "id",commentId,"statuses",CommentStatusEnum.NON_DELETE_STATUSED.stream().map(CommentStatusEnum::getCode).collect(Collectors.toList())
+        ));
+    }
+
+    public List<XkrResourceComment> getCommentsByResourceId(Long resourceId) {
+        return getCommentsByResourceId(resourceId,CommentStatusEnum.NON_DELETE_STATUSED.stream().map(CommentStatusEnum::getCode).collect(Collectors.toList()));
+    }
+
+    public List<XkrResourceComment> getCommentsByResourceId(Long resourceId, List<Integer> statuses) {
         if (Objects.isNull(resourceId)) {
             logger.error("XkrResourceCommentAgent getCommentsByResourceIds empty resourceId");
             return Lists.newArrayList();
         }
         Map<String, Object> params = ImmutableMap.of(
-                "status", status,
+                "statuses", statuses,
                 "resourceId", resourceId
         );
         return xkrResourceCommentMapper.getCommentsByResourceId(params);
@@ -80,7 +134,7 @@ public class XkrResourceCommentAgent {
         resourceComment.setRootCommentId(id);
         resourceComment.setResourceId(resourceId);
         resourceComment.setUserId(user.getId());
-        resourceComment.setStatus((byte)STATUS_TOVERIFY);
+        resourceComment.setStatus((byte)CommentStatusEnum.STATUS_TOVERIFY.getCode());
 
         if(xkrResourceCommentMapper.insert(resourceComment) == 1){
             CommentIndexDTO commentIndexDTO = new CommentIndexDTO();

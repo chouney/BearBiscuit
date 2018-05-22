@@ -22,7 +22,7 @@ public class XkrAdminPermissionAgent {
     private XkrAdminPermissionMapper xkrAdminPermissionMapper;
 
 
-    public List<XkrAdminPermission> getAdminRoleByIds(List<Integer> ids){
+    public List<XkrAdminPermission> getPermissionByIds(List<Integer> ids){
         if(CollectionUtils.isEmpty(ids)){
             return Lists.newArrayList();
         }

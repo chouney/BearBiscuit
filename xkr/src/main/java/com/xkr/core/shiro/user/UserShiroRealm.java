@@ -5,6 +5,7 @@
 package com.xkr.core.shiro.user;
 
 import com.xkr.domain.XkrUserAgent;
+import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrUser;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -55,15 +56,16 @@ public class UserShiroRealm extends AuthorizingRealm {
             throw new UnknownAccountException();
         }
 
-        if((byte)XkrUserAgent.USER_STATUS_FREEZED == xkrUser.getStatus()){
+        if(UserStatusEnum.USER_STATUS_FREEZED.getCode() == xkrUser.getStatus()){
             throw new LockedAccountException();
         }
+
         //todo 账号status判断;
 
         //加密方式;
         //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-                xkrUser.getUserName(), //用户名
+                xkrUser, //用户名
                 xkrUser.getUserToken(),
                 ByteSource.Util.bytes(xkrUser.getSalt()),
                 getName()

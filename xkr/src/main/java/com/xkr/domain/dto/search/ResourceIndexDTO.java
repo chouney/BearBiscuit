@@ -21,6 +21,7 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
      "content":"内容简要",
      "resourceId":"资源id",
      "classId":"栏目id",
+     "type":"资源类型:毕设或者资源",
      "userName":"会员账号",
      "userId":"会员id",
      "updateTime":"更新时间",
@@ -39,6 +40,8 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
     private String content;
 
     private Long classId;
+
+    private Integer type;
 
     private String userName;
 
@@ -93,6 +96,14 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
 
     public void setClassId(Long classId) {
         this.classId = classId;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public String getUserName() {

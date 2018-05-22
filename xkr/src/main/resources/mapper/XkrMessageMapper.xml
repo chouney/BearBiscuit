@@ -34,8 +34,11 @@
     SELECT <include refid="message_field"/>
     FROM xkr_message WHERE from_type_code = #{fromTypeCode}
     AND from_id = #{fromId}
-    <if test="status!=null">
-      AND status = #{status}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
     </if>
     ORDER BY update_time DESC
   </select>
@@ -44,8 +47,11 @@
     SELECT <include refid="message_field"/>
     FROM xkr_message WHERE to_type_code = #{toTypeCode}
     AND to_id = #{toId}
-    <if test="status!=null">
-      AND status = #{status}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
     </if>
     ORDER BY update_time DESC
   </select>

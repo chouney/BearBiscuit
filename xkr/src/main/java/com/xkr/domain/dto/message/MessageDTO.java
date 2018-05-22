@@ -1,4 +1,4 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.message;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

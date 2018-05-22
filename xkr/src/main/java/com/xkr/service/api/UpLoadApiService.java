@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
 import com.xkr.domain.dto.file.FileInfoDTO;
-import com.xkr.domain.dto.FileUploadResponseDTO;
+import com.xkr.domain.dto.file.FileUploadResponseDTO;
 import com.xkr.domain.dto.file.FolderItemDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;

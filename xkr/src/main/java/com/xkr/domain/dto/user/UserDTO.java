@@ -1,7 +1,6 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.user;
 
-import com.xkr.domain.dto.search.BaseIndexDTO;
-
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,8 +8,9 @@ import java.util.Date;
  * @version 1.0
  * @date 2018/5/11
  */
-public class UserDTO extends BaseIndexDTO {
+public class UserDTO implements Serializable {
 
+    private static final long serialVersionUID = -7981572961222192969L;
     /**
      * "userId":"会员id"
      * "userName":"会员名",
@@ -27,10 +27,6 @@ public class UserDTO extends BaseIndexDTO {
     private Date createTime;
 
     private Integer status;
-
-    public UserDTO() {
-        super("xkr", "user");
-    }
 
     public Long getUserId() {
         return userId;
@@ -72,8 +68,4 @@ public class UserDTO extends BaseIndexDTO {
         this.status = status;
     }
 
-    @Override
-    public String getIndexKey() {
-        return String.valueOf(this.userId);
-    }
 }

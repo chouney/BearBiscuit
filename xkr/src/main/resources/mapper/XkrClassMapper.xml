@@ -28,6 +28,12 @@
     and status = 1;
   </select>
 
+  <select id="getClassById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT <include refid="class_field"/>
+    FROM xkr_class WHERE id = #{classId}
+    and status = 1;
+  </select>
+
   <select id="getAllChildClassByClassId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     SELECT <include refid="class_field"/>
     FROM xkr_class WHERE path like concat('%', #{classId},'%') and status = 1;

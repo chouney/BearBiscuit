@@ -10,6 +10,14 @@ import java.util.Map;
 @Service
 public interface XkrResourceMapper extends CustomerMapper<XkrResource> {
 
+    Integer batchUpdateResourceClassByIds(Map<String,Object> params);
+
+    XkrResource getResourceById(Map<String,Object> params);
+
+    Integer batchDeleteResourceByIds(List<Long> list);
+
+    Integer batchUpdateResourceByIds(Map<String,Object> params);
+
     List<XkrResource> getResourceByClassIds(Map<String,Object> params);
 
     List<XkrResource> getResourceByUserId(Map<String,Object> params);

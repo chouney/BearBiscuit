@@ -1,10 +1,12 @@
 package com.xkr.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.LoginEnum;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrMessageMapper;
+import com.xkr.domain.dto.message.MessageStatusEnum;
 import com.xkr.domain.entity.XkrMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
@@ -31,12 +34,6 @@ public class XkrMessageAgent {
 
     @Autowired
     public XkrMessageMapper xkrMessageMapper;
-
-    public static final int MESSAGE_STATUS_UNREAD = 1;
-
-    public static final int MESSAGE_STATUS_READ = 2;
-
-    public static final int MESSAGE_STATUS_DELETE = 3;
 
 
     public boolean updateMessageStatus(Integer status , List<Long> messageIds){
@@ -61,7 +58,7 @@ public class XkrMessageAgent {
         xkrMessage.setToTypeCode(Byte.valueOf(toUserType.getType()));
         xkrMessage.setToId(toUserId);
         xkrMessage.setContent(content);
-        xkrMessage.setStatus((byte) 1);
+        xkrMessage.setStatus((byte) MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode());
         logger.info("XkrMessageAgent saveToUserMessage, params:{}", JSON.toJSONString(xkrMessage));
         if(xkrMessageMapper.insert(xkrMessage) == 1){
             return messageId;
@@ -74,15 +71,15 @@ public class XkrMessageAgent {
         Map<String, Object> params = ImmutableMap.of(
                 "toTypeCode", Integer.valueOf(LoginEnum.CUSTOMER.getType()),
                 "toId", userId,
-                "status", XkrMessageAgent.MESSAGE_STATUS_UNREAD
-        );
+                "statuses", ImmutableList.of(MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode()));
         return xkrMessageMapper.getMessagesByToSource(params);
     }
 
     public List<XkrMessage> getAllToUserMessage(long userId) {
         Map<String, Object> params = ImmutableMap.of(
                 "toTypeCode", Integer.valueOf(LoginEnum.CUSTOMER.getType()),
-                "toId", userId
+                "toId", userId,
+                "statuses", MessageStatusEnum.NON_DELETE_STATUSED.stream().map(MessageStatusEnum::getCode).collect(Collectors.toList())
         );
         return xkrMessageMapper.getMessagesByToSource(params);
     }

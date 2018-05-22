@@ -22,25 +22,70 @@
     id,user_name,user_token,salt,email,wealth,total_recharge,status,create_time,update_time,ext
   </sql>
 
+  <select id="getTotalUser" parameterType="java.util.Map" resultType="java.lang.Integer">
+    SELECT count(1)
+    FROM xkr_user
+    <if test="statuses!=null">
+      WHERE status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
+  </select>
+
+  <update id="batchUpdateUserByIds" parameterType="java.util.Map">
+    UPDATE xkr_user SET status = #{status}, update_time = now()
+    where id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <select id="getUserById" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT  <include refid="user_fields"/>
+    FROM xkr_user WHERE id = #{id}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
+  </select>
+
   <select id="getUserByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
     SELECT  <include refid="user_fields"/>
     FROM xkr_user WHERE id IN
     <foreach collection="ids" item="id" separator="," open="(" close=")">
       #{id}
     </foreach>
-    <if test="status!=null">
-      AND status = #{status}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
     </if>
   </select>
 
-  <select id="selectByUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByUserName" parameterType="java.util.Map" resultMap="BaseResultMap">
     SELECT  <include refid="user_fields"/>
     FROM xkr_user WHERE user_name = #{userLogin}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
   </select>
 
-  <select id="selectByEmail" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByEmail" parameterType="java.util.Map" resultMap="BaseResultMap">
     SELECT <include refid="user_fields"/>
     FROM xkr_user WHERE email = #{userLogin}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
   </select>
 
 </mapper>

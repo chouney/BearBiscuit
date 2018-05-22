@@ -1,7 +1,7 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.message;
 
 import com.google.common.collect.Lists;
-import com.xkr.domain.dto.MessageDTO;
+import com.xkr.domain.dto.BaseDTO;
 
 import java.io.Serializable;
 import java.util.List;

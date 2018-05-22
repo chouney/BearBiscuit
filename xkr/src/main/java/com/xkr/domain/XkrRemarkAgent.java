@@ -10,6 +10,7 @@ import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrAboutRemarkMapper;
 import com.xkr.dao.mapper.XkrResourceCommentMapper;
 import com.xkr.domain.dto.ResponseDTO;
+import com.xkr.domain.dto.remark.RemarkStatusEnum;
 import com.xkr.domain.dto.search.CommentIndexDTO;
 import com.xkr.domain.entity.XkrAboutRemark;
 import com.xkr.domain.entity.XkrResource;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -41,9 +43,8 @@ public class XkrRemarkAgent {
     @Autowired
     private XkrAboutRemarkMapper xkrAboutRemarkMapper;
 
-    private final static int STATUS_NORMAL = 1;
+    public final static long DEFAULT_PARENT_REMARK_ID = 0L;
 
-    private final static int STATUS_DELETE = 2;
 
     public XkrAboutRemark saveNewRemark(Long parentRemarkId,
                                         LoginEnum loginEnum, Long userId,
@@ -51,24 +52,53 @@ public class XkrRemarkAgent {
                                         String content){
         if(Objects.isNull(loginEnum) ||
                 Objects.isNull(userId) ||
-                StringUtils.isEmpty(qq) || StringUtils.isEmpty(phone) ||
                 StringUtils.isEmpty(content)){
             return null;
         }
         Long id = idGenerator.generateId();
-        parentRemarkId = parentRemarkId == null ? id : parentRemarkId;
         XkrAboutRemark xkrAboutRemark = new XkrAboutRemark();
+
+        if(Objects.nonNull(parentRemarkId)){
+            xkrAboutRemark.setStatus((byte) RemarkStatusEnum.STATUS_NORMAL_ADMIN_REPLY.getCode());
+            xkrAboutRemark.setParentRemarkId(parentRemarkId);
+        }else{
+            xkrAboutRemark.setStatus((byte) RemarkStatusEnum.STATUS_NORMAL_USER_REMARK.getCode());
+            xkrAboutRemark.setParentRemarkId(DEFAULT_PARENT_REMARK_ID);
+        }
+
+        if(StringUtils.isEmpty(qq) && StringUtils.isEmpty(phone)) {
+            JSONObject ext = new JSONObject();
+            ext.put("qq", qq);
+            ext.put("phone", phone);
+            xkrAboutRemark.setExt(ext.toJSONString());
+        }
+
         xkrAboutRemark.setContent(content);
-        xkrAboutRemark.setParentRemarkId(parentRemarkId);
         xkrAboutRemark.setId(id);
-        JSONObject ext = new JSONObject();
-        ext.put("qq",qq);
-        ext.put("phone",phone);
-        xkrAboutRemark.setExt(ext.toJSONString());
         xkrAboutRemark.setUserId(userId);
         xkrAboutRemark.setUserTypeCode(Byte.valueOf(loginEnum.getType()));
-        xkrAboutRemark.setStatus((byte)STATUS_NORMAL);
+
         return xkrAboutRemarkMapper.insert(xkrAboutRemark) == 1 ? xkrAboutRemark : null;
+    }
+
+    public XkrAboutRemark getRemarkById(Long id){
+        if(Objects.isNull(id)){
+            return null;
+        }
+        return xkrAboutRemarkMapper.getRemarkById(id);
+    }
+
+    public List<XkrAboutRemark> getAllRemarkList(){
+        return xkrAboutRemarkMapper.getAllList();
+    }
+
+    public boolean batchUpdateRemarkStatus(List<Long> ids,Integer status){
+        if(CollectionUtils.isEmpty(ids) || Objects.isNull(status)){
+            return false;
+        }
+        return xkrAboutRemarkMapper.batchUpdateRemarkByIds(ImmutableMap.of(
+                "status",status,"list",ids
+        )) == 1;
     }
 
 }

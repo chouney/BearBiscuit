@@ -24,12 +24,50 @@
     create_time,update_time,ext
   </sql>
 
+  <select id="getCommentsByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="resource_comment_field"/>
+    FROM xkr_resource_comment WHERE id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="getCommentById" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="resource_comment_field"/>
+    FROM xkr_resource_comment WHERE id = #{id}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
+  </select>
+
+  <update id="batchUpdateCommentByIds" parameterType="java.util.Map">
+    UPDATE xkr_resource_comment SET status = #{status}, update_time = now()
+    where id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </update>
+
   <select id="getCommentsByResourceId" parameterType="java.util.Map" resultMap="BaseResultMap">
     SELECT
     <include refid="resource_comment_field"/>
     FROM xkr_resource_comment WHERE resource_id = #{resourceId}
-    <if test="status!=null">
-      AND status = #{status}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
     </if>
   </select>
 

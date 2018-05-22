@@ -1,6 +1,7 @@
 package com.xkr.util;
 
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -28,6 +29,10 @@ public class EncodeUtil {
      */
     public static String decBase64(String str){
         return Base64.decodeToString(str);
+    }
+
+    public static String md5(Object obj){
+        return new Md5Hash(obj).toString();
     }
 
     /**

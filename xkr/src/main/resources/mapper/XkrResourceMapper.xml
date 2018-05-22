@@ -26,6 +26,41 @@
     create_time,update_time,ext,detail
   </sql>
 
+    <delete id="batchDeleteResourceByIds" parameterType="java.util.List">
+        DELETE FROM xkr_resource WHERE id IN
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="batchUpdateResourceByIds" parameterType="java.util.Map">
+        UPDATE xkr_resource SET status = #{status}, update_time = now()
+        where id IN
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateResourceClassByIds" parameterType="java.util.Map">
+        UPDATE xkr_resource SET class_id = #{classId}, update_time = now()
+        where id IN
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getResourceById" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="resource_field"/>
+        FROM xkr_resource WHERE id = #{id}
+        <if test="statuses!=null">
+            AND status in
+            <foreach collection="statuses" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
+        </if>
+    </select>
+
     <select id="getResourceByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
         SELECT
         <include refid="resource_field"/>
@@ -33,8 +68,11 @@
         <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
-        <if test="status!=null">
-            AND status = #{status}
+        <if test="statuses!=null">
+            AND status in
+            <foreach collection="statuses" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
         </if>
     </select>
 
@@ -45,8 +83,11 @@
         <foreach collection="classIds" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
-        <if test="status!=null">
-            AND status = #{status}
+        <if test="statuses!=null">
+            AND status in
+            <foreach collection="statuses" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
         </if>
     </select>
 
@@ -54,8 +95,11 @@
         SELECT
         <include refid="resource_field"/>
         FROM xkr_resource WHERE user_id = #{userId}
-        <if test="status!=null">
-            AND status = #{status}
+        <if test="statuses!=null">
+            AND status in
+            <foreach collection="statuses" item="status" separator="," open="(" close=")">
+                #{status}
+            </foreach>
         </if>
     </select>
 

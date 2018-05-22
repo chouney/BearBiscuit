@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalField;
 import java.util.Objects;
 
 /**
@@ -41,6 +44,39 @@ public class BaseRedisService {
             returnResource(jedis);
         }
     }
+
+    public void set(String key, String value,int expireSecond) {
+        Jedis jedis = null;
+        try {
+            jedis = getResource();
+            jedis.set(key, value);
+            jedis.expire(key,expireSecond);
+            logger.info("Redis set success - " + key + ", value:" + value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Redis set error: " + e.getMessage() + " - " + key + ", value:" + value);
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    public void incrByCount(String key,long count, int ifNotExistExpireSecond) {
+        Jedis jedis = null;
+        try {
+            jedis = getResource();
+            Long newValue = jedis.incrBy(key,count);
+            if(newValue == 1L){
+                jedis.expire(key,ifNotExistExpireSecond);
+            }
+            logger.info("Redis set success - " + key + ", ifNotExistExpireSecond:" + ifNotExistExpireSecond);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Redis set error: " + e.getMessage() + " - " + key + ", ifNotExistExpireSecond:" + ifNotExistExpireSecond);
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
 
     public String get(String key) {
         String result = null;

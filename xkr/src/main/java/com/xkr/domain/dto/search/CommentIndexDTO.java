@@ -14,7 +14,7 @@ public class CommentIndexDTO extends BaseIndexDTO implements Serializable{
     private static final long serialVersionUID = -4029774414056704378L;
     /**
      * "commentId":"评论id",
-     * "resId":"资源id",
+     * "resourceId":"资源id",
      * ”title“:"资源标题",
      * "content":"评论内容",
      * "clientIp":"ip地址",

@@ -40,7 +40,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     }
 
     // 创建session，保存到数据库
-    // TODO: 2018/5/7 数据库同步SESSION记录
     @Override
     protected Serializable doCreate(Session session) {
         Serializable sessionId = this.generateSessionId(session);
@@ -54,7 +53,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     @Override
     protected Session doReadSession(Serializable sessionId) {
         logger.debug("readSession:{}", sessionId.toString());
-        // 先从缓存中获取session，如果没有再去数据库中获取 todo
+        // 先从缓存中获取session，如果没有再去数据库中获取
         Session session = null;
         if(session == null){
             session = (Session) redisTemplate.opsForValue().get(getKey(sessionId.toString()));

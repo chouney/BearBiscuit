@@ -1,8 +1,7 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.clazz;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.google.common.collect.Lists;
+import com.xkr.domain.dto.BaseDTO;
 
 import java.io.Serializable;
 import java.util.List;

@@ -3,11 +3,10 @@ package com.xkr.domain;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.xkr.common.UserStatusEnum;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrUserMapper;
-import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
+import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.util.IdUtil;
@@ -23,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
@@ -42,21 +42,32 @@ public class XkrUserAgent {
     @Autowired
     private SearchApiService searchApiService;
 
-    public static final int USER_STATUS_NORMAL = 1;
+    public boolean batchUpdateUserByIds(List<Long> userIds,UserStatusEnum status){
+        if(CollectionUtils.isEmpty(userIds) || Objects.isNull(status)){
+            return false;
+        }
+        boolean isSuccess = false;
+        if(UserStatusEnum.TOUPDATE_STATUSED.contains(status)){
+            isSuccess = xkrUserMapper.batchUpdateUserByIds(ImmutableMap.of(
+                    "list",userIds,"status",status.getCode()
+            )) == 1;
+        }
+        if(isSuccess){
+            if (!searchApiService.bulkUpdateIndexStatus("user", userIds, status.getCode())) {
+                logger.error("XkrUserAgent batchUpdateUserByIds failed ,userIds:{},status:{}", JSON.toJSONString(userIds),status);
+            }
+        }
+        return isSuccess;
+    }
 
-    public static final int USER_STATUS_UNVERIFY = 2;
-
-    public static final int USER_STATUS_FREEZED = 3;
-
-
-    public List<XkrUser> getUserByIds(List<Long> userIds,Integer status){
+    public List<XkrUser> getUserByIds(List<Long> userIds,List<UserStatusEnum> statuses){
         List<XkrUser> list = Lists.newArrayList();
         if(CollectionUtils.isEmpty(userIds)){
             return list;
         }
         Map<String,Object> params = ImmutableMap.of(
                 "ids",userIds,
-                "status",status
+                "statuses",statuses.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
         );
         return xkrUserMapper.getUserByIds(params);
     }
@@ -67,25 +78,48 @@ public class XkrUserAgent {
             return list;
         }
         Map<String,Object> params = ImmutableMap.of(
-                "ids",userIds
+                "ids",userIds,
+                "statuses",UserStatusEnum.NON_DELETE_STATUSED.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
         );
         return xkrUserMapper.getUserByIds(params);
+    }
+
+    public XkrUser getUserById(Long userId,List<UserStatusEnum> statuses){
+        if(Objects.isNull(userId)){
+            return null;
+        }
+        return xkrUserMapper.getUserById(ImmutableMap.of(
+                "id",userId,"statuses",statuses.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
+        ));
+    }
+
+    public Integer getUserTotalCount(){
+        return xkrUserMapper.getTotalUser(ImmutableMap.of(
+                "statuses",UserStatusEnum.NON_DELETE_STATUSED.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
+        ));
     }
 
     public XkrUser getUserById(Long userId){
         if(Objects.isNull(userId)){
             return null;
         }
-        return xkrUserMapper.selectByPrimaryKey(userId);
+        return xkrUserMapper.getUserById(ImmutableMap.of(
+                "id",userId,"statuses",UserStatusEnum.NON_DELETE_STATUSED.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
+        ));
     }
 
     public XkrUser getUserByNameOrEmail(String userLogin){
         if(StringUtils.isEmpty(userLogin)){
             return null;
         }
-        XkrUser user = xkrUserMapper.selectByUserName(userLogin);
+        List<Integer> statusesCode = UserStatusEnum.NON_DELETE_STATUSED.stream().map(UserStatusEnum::getCode).collect(Collectors.toList());
+        XkrUser user = xkrUserMapper.selectByUserName(ImmutableMap.of(
+                "userLogin",userLogin,"statuses",statusesCode
+        ));
         if(Objects.isNull(user)){
-            user = xkrUserMapper.selectByEmail(userLogin);
+            user = xkrUserMapper.selectByEmail(ImmutableMap.of(
+                    "userLogin",userLogin,"statuses",statusesCode
+            ));
         }
         return user;
     }
@@ -96,11 +130,11 @@ public class XkrUserAgent {
         }
         XkrUser user = new XkrUser();
         user.setId(userId);
-        user.setStatus((byte)USER_STATUS_NORMAL);
+        user.setStatus((byte)UserStatusEnum.USER_STATUS_NORMAL.getCode());
         if(xkrUserMapper.updateByPrimaryKey(user) == 1){
             UserIndexDTO userIndexDTO = new UserIndexDTO();
             searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(user.getId()));
-            userIndexDTO.setStatus(USER_STATUS_NORMAL);
+            userIndexDTO.setStatus(UserStatusEnum.USER_STATUS_NORMAL.getCode());
             if(!searchApiService.upsertIndex(userIndexDTO)){
                 logger.error("XkrUserAgent verifyUserAccountByUserId failed ,userId:{}",userId);
             }
@@ -133,7 +167,7 @@ public class XkrUserAgent {
         user.setEmail(email);
         user.setTotalRecharge(0L);
         user.setWealth(0L);
-        user.setStatus(UserStatusEnum.UNAUTHORIZED.getCode());
+        user.setStatus((byte)UserStatusEnum.USER_STATUS_UNVERIFIED.getCode());
         if(xkrUserMapper.insertSelective(user) == 1){
             //创建用户索引
             UserIndexDTO userIndexDTO = new UserIndexDTO();

@@ -29,6 +29,9 @@ public enum ErrorStatus {
     USER_NOT_EXIST(11410,"用户不存在"),
     USER_ALREADY_FREEZED(11411,"用户已冻结"),
     USER_ALREADY_ACTIVE(11412,"用户已激活"),
+    USER_INCORRECT_LOGIN(11413,"登录账号或密码错误"),
+    USER_ATTEMPT_EXCESSIVE_LOGIN(11414,"账号错误次数过多,请稍后再试"),
+    USER_LOGIN_ERROR(11500,"登录异常,请稍后再试"),
 
     //评论
     COMMENT_USER_NOT_PRILIVEGED(12400,"用户无评论权限"),
@@ -36,6 +39,25 @@ public enum ErrorStatus {
     //留言
     REMARK_USER_NOT_PRILIVEGED(12500,"用户无留言权限"),
 
+    //后台
+    ADMIN_EXIST_HOLDING_ROLE_ACCOUNT(20000,"存在拥有该角色的管理账户"),
+
+
+/**
+ * catch (UnknownAccountException uae) {
+ logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,未知账户");
+
+ } catch (IncorrectCredentialsException ice) {
+ logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,错误的凭证");
+ } catch (LockedAccountException lae) {
+ logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,账户已锁定");
+ } catch (ExcessiveAttemptsException eae) {
+ logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,错误次数过多");
+ } catch (AuthenticationException ae) {
+ //通过处理Shiro的运行时AuthenticationException就可以控制用户登录失败或密码错误时的情景
+ logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,堆栈轨迹如下");
+ }
+ */
 
     ;
     private int code;

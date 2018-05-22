@@ -3,11 +3,12 @@ package com.xkr.service;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
+import com.xkr.common.ErrorStatus;
 import com.xkr.common.LoginEnum;
 import com.xkr.domain.XkrMessageAgent;
-import com.xkr.domain.dto.ListMessageDTO;
-import com.xkr.domain.dto.MessageDTO;
+import com.xkr.domain.dto.message.ListMessageDTO;
+import com.xkr.domain.dto.message.MessageDTO;
+import com.xkr.domain.dto.message.MessageStatusEnum;
 import com.xkr.domain.entity.XkrMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class MessageService {
             logger.info("MessageService markedMessageById do not execute , messageId:{}", JSON.toJSONString(messageIds));
             return false;
         }
-        return messageAgent.updateMessageStatus(XkrMessageAgent.MESSAGE_STATUS_READ,messageIds);
+        return messageAgent.updateMessageStatus(MessageStatusEnum.MESSAGE_STATUS_READ.getCode(),messageIds);
     }
 
     @Async
@@ -52,6 +53,7 @@ public class MessageService {
     public ListMessageDTO getToUserMessage(int frontType, long userId,int pageNum,int size) {
         ListMessageDTO result = new ListMessageDTO();
         if (userId < 0L) {
+            result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
         List<XkrMessage> list;

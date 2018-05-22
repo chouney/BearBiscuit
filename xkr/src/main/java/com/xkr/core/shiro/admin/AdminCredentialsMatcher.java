@@ -1,11 +1,16 @@
 package com.xkr.core.shiro.admin;
 
+import com.xkr.domain.XkrLoginTokenAgent;
+import com.xkr.domain.entity.XkrAdminAccount;
+import com.xkr.domain.entity.XkrUser;
+import com.xkr.util.EncodeUtil;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,6 +25,11 @@ public class AdminCredentialsMatcher extends SimpleCredentialsMatcher {
 
     public AdminCredentialsMatcher(CacheManager cacheManager) {
         passwordRetryCache = cacheManager.getCache("passwordRetryCache");
+    }
+
+    @Override
+    protected Object getCredentials(AuthenticationToken token) {
+        return EncodeUtil.md5(token.getCredentials());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.xkr.domain.dto;
+package com.xkr.domain.dto.resource;
 
 import java.io.Serializable;
 import java.util.Date;

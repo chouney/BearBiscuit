@@ -9,9 +9,18 @@ import java.util.Map;
 
 @Service
 public interface XkrUserMapper extends CustomerMapper<XkrUser> {
-    XkrUser selectByUserName(String userName);
 
-    XkrUser selectByEmail(String email);
+    Integer getTotalUser(Map<String,Object> params);
+
+    Integer batchDeleteUserByIds(List<Long> list);
+
+    Integer batchUpdateUserByIds(Map<String,Object> params);
+
+    XkrUser selectByUserName(Map<String,Object> params);
+
+    XkrUser selectByEmail(Map<String,Object> params);
 
     List<XkrUser> getUserByIds(Map<String,Object> params);
+
+    XkrUser getUserById(Map<String,Object> params);
 }

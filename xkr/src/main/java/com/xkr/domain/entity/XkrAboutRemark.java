@@ -31,7 +31,7 @@ public class XkrAboutRemark {
     private Long parentRemarkId;
 
     /**
-     * 留言状态
+     * 留言状态 1用户正常留言,2管理员回复,3删除
      */
     private Byte status;
 

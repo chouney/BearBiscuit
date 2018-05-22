@@ -1,12 +1,8 @@
 package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
-import com.xkr.domain.dto.ListMessageDTO;
-import com.xkr.domain.dto.MessageDTO;
+import com.xkr.domain.dto.message.ListMessageDTO;
 import com.xkr.service.MessageService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.ListMessageVO;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

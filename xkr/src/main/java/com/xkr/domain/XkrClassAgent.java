@@ -6,14 +6,12 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrClassMapper;
-import com.xkr.domain.dto.ClassMenuDTO;
 import com.xkr.domain.entity.XkrClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -63,7 +61,7 @@ public class XkrClassAgent {
             logger.info("XkrClassAgent getClassById param classId invalid null");
             return null;
         }
-        return xkrClassMapper.selectByPrimaryKey(classId);
+        return xkrClassMapper.getClassById(classId);
     }
 
     public List<XkrClass> getClassByIds(List<Long> classIds){
@@ -119,6 +117,21 @@ public class XkrClassAgent {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 删除Class及其子class
+     * @param classIds
+     * @return
+     */
+    public boolean batchDeleteClassByClassIds(List<Long> classIds){
+        if(CollectionUtils.isEmpty(classIds)){
+            logger.info("XkrClassAgent batchDeleteClassByClassId param classId invalid null");
+            return false;
+        }
+        classIds.forEach(classId-> xkrClassMapper.deleteClassByClassId(classId));
+        childClassCache.cleanUp();
+        return true;
     }
 
 

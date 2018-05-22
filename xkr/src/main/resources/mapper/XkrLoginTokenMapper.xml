@@ -15,4 +15,18 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
+
+  <sql id="login_token_fields" >
+    id,user_id,login_token,client_ip,login_count,status,create_time,update_time,ext
+  </sql>
+
+  <select id="getLoginTokensByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+    SELECT  <include refid="login_token_fields"/>
+    FROM xkr_login_token WHERE id IN
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    AND status = 1
+  </select>
+
 </mapper>
