@@ -50,7 +50,6 @@ public class ESClientFactory {
         setConnectTimeOutConfig();
         setMutiConnectConfig();
         restHighLevelClient = new RestHighLevelClient(builder);
-        System.out.println("init factory");
     }
     // 配置连接时间延时
     public void setConnectTimeOutConfig(){

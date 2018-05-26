@@ -8,10 +8,34 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="backup_name" property="backupName" jdbcType="VARCHAR" />
     <result column="admin_account_id" property="adminAccountId" jdbcType="BIGINT" />
-    <result column="type" property="type" jdbcType="TINYINT" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
+  <sql id="backup_field" >
+    id,backup_name,admin_account_id,status,create_time,update_time,ext
+  </sql>
+
+  <select id="selectList"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="backup_field"/>
+    FROM xkr_database_backup
+    WHERE status = 1
+  </select>
+
+  <delete id="batchDeleteBackUpByIds" parameterType="java.util.List">
+    DELETE FROM xkr_database_backup WHERE id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="getBackUpById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT <include refid="backup_field"/>
+    FROM xkr_database_backup WHERE id = #{id}
+    and status = 1;
+  </select>
+
+
 </mapper>

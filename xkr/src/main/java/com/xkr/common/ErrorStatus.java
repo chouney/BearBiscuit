@@ -15,7 +15,7 @@ public enum ErrorStatus {
     CSRF_TOEKN_ERROR(403,"认证异常"),
     NOT_FOUND(404,"资源未找到"),
     ERROR(500,"服务器异常"),
-
+    FREQUENCY_OPT(510,"操作太频繁了"),
     //资源
     RESOURCE_NOT_FOUND(10404,"资源未找到"),
     RESOURCE_FREEZED(10400,"资源已被冻结"),

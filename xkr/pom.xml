@@ -82,6 +82,13 @@
             <version>1.7.3</version>
         </dependency>
 
+        <!--定时调度quartz-->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+
         <!-- 又拍云存储服务 -->
         <dependency>
             <groupId>com.upyun</groupId>

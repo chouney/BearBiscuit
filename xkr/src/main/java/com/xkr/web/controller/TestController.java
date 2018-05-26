@@ -9,6 +9,7 @@ import com.xkr.common.annotation.CSRFValid;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
+import com.xkr.service.BackUpService;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
@@ -54,6 +55,9 @@ public class TestController {
 
     @Autowired
     private SearchApiService searchApiService;
+
+    @Autowired
+    private BackUpService backUpService;
 
     @RequestMapping(value = "/index", method = {RequestMethod.GET})
     @ResponseBody
@@ -152,6 +156,18 @@ public class TestController {
         } catch (IOException | UpException e) {
             e.printStackTrace();
         }
+        return new BasicResult(ErrorStatus.OK);
+    }
+
+    /**
+     * 文件上传测试
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/backup", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult index5(@RequestParam(name = "type") Integer type) {
+        backUpService.autoCrontab(type);
         return new BasicResult(ErrorStatus.OK);
     }
 

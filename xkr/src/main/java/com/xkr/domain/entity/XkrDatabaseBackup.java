@@ -25,11 +25,6 @@ public class XkrDatabaseBackup {
     private Long adminAccountId;
 
     /**
-     * 备份方式:1自动每天,2自动每周,3自动每月,4手动
-     */
-    private Byte type;
-
-    /**
      * 状态
      */
     private Byte status;
@@ -103,24 +98,6 @@ public class XkrDatabaseBackup {
      */
     public void setAdminAccountId(Long adminAccountId) {
         this.adminAccountId = adminAccountId;
-    }
-
-    /**
-     * 获取备份方式:1自动每天,2自动每周,3自动每月,4手动
-     *
-     * @return type - 备份方式:1自动每天,2自动每周,3自动每月,4手动
-     */
-    public Byte getType() {
-        return type;
-    }
-
-    /**
-     * 设置备份方式:1自动每天,2自动每周,3自动每月,4手动
-     *
-     * @param type 备份方式:1自动每天,2自动每周,3自动每月,4手动
-     */
-    public void setType(Byte type) {
-        this.type = type;
     }
 
     /**

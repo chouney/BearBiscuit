@@ -218,7 +218,6 @@ CREATE TABLE xkr_database_backup(
 	`id` bigint(20) UNSIGNED NOT NULL COMMENT '数据库备份id',
 	`backup_name` varchar(64) NOT NULL COMMENT '数据库备份名',
 	`admin_account_id` bigint(20) UNSIGNED NOT NULL COMMENT '管理员id',
-	`type` tinyint(4) NOT NULL COMMENT '备份方式:1自动每天,2自动每周,3自动每月,4手动',
 	`status` tinyint(4) NOT NULL COMMENT '状态',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',

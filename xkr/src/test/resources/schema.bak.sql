@@ -211,7 +211,6 @@ CREATE TABLE xkr_database_backup(
 	id bigint(20) UNSIGNED NOT NULL ,
 	backup_name varchar(64) NOT NULL ,
 	admin_account_id bigint(20) UNSIGNED NOT NULL ,
-	type tinyint(4) NOT NULL ,
 	status tinyint(4) NOT NULL ,
 	create_time DATETIME DEFAULT CURRENT_TIMESTAMP ,
 	update_time DATETIME DEFAULT CURRENT_TIMESTAMP ,
