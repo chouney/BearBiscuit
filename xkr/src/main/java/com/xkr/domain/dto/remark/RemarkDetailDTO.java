@@ -3,6 +3,7 @@ package com.xkr.domain.dto.remark;
 import com.xkr.domain.dto.BaseDTO;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author chriszhang
@@ -16,6 +17,8 @@ public class RemarkDetailDTO extends BaseDTO implements Serializable{
     private Long remarkId;
 
     private String content;
+
+    private Date submitDate;
 
     private RemarkDetailDTO pRemark;
 
@@ -41,5 +44,13 @@ public class RemarkDetailDTO extends BaseDTO implements Serializable{
 
     public void setpRemark(RemarkDetailDTO pRemark) {
         this.pRemark = pRemark;
+    }
+
+    public Date getSubmitDate() {
+        return submitDate;
+    }
+
+    public void setSubmitDate(Date submitDate) {
+        this.submitDate = submitDate;
     }
 }

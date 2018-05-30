@@ -12,16 +12,20 @@ import java.util.List;
  * @version 1.0
  * @date 2018/5/16
  */
-public class CommentDTO extends BaseDTO implements Serializable{
+public class CommentDTO implements Serializable{
 
 
     private static final long serialVersionUID = 3605348949401837814L;
+
+    private Long commentId;
 
     private String userName;
 
     private String content;
 
     private Date commentDate;
+
+    private Integer status;
 
     public String getUserName() {
         return userName;
@@ -45,5 +49,21 @@ public class CommentDTO extends BaseDTO implements Serializable{
 
     public void setCommentDate(Date commentDate) {
         this.commentDate = commentDate;
+    }
+
+    public Long getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(Long commentId) {
+        this.commentId = commentId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

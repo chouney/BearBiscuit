@@ -11,6 +11,7 @@ import com.xkr.common.ErrorStatus;
 import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
+import com.xkr.dao.cache.AdminIndexRedisService;
 import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.XkrResourceAgent;
 import com.xkr.domain.XkrResourceUserAgent;
@@ -19,10 +20,7 @@ import com.xkr.domain.dto.*;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.file.FileInfoDTO;
 import com.xkr.domain.dto.file.FolderItemDTO;
-import com.xkr.domain.dto.resource.ListResourceDTO;
-import com.xkr.domain.dto.resource.ResourceDTO;
-import com.xkr.domain.dto.resource.ResourceDetailDTO;
-import com.xkr.domain.dto.resource.ResourceStatusEnum;
+import com.xkr.domain.dto.resource.*;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
@@ -78,6 +76,9 @@ public class ResourceService {
 
     @Autowired
     private UpLoadApiService upLoadApiService;
+
+    @Autowired
+    private AdminIndexRedisService adminIndexRedisService;
 
     @Value("${upyun.opt.user}")
     private String optUser;
@@ -199,7 +200,12 @@ public class ResourceService {
             xkrResourceAgent.updateDownloadCountById(resourceId);
 
         }
+
+        //生成下载token
         try {
+            //增加下载数
+            adminIndexRedisService.incDownLoadCount();
+
             return new FileDownloadResponseDTO(UpYunUtils.sign("GET",
                     LocalDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
                     String.format(UpLoadApiService.getCompressFilePathFormat(),resource.getUserId(),resource.getResourceUrl()),
@@ -209,7 +215,6 @@ public class ResourceService {
             throw new RuntimeException("generate download token failed",e);
         }
 
-        //生成下载token
     }
 
     /**
@@ -242,9 +247,11 @@ public class ResourceService {
                 return new ResponseDTO<>(ErrorStatus.ERROR);
             }
 
-            XkrResource resource = xkrResourceAgent.saveNewResource(title, detail, cost, classId,
+            XkrResource resource = xkrResourceAgent.saveNewResource(title, detail, cost, xkrClass,
                     userId, compressMd5, unCompressMd5, fileInfoDTO.getSize());
             if (Objects.nonNull(resource)) {
+
+                adminIndexRedisService.incrUploadCount();
 
                 //todo 富文本过滤
                 return new ResponseDTO<>(resource.getId());
@@ -260,28 +267,78 @@ public class ResourceService {
 
 
     /**
-     * 获取资源目录列表（只返回正常状态的）
+     * 获取资源目录列表
      *
-     * @param resourceId
+     * @param resource
      * @param resUri
      * @return
      */
-    public List<FolderItemDTO> getResourceMenuList(Long resourceId, String resUri) {
+    private List<FolderItemDTO> getResourceMenuList(XkrResource resource, String resUri) {
         List<FolderItemDTO> list = Lists.newArrayList();
+        if (Objects.isNull(resource)) {
+            logger.error("ResourceService getResourceMenuList resource info is null : resId:{},resUri:{}", "null", resUri);
+            return list;
+        }
+        String unCompressMd5 = JSONObject.parseObject(resource.getExt()).getString(EXT_MD5_UNCOMPRESS_FILE_KEY);
+        if (StringUtils.isEmpty(unCompressMd5)) {
+            logger.error("ResourceService getResourceMenuList md5FileList is null : resource:{}", JSON.toJSONString(resource));
+            return list;
+        }
+        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), "/" + unCompressMd5 +"/" + resUri);
+        return upLoadApiService.getDirInfo(dicPath);
+    }
+
+    /**
+     * 获取资源目录全拓扑（只返回正常状态的）
+     *
+     * @param resourceId
+     * @return
+     */
+    public ListResourceFolderDTO getResourceMenuList(Long resourceId) {
+        ListResourceFolderDTO list = new ListResourceFolderDTO();
         XkrResource resource = xkrResourceAgent.getResourceById(resourceId, ImmutableList.of(
                 ResourceStatusEnum.STATUS_NORMAL.getCode()
         ));
         if (Objects.isNull(resource)) {
-            logger.error("ResourceService getResourceMenuList resource info is null : resId:{},resUri:{}", resourceId, resUri);
+            logger.error("ResourceService getResourceMenuList resource info is null : resId:{}", resourceId);
+            list.setStatus(ErrorStatus.PARAM_ERROR);
             return list;
         }
-        String unCompressMd5 = JSONObject.parseObject(resource.getExt()).getString(EXT_MD5_UNCOMPRESS_FILE_KEY);
-        if (StringUtils.isEmpty(resource)) {
-            logger.error("ResourceService getResourceMenuList md5FileList is null : resource:{}", JSON.toJSONString(resource));
-            return list;
+        String rootUri = "";
+        List<FolderItemDTO> currentMenuList = getResourceMenuList(resource,rootUri);
+        currentMenuList.forEach(folderItemDTO -> {
+            ResourceFolderDTO resourceFolderDTO = new ResourceFolderDTO();
+            resourceFolderDTO.setName(folderItemDTO.getName());
+            if(folderItemDTO.isFolder()){
+                String uri = rootUri+folderItemDTO.getName();
+                resourceFolderDTO.setFileType("d");
+                buildResourceSubFolder(resourceFolderDTO,resource,uri);
+            }else{
+                resourceFolderDTO.setFileType("-");
+            }
+            list.getList().add(resourceFolderDTO);
+        });
+        return list;
+    }
+
+    private void buildResourceSubFolder(ResourceFolderDTO resourceFolderDTO,XkrResource resource,String currentUri){
+        if(Objects.nonNull(resourceFolderDTO) && "d".equals(resourceFolderDTO.getFileType())){
+            resourceFolderDTO.setSubFolders(Lists.newArrayList());
+            List<FolderItemDTO> subList = getResourceMenuList(resource,currentUri);
+            subList.forEach(folderItemDTO -> {
+                ResourceFolderDTO subFolder = new ResourceFolderDTO();
+                subFolder.setName(folderItemDTO.getName());
+                if(folderItemDTO.isFolder()){
+                    String uri = currentUri+"/"+folderItemDTO.getName();
+                    resourceFolderDTO.setFileType("d");
+                    buildResourceSubFolder(subFolder,resource,uri);
+                }else{
+                    subFolder.setFileType("-");
+                }
+                resourceFolderDTO.getSubFolders().add(subFolder);
+            });
         }
-        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), "/" + unCompressMd5 + resUri);
-        return upLoadApiService.getDirInfo(dicPath);
+
     }
 
     /**
@@ -374,7 +431,7 @@ public class ResourceService {
      * @param needSearch
      * @return
      */
-    public ListResourceDTO getResourcesByClassIds(Long rootClassId, int orderType,
+    public ListResourceDTO getResourcesByClassId(Long rootClassId, int orderType,
                                                   int pageNum, int size, boolean needSearch) {
         ListResourceDTO result = new ListResourceDTO();
         if (Objects.isNull(rootClassId)) {

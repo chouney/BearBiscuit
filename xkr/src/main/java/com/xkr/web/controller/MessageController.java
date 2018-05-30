@@ -5,7 +5,8 @@ import com.xkr.common.ErrorStatus;
 import com.xkr.domain.dto.message.ListMessageDTO;
 import com.xkr.service.MessageService;
 import com.xkr.web.model.BasicResult;
-import com.xkr.web.model.vo.ListMessageVO;
+import com.xkr.web.model.vo.message.ListMessageVO;
+import com.xkr.web.model.vo.message.MessageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -43,9 +44,13 @@ public class MessageController {
         try {
             ListMessageDTO result = messageService.getToUserMessage(type, Long.valueOf(userId), pageNum, size);
 
+            if(!ErrorStatus.OK.equals(result.getStatus())){
+                return new BasicResult(result.getStatus());
+            }
+
             ListMessageVO vo = new ListMessageVO();
 
-            BeanUtils.copyProperties(result,vo);
+            buildListMessageVO(vo,result);
 
             return new BasicResult<>(vo);
         } catch (Exception e) {
@@ -64,6 +69,16 @@ public class MessageController {
             logger.error("MessageController getUserMessage error ,messageIds:{}", JSON.toJSONString(messageIds), e);
         }
         return new BasicResult(ErrorStatus.ERROR);
+    }
+
+    private void buildListMessageVO(ListMessageVO listMessageVO,ListMessageDTO listMessageDTO){
+        listMessageDTO.getMsgList().forEach(messageDTO -> {
+            MessageVO messageVO = new MessageVO();
+            messageVO.setMsg(messageDTO.getMsg());
+            messageVO.setDate(messageDTO.getDate());
+            listMessageVO.getMsgList().add(messageVO);
+        });
+        listMessageVO.setTotalCount(listMessageDTO.getTotalCount());
     }
 
 }

@@ -8,6 +8,7 @@ import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.XkrResourceAgent;
+import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.clazz.ClassMenuDTO;
 import com.xkr.domain.dto.resource.ResourceStatusEnum;
 import com.xkr.domain.entity.XkrClass;
@@ -67,17 +68,18 @@ public class ClassService {
         build(list, xkrClasses);
 
         if (CollectionUtils.isEmpty(list)) {
-            return null;
+            result.setStatus(ErrorStatus.ERROR);
+            return result;
         }
         return list.get(0);
     }
 
     @OptLog(moduleEnum = OptLogModuleEnum.CLASSIFY,optEnum = OptEnum.UPDATE)
-    public boolean updateClassNameById(Long classId, String className) {
+    public ResponseDTO<Boolean> updateClassNameById(Long classId, String className) {
         if(Objects.isNull(classId) || StringUtils.isEmpty(className)){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-        return classAgent.updateClassNameByClassId(classId, className);
+        return new ResponseDTO<>(classAgent.updateClassNameByClassId(classId, className));
     }
 
     /**
@@ -86,14 +88,14 @@ public class ClassService {
      * @return
      */
     @OptLog(moduleEnum = OptLogModuleEnum.CLASSIFY,optEnum = OptEnum.DELETE)
-    public boolean deleteClassByClassId(Long classId) {
+    public ResponseDTO<Boolean> deleteClassByClassId(Long classId) {
         if(Objects.isNull(classId) || classId.equals(XkrClassAgent.ROOT_CLASS_ID)){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         List<XkrClass> classList = classAgent.getAllChildClassByClassId(classId);
         Optional<XkrClass> optional = classList.stream().filter(xkrClass -> xkrClass.getId().equals(classId)).findFirst();
         if(!optional.isPresent()){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.ERROR);
         }
         XkrClass currentClass = optional.get();
         List<Long> ids = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
@@ -104,9 +106,9 @@ public class ClassService {
 
         boolean isSuccess = xkrResourceAgent.batchUpdateResourceClassByIds(resourceId,currentClass.getParentClassId());
         if(!isSuccess){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.ERROR);
         }
-        return classAgent.deleteClassByClassId(classId);
+        return new ResponseDTO<>(classAgent.deleteClassByClassId(classId));
     }
 
     /**
@@ -115,20 +117,20 @@ public class ClassService {
      * @return
      */
     @OptLog(moduleEnum = OptLogModuleEnum.CLASSIFY,optEnum = OptEnum.DELETE)
-    public boolean batchDeleteClassByClassId(List<Long> classIds) {
+    public ResponseDTO<Boolean> batchDeleteClassByClassId(List<Long> classIds) {
         if(CollectionUtils.isEmpty(classIds)){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         classIds.forEach(this::deleteClassByClassId);
-        return true;
+        return new ResponseDTO<>(true);
     }
 
     @OptLog(moduleEnum = OptLogModuleEnum.CLASSIFY,optEnum = OptEnum.INSERT)
-    public boolean saveNewClass(String className, Long parentClassId) {
+    public ResponseDTO<Boolean> saveNewClass(String className, Long parentClassId) {
         if(StringUtils.isEmpty(className) || Objects.isNull(parentClassId)){
-            return false;
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-        return classAgent.saveNewClass(className, parentClassId);
+        return new ResponseDTO<>(classAgent.saveNewClass(className, parentClassId));
     }
 
 

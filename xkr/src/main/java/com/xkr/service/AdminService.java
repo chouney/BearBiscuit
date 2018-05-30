@@ -419,7 +419,6 @@ public class AdminService {
             return;
         }
 
-        /// TODO: 2018/5/25 如下埋点需要待添加
         indexDTO.setRoleName(role.getRoleName());
         indexDTO.setAccountName(adminAccount.getAccountName());
         indexDTO.setLastLoginDate(session.getLastAccessTime());

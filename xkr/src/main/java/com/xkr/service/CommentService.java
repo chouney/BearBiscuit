@@ -219,6 +219,8 @@ public class CommentService {
     private void buildCommentDTO(CommentDTO commentDTO, XkrResourceComment resourceComment, XkrUser commentUser) {
         commentDTO.setCommentDate(resourceComment.getCreateTime());
         commentDTO.setContent(resourceComment.getContent());
+        commentDTO.setCommentId(resourceComment.getId());
+        commentDTO.setStatus(Integer.valueOf(resourceComment.getStatus()));
         if (Objects.isNull(commentUser)) {
             commentUser = new XkrUser();
             commentDTO.setUserName("未知用户");

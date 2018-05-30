@@ -1,4 +1,4 @@
-package com.xkr.web.model.vo;
+package com.xkr.web.model.vo.message;
 
 import com.google.common.collect.Lists;
 

@@ -1,6 +1,7 @@
 package com.xkr.service.api;
 
 import com.google.common.collect.Lists;
+import com.xkr.common.ErrorStatus;
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
 import com.xkr.domain.dto.file.FileInfoDTO;
@@ -73,6 +74,14 @@ public class UpLoadApiService {
         IMAGE_FILE_PATH_FORMAT = rootPath + "/image/%d%d%d%d%d%d-%s";
     }
 
+    /**
+     * 下载文件
+     * @param upyunFilePath
+     * @param targetFile
+     * @return
+     * @throws IOException
+     * @throws UpException
+     */
     public boolean downLoadFile(String upyunFilePath, File targetFile) throws IOException, UpException {
         return upYun.readFile(upyunFilePath, targetFile);
     }
@@ -153,22 +162,22 @@ public class UpLoadApiService {
             FileTypeEnum fileTypeEnum = FileUtil.getFileType(uploadFile);
             if (fileTypeEnum == null || fileTypeEnum.getProcessorClazz() == null) {
                 //todo 格式异常
-                return null;
+                return new FileUploadResponseDTO(ErrorStatus.PARAM_ERROR);
             }
             //上传压缩文件
             XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
             if (Objects.isNull(user)) {
-                throw new UnauthenticatedException("user not login");
+                return new FileUploadResponseDTO(ErrorStatus.UNLOGIN_REDIRECT);
             }
             boolean isSuccess;
             File unCompressDic = compressProcessorFacade.unCompressFile(uploadFile, fileTypeEnum.getProcessorClazz());
             if (Objects.isNull(unCompressDic)) {
-                return null;
+                return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
             String unCompressMd5 = UpYunUtils.md5(unCompressDic.getName());
             isSuccess = uploadUnCompressDic(String.valueOf(user.getId()), unCompressMd5, unCompressDic);
             if (!isSuccess) {
-                return null;
+                return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
             String compressMd5 = UpYunUtils.md5(uploadFile.getName());
             isSuccess = uploadCompressFile(String.valueOf(user.getId()), compressMd5, uploadFile, true);
@@ -184,7 +193,7 @@ public class UpLoadApiService {
                 return new FileUploadResponseDTO(imageMd5);
             }
         }
-        return null;
+        return new FileUploadResponseDTO(ErrorStatus.ERROR);
 
     }
 

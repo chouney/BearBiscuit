@@ -39,7 +39,7 @@ public class XkrLoginTokenAgent {
             return;
         }
         //存储登录类型key
-        session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, loginEnum.toString());
+        session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, loginEnum.getType());
         XkrLoginToken xkrLoginToken = new XkrLoginToken();
         xkrLoginToken.setUserId(userId);
         xkrLoginToken.setStatus((byte) 1);

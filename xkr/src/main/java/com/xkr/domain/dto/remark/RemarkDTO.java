@@ -1,6 +1,7 @@
 package com.xkr.domain.dto.remark;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author chriszhang
@@ -26,6 +27,8 @@ public class RemarkDTO implements Serializable{
     private String qq;
 
     private String userName;
+
+    private Date submitDate;
 
     public Long getRemarkId() {
         return remarkId;
@@ -65,5 +68,13 @@ public class RemarkDTO implements Serializable{
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Date getSubmitDate() {
+        return submitDate;
+    }
+
+    public void setSubmitDate(Date submitDate) {
+        this.submitDate = submitDate;
     }
 }

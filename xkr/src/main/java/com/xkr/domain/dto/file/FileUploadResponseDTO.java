@@ -1,5 +1,8 @@
 package com.xkr.domain.dto.file;
 
+import com.xkr.common.ErrorStatus;
+import com.xkr.domain.dto.BaseDTO;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +10,7 @@ import java.io.Serializable;
  * @version 1.0
  * @date 2018/5/18
  */
-public class FileUploadResponseDTO implements Serializable{
+public class FileUploadResponseDTO extends BaseDTO implements Serializable{
 
     private static final long serialVersionUID = -5011995111976061889L;
     private String compressMd5;
@@ -15,6 +18,10 @@ public class FileUploadResponseDTO implements Serializable{
     private String unCompressMd5;
 
     private String imageMd5;
+
+    public FileUploadResponseDTO(ErrorStatus status) {
+        super(status);
+    }
 
     public FileUploadResponseDTO(String compressMd5, String unCompressMd5) {
         this.compressMd5 = compressMd5;

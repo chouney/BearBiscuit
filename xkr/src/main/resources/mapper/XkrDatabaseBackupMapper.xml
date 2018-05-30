@@ -24,6 +24,16 @@
     WHERE status = 1
   </select>
 
+  <select id="getListByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+    SELECT
+    <include refid="backup_field"/>
+    FROM xkr_database_backup WHERE id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+    AND status = 1
+  </select>
+
   <delete id="batchDeleteBackUpByIds" parameterType="java.util.List">
     DELETE FROM xkr_database_backup WHERE id IN
     <foreach collection="list" item="id" separator="," open="(" close=")">

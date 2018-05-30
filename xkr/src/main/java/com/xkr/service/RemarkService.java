@@ -132,6 +132,7 @@ public class RemarkService {
     private void buildRemarkDetailDTO(RemarkDetailDTO remarkDetailDTO,XkrAboutRemark remark){
         remarkDetailDTO.setContent(remark.getContent());
         remarkDetailDTO.setRemarkId(remark.getId());
+        remarkDetailDTO.setSubmitDate(remark.getCreateTime());
         if(Objects.nonNull(remark.getParentRemarkId()) &&
                 remark.getParentRemarkId() != XkrRemarkAgent.DEFAULT_PARENT_REMARK_ID){
             XkrAboutRemark parentRemark = remarkAgent.getRemarkById(remark.getParentRemarkId());
@@ -157,6 +158,7 @@ public class RemarkService {
                 user.setUserName("未知账户");
             }
             remark.setUserName(user.getUserName());
+            remark.setSubmitDate(xkrAboutRemark.getCreateTime());
             remarkDTO.getList().add(remark);
         });
     }

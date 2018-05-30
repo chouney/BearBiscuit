@@ -3,10 +3,9 @@ package com.xkr.web.model;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
-import org.chris.redbud.validator.result.ValidError;
+import org.chris.redbud.validator.result.ValidResult;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,9 +32,9 @@ public class BasicResult<T extends Serializable> implements Serializable{
         this.ext = Maps.newHashMap();
     }
 
-    public BasicResult(List<ValidError> errors) {
+    public BasicResult(ValidResult errors) {
         this.code = ErrorStatus.PARAM_ERROR.getCode();
-        this.msg = ErrorStatus.PARAM_ERROR.getDesc();
+        this.msg = errors.toString();
         this.data = (T) new JSONObject();
         this.ext = Maps.newHashMap();
     }

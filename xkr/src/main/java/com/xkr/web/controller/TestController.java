@@ -69,7 +69,7 @@ public class TestController {
             @RequestParam Integer age,
             ValidResult validResult) {
         if(validResult.hasErrors()){
-            return new BasicResult(validResult.getErrors());
+            return new BasicResult(validResult);
         }
         return new BasicResult(ErrorStatus.OK);
     }

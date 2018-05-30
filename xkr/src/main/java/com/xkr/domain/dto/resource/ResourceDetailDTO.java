@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -139,38 +138,5 @@ public class ResourceDetailDTO extends BaseDTO implements Serializable{
         }
     }
 
-    private class ParentClass implements Serializable{
-        private static final long serialVersionUID = -7682073591218877055L;
-
-        private Long classId;
-
-        private String className;
-
-        private ParentClass pClass;
-
-        public Long getClassId() {
-            return classId;
-        }
-
-        public void setClassId(Long classId) {
-            this.classId = classId;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
-        public ParentClass getpClass() {
-            return pClass;
-        }
-
-        public void setpClass(ParentClass pClass) {
-            this.pClass = pClass;
-        }
-    }
 
 }

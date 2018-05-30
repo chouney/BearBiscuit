@@ -4,16 +4,16 @@ import com.google.common.collect.ImmutableMap;
 import com.xkr.common.*;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.core.shiro.LoginAuthenticationToken;
+import com.xkr.dao.cache.AdminIndexRedisService;
 import com.xkr.domain.XkrLoginTokenAgent;
 import com.xkr.domain.XkrUserAgent;
-import com.xkr.domain.dto.user.ListUserDetailDTO;
 import com.xkr.domain.dto.ResponseDTO;
-import com.xkr.domain.dto.user.UserDTO;
-import com.xkr.domain.dto.user.UserDetailDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
+import com.xkr.domain.dto.user.ListUserDetailDTO;
+import com.xkr.domain.dto.user.UserDTO;
+import com.xkr.domain.dto.user.UserDetailDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
-import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrLoginToken;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.MailApiService;
@@ -61,6 +61,9 @@ public class UserService {
 
     @Autowired
     private SearchApiService searchApiService;
+
+    @Autowired
+    private AdminIndexRedisService adminIndexRedisService;
 
     /**
      * ------------------- 管理员服务 ----------------------
@@ -147,8 +150,8 @@ public class UserService {
      * ------------------- 用户服务 ----------------------
      */
 
-    public ResponseDTO<Boolean> userLogin(LoginAuthenticationToken token) {
-        ResponseDTO<Boolean> result = new ResponseDTO<>();
+    public ResponseDTO<Long> userLogin(LoginAuthenticationToken token) {
+        ResponseDTO<Long> result = new ResponseDTO<>();
         token.setLoginType(LoginEnum.CUSTOMER.toString());
         //获取当前的Subject
         Subject currentUser = SecurityUtils.getSubject();
@@ -179,9 +182,10 @@ public class UserService {
         }
         //验证是否登录成功
         if (currentUser.isAuthenticated()) {
+            adminIndexRedisService.incrLoginCount();
             XkrUser user = (XkrUser) currentUser.getPrincipal();
             xkrLoginTokenAgent.recordLogin(user.getId(), LoginEnum.CUSTOMER);
-            return new ResponseDTO<>(true);
+            return new ResponseDTO<>(user.getId());
         }
         token.clear();
         return new ResponseDTO<>(ErrorStatus.USER_INCORRECT_LOGIN);
@@ -226,6 +230,9 @@ public class UserService {
         }
         //发送验证邀请
         try {
+
+            adminIndexRedisService.incrRegCount();
+
             mailApiService.sendCaptcha(newUser.getEmail(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
                     String.valueOf(newUser.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_REG)));
             return new ResponseDTO<>(newUser.getId());

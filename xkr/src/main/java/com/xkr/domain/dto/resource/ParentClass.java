@@ -1,27 +1,24 @@
-package com.xkr.web.model.vo;
+package com.xkr.domain.dto.resource;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.ToStringSerializer;
-import com.google.common.collect.Lists;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author chriszhang
  * @version 1.0
- * @date 2018/5/16
+ * @date 2018/5/17
  */
-public class ClassMenuVO implements Serializable{
-
-    private static final long serialVersionUID = 8235865000438668222L;
+public class ParentClass implements Serializable{
+    private static final long serialVersionUID = -7682073591218877055L;
 
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long classId;
 
     private String className;
 
-    private List<ClassMenuVO> child = Lists.newArrayList();
+    private ParentClass pClass;
 
     public Long getClassId() {
         return classId;
@@ -39,11 +36,11 @@ public class ClassMenuVO implements Serializable{
         this.className = className;
     }
 
-    public List<ClassMenuVO> getChild() {
-        return child;
+    public ParentClass getpClass() {
+        return pClass;
     }
 
-    public void setChild(List<ClassMenuVO> child) {
-        this.child = child;
+    public void setpClass(ParentClass pClass) {
+        this.pClass = pClass;
     }
 }

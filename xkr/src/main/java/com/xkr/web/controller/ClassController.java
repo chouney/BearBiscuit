@@ -4,7 +4,7 @@ import com.xkr.common.ErrorStatus;
 import com.xkr.domain.dto.clazz.ClassMenuDTO;
 import com.xkr.service.ClassService;
 import com.xkr.web.model.BasicResult;
-import com.xkr.web.model.vo.ClassMenuVO;
+import com.xkr.web.model.vo.clazz.ClassMenuVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,21 +34,31 @@ public class ClassController {
 
     @RequestMapping(value = "/list",method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult getUserMessage(@RequestParam(name = "type") int type) {
+    public BasicResult getClassList(@RequestParam(name = "type") int type) {
         try {
             ClassMenuDTO rootClass = classService.getAllChildClassByClassId((long) type);
-            if(Objects.isNull(rootClass)){
+            if(!ErrorStatus.OK.equals(rootClass.getStatus())){
                 return new BasicResult(ErrorStatus.ERROR);
             }
             ClassMenuVO vo = new ClassMenuVO();
 
-            BeanUtils.copyProperties(rootClass,vo);
+            buildClassMenuVO(vo,rootClass);
 
             return new BasicResult<>(vo);
         } catch (Exception e) {
             logger.error("ClassController getUserMessage error ,type:{}", type, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
+    }
+
+    private void buildClassMenuVO(ClassMenuVO vo,ClassMenuDTO classMenuDTOs){
+        vo.setClassId(classMenuDTOs.getClassId());
+        vo.setClassName(classMenuDTOs.getClassName());
+        classMenuDTOs.getChild().forEach(classMenuDTO -> {
+            ClassMenuVO menuVO = new ClassMenuVO();
+            buildClassMenuVO(menuVO,classMenuDTO);
+            vo.getChild().add(menuVO);
+        });
     }
 
 }

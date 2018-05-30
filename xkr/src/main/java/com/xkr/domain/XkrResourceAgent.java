@@ -12,6 +12,7 @@ import com.xkr.dao.cache.RemedyCacheLoader;
 import com.xkr.dao.mapper.XkrResourceMapper;
 import com.xkr.domain.dto.resource.ResourceStatusEnum;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
+import com.xkr.domain.entity.XkrClass;
 import com.xkr.domain.entity.XkrResource;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.ResourceService;
@@ -127,11 +128,16 @@ public class XkrResourceAgent {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public XkrResource saveNewResource(String title, String deital, Integer cost, Long classId, Long userId,
+    public XkrResource saveNewResource(String title, String deital, Integer cost, XkrClass xkrClass, Long userId,
                                        String compressMd5, String unCompressMd5, String fileSize) {
+        if(Objects.isNull(xkrClass)){
+            return null;
+        }
+        //获取资源分类：毕设或者资源
+        Integer resType = Integer.valueOf(xkrClass.getPath().split("-")[1]);
         Long resourceId = idGenerator.generateId();
         XkrResource resource = new XkrResource();
-        resource.setClassId(classId);
+        resource.setClassId(xkrClass.getId());
         resource.setCost(cost);
         resource.setTitle(title);
         resource.setDetail(deital);
@@ -149,7 +155,7 @@ public class XkrResourceAgent {
             //创建资源索引
             ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
 
-            buildResourceIndexDTO(resourceIndexDTO, resource);
+            buildResourceIndexDTO(resourceIndexDTO, resource,resType);
 
             if (!searchApiService.upsertIndex(resourceIndexDTO)) {
                 logger.error("ResourceService saveNewResource buildIndex failed, resourceIndexDTO:{}", JSON.toJSONString(resourceIndexDTO));
@@ -248,7 +254,7 @@ public class XkrResourceAgent {
         return false;
     }
 
-    private void buildResourceIndexDTO(ResourceIndexDTO indexDTO, XkrResource resource) {
+    private void buildResourceIndexDTO(ResourceIndexDTO indexDTO, XkrResource resource,int resType) {
         indexDTO.setClassId(resource.getClassId());
         indexDTO.setContent(resource.getDetail());
         indexDTO.setCost(resource.getCost());
@@ -259,6 +265,7 @@ public class XkrResourceAgent {
         indexDTO.setTitle(resource.getTitle());
         indexDTO.setUpdateTime(resource.getUpdateTime());
         indexDTO.setUserId(resource.getUserId());
+        indexDTO.setType(resType);
         XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
         if (Objects.isNull(user)) {
             indexDTO.setUserName("未知账号");

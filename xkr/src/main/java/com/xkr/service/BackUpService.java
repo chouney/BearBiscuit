@@ -4,8 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
+import com.xkr.domain.XkrAdminAccountAgent;
 import com.xkr.domain.XkrDatabaseBackUpAgent;
 import com.xkr.domain.dto.ResponseDTO;
+import com.xkr.domain.dto.backup.BackUpDTO;
+import com.xkr.domain.dto.backup.ListBackUpDTO;
+import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrDatabaseBackup;
 import com.xkr.service.api.DbBackUpApiService;
 import com.xkr.service.api.UpLoadApiService;
@@ -15,16 +19,20 @@ import main.java.com.upyun.UpException;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author chriszhang
@@ -75,6 +83,9 @@ public class BackUpService {
     @Resource
     private XkrDatabaseBackUpAgent xkrDatabaseBackUpAgent;
 
+    @Autowired
+    private XkrAdminAccountAgent xkrAdminAccountAgent;
+
     /**
      * 备份服务，备份两份,本地备份以及云盘备份
      *
@@ -89,8 +100,9 @@ public class BackUpService {
             try {
                 String upyunFilePath = upLoadApiService.extFileUpload(backUpName, new File(localFilePath));
                 if (!StringUtils.isEmpty(upyunFilePath)) {
-                    return new ResponseDTO<>(xkrDatabaseBackUpAgent.saveNewBackUpDate(backUpName, localFilePath,
-                            upyunFilePath, adminAccountId));
+                    Long id = xkrDatabaseBackUpAgent.saveNewBackUpDate(backUpName, localFilePath,
+                            upyunFilePath, adminAccountId);
+                    return new ResponseDTO<>(Objects.isNull(id) ? ErrorStatus.ERROR : ErrorStatus.OK);
                 }
             } catch (UpException | IOException e) {
                 logger.error("backup service save backup failed adminAccountId:{},error:{}", adminAccountId, e);
@@ -100,7 +112,67 @@ public class BackUpService {
     }
 
     /**
+     * 批量删除
+     *
+     * @return
+     */
+    public ResponseDTO<Boolean> batchDelBackUp(List<Long> backUpIds) {
+        if (CollectionUtils.isEmpty(backUpIds)) {
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        List<XkrDatabaseBackup> backupList = xkrDatabaseBackUpAgent.getListByIds(backUpIds);
+
+        //删除云盘和本地文件
+        backupList.forEach(xkrDatabaseBackup -> {
+            JSONObject ext = JSON.parseObject(xkrDatabaseBackup.getExt());
+            String localFilePath = ext.getString(XkrDatabaseBackUpAgent.EXT_LOCAL_FILEPATH_KEY);
+            String yunFilePath = ext.getString(XkrDatabaseBackUpAgent.EXT_YUN_FILEPATH_KEY);
+            boolean isSuccess;
+            try {
+                File localFile = new File(localFilePath);
+                isSuccess = localFile.delete();
+                upLoadApiService.deleteFile(yunFilePath, false);
+            } catch (UpException | IOException e) {
+                logger.error("云盘删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath, e);
+                isSuccess = false;
+            } catch (Exception e){
+                logger.error("删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath, e);
+                isSuccess = false;
+            }
+            if(!isSuccess){
+                logger.error("本地删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath);
+            }
+        });
+
+        if(!xkrDatabaseBackUpAgent.batchDeleteBackUpByIds(backUpIds)){
+            return new ResponseDTO<>(ErrorStatus.ERROR);
+        }
+        return new ResponseDTO<>(true);
+
+    }
+
+    /**
+     * 获取备份列表
+     *
+     * @return
+     */
+    public ListBackUpDTO getBackUpList() {
+        List<XkrDatabaseBackup> backupList = xkrDatabaseBackUpAgent.getList();
+
+        List<Long> adminAccountIds = backupList.stream().map(XkrDatabaseBackup::getAdminAccountId).collect(Collectors.toList());
+
+        List<XkrAdminAccount> adminAccounts = xkrAdminAccountAgent.getListByIds(adminAccountIds);
+
+        ListBackUpDTO listBackUpDTO = new ListBackUpDTO();
+
+        buildListBackUpDTO(listBackUpDTO, backupList, adminAccounts);
+
+        return listBackUpDTO;
+    }
+
+    /**
      * 备份恢复
+     *
      * @param backUpId
      * @return
      */
@@ -116,8 +188,9 @@ public class BackUpService {
                 String localFilePath = ext.getString(XkrDatabaseBackUpAgent.EXT_LOCAL_FILEPATH_KEY);
                 String upyunFilePath = ext.getString(XkrDatabaseBackUpAgent.EXT_YUN_FILEPATH_KEY);
                 File localFile = new File(localFilePath);
-                if (localFile.exists() || (localFile.createNewFile() && upLoadApiService.downLoadFile(upyunFilePath,localFile))) {
-                    return new ResponseDTO<>(backUpApiService.restore(localFilePath));
+                if (localFile.exists() || (localFile.createNewFile() && upLoadApiService.downLoadFile(upyunFilePath, localFile))) {
+                    boolean isSuccess = backUpApiService.restore(localFilePath);
+                    return new ResponseDTO<>(isSuccess ? ErrorStatus.OK : ErrorStatus.ERROR);
                 }
             }
         } catch (IOException | UpException e) {
@@ -168,5 +241,22 @@ public class BackUpService {
             logger.error("backup service set schedule failed,periodType:{},error:", periodType, e);
         }
         return new ResponseDTO<>(ErrorStatus.ERROR);
+    }
+
+    private void buildListBackUpDTO(ListBackUpDTO listBackUpDTO, List<XkrDatabaseBackup> xkrDatabaseBackupList, List<XkrAdminAccount> adminAccounts) {
+        xkrDatabaseBackupList.forEach(xkrDatabaseBackup -> {
+            XkrAdminAccount adminAccount = adminAccounts.stream().filter(adminAccount1 -> adminAccount1.getId().equals(xkrDatabaseBackup.getAdminAccountId())).findFirst().orElse(null);
+            BackUpDTO backUpDTO = new BackUpDTO();
+            if (Objects.isNull(adminAccount)) {
+                backUpDTO.setAccountName("管理员已不存在");
+            } else {
+                backUpDTO.setAccountName(adminAccount.getAccountName());
+            }
+            backUpDTO.setBackUpId(xkrDatabaseBackup.getId());
+            backUpDTO.setDate(xkrDatabaseBackup.getCreateTime());
+            backUpDTO.setBackUpName(xkrDatabaseBackup.getBackupName());
+            listBackUpDTO.getList().add(backUpDTO);
+        });
+        listBackUpDTO.setTotalCount(listBackUpDTO.getList().size());
     }
 }

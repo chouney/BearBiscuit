@@ -2,43 +2,33 @@ package com.xkr.domain.dto.file;
 
 import com.xkr.common.ErrorStatus;
 
+import java.io.Serializable;
+
 /**
  * @author chriszhang
  * @version 1.0
  * @date 2018/5/18
  */
-public class FileDownloadResponseDTO {
+public class FileDownloadResponseDTO implements Serializable{
 
-    private String msg;
-
-    private int status;
+    private static final long serialVersionUID = -4833123953280423993L;
+    private ErrorStatus status = ErrorStatus.OK;
 
     private String token;
 
     public FileDownloadResponseDTO(String token) {
-        this.status = ErrorStatus.OK.getCode();
-        this.msg = ErrorStatus.OK.getDesc();
         this.token = token;
     }
 
     public FileDownloadResponseDTO(ErrorStatus errorStatus) {
-        this.status = errorStatus.getCode();
-        this.msg = errorStatus.getDesc();
+        this.status = errorStatus;
     }
 
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public int getStatus() {
+    public ErrorStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ErrorStatus status) {
         this.status = status;
     }
 

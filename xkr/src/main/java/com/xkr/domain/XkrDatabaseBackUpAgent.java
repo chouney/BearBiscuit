@@ -55,6 +55,14 @@ public class XkrDatabaseBackUpAgent {
         return xkrDatabaseBackupMapper.selectList();
     }
 
+    public List<XkrDatabaseBackup> getListByIds(List<Long> backUpIds){
+        List<XkrDatabaseBackup> backupList = Lists.newArrayList();
+        if(CollectionUtils.isEmpty(backUpIds)){
+            return backupList;
+        }
+        return xkrDatabaseBackupMapper.getListByIds(backUpIds);
+    }
+
     public Long saveNewBackUpDate(String backUpName,String localFilePath,
                                   String upyunFilePath,Long adminAccountId){
         XkrDatabaseBackup backup = new XkrDatabaseBackup();

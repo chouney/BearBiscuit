@@ -43,21 +43,6 @@ public enum ErrorStatus {
     ADMIN_EXIST_HOLDING_ROLE_ACCOUNT(20000,"存在拥有该角色的管理账户"),
 
 
-/**
- * catch (UnknownAccountException uae) {
- logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,未知账户");
-
- } catch (IncorrectCredentialsException ice) {
- logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,错误的凭证");
- } catch (LockedAccountException lae) {
- logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,账户已锁定");
- } catch (ExcessiveAttemptsException eae) {
- logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,错误次数过多");
- } catch (AuthenticationException ae) {
- //通过处理Shiro的运行时AuthenticationException就可以控制用户登录失败或密码错误时的情景
- logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,堆栈轨迹如下");
- }
- */
 
     ;
     private int code;
