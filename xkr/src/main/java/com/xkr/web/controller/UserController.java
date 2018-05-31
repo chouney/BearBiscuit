@@ -62,7 +62,7 @@ public class UserController {
      * @param result
      * @return
      */
-    @RequestMapping(value = "/reg", method = {RequestMethod.GET})
+    @RequestMapping(value = "/reg", method = {RequestMethod.POST})
     @ResponseBody
     @HttpValidate
     public BasicResult<JSONObject> regUser(
@@ -98,7 +98,7 @@ public class UserController {
      * @return
      */
     @CSRFGen
-    @RequestMapping(value = "/validate", method = {RequestMethod.GET})
+    @RequestMapping(value = "/validate", method = {RequestMethod.POST})
     @ResponseBody
     @HttpValidate
     public BasicResult<JSONObject> validateEmail(

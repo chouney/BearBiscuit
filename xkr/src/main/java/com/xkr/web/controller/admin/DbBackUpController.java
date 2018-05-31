@@ -2,6 +2,9 @@ package com.xkr.web.controller.admin;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.OptEnum;
+import com.xkr.common.OptLogModuleEnum;
+import com.xkr.common.annotation.OptLog;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.backup.ListBackUpDTO;
@@ -175,8 +178,13 @@ public class DbBackUpController {
         return new BasicResult<>(ErrorStatus.ERROR);
     }
 
+    /**
+     * 手动备份
+     * @return
+     */
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.INSERT)
     public BasicResult backup() {
         try {
 

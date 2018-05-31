@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
+import com.xkr.common.annotation.OptLog;
 import com.xkr.domain.XkrAdminAccountAgent;
 import com.xkr.domain.XkrAdminOptLogAgent;
 import com.xkr.domain.dto.ResponseDTO;
@@ -82,6 +84,7 @@ public class OptLogService {
      * @param ids
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.OPT_LOG,optEnum = OptEnum.DELETE)
     public ResponseDTO<Boolean> batchDelOptLogByIds(List<Long> ids){
         if(CollectionUtils.isEmpty(ids)){
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);

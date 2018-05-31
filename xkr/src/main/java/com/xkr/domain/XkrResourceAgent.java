@@ -7,6 +7,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.hengyi.dzfilter.utils.TextUtils;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.cache.RemedyCacheLoader;
 import com.xkr.dao.mapper.XkrResourceMapper;
@@ -95,7 +97,10 @@ public class XkrResourceAgent {
                 "list",resourceIds,"classId",newClassId
         )) == 1;
         if(isSuccess){
-            if (!searchApiService.bulkUpdateResourceIndexClassId("resource", resourceIds, newClassId)) {
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("classId",newClassId);
+            map.put("updateTime",new Date());
+            if (!searchApiService.bulkUpdateIndex("resource", resourceIds, map)) {
                 logger.error("XkrResourceAgent batchUpdateResourceClassByIds failed ,resourceIds:{},newClassId:{}", JSON.toJSONString(resourceIds),newClassId);
                 throw new RuntimeException();
             }
@@ -128,11 +133,14 @@ public class XkrResourceAgent {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public XkrResource saveNewResource(String title, String deital, Integer cost, XkrClass xkrClass, Long userId,
+    public XkrResource saveNewResource(String title, String detail, Integer cost, XkrClass xkrClass, Long userId,
                                        String compressMd5, String unCompressMd5, String fileSize) {
         if(Objects.isNull(xkrClass)){
             return null;
         }
+        //做敏感词过滤
+        title = TextUtils.filter(title);
+        detail = TextUtils.filter(detail);
         //获取资源分类：毕设或者资源
         Integer resType = Integer.valueOf(xkrClass.getPath().split("-")[1]);
         Long resourceId = idGenerator.generateId();
@@ -140,7 +148,7 @@ public class XkrResourceAgent {
         resource.setClassId(xkrClass.getId());
         resource.setCost(cost);
         resource.setTitle(title);
-        resource.setDetail(deital);
+        resource.setDetail(detail);
         resource.setFileSize(fileSize);
         resource.setId(resourceId);
         resource.setReport((byte) REPORT_NORMAL);
@@ -256,7 +264,8 @@ public class XkrResourceAgent {
 
     private void buildResourceIndexDTO(ResourceIndexDTO indexDTO, XkrResource resource,int resType) {
         indexDTO.setClassId(resource.getClassId());
-        indexDTO.setContent(resource.getDetail());
+        //对内容进行html标签过滤
+        indexDTO.setContent(TextUtils.delHtmlTag(resource.getDetail()));
         indexDTO.setCost(resource.getCost());
         indexDTO.setDownloadCount(resource.getDownloadCount());
         indexDTO.setReport((int) resource.getReport());

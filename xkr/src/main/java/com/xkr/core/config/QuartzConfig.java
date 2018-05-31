@@ -8,6 +8,8 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.concurrent.Executors;
+
 /**
  * @author chriszhang
  * @version 1.0
@@ -34,7 +36,7 @@ public class QuartzConfig {
          * 这两行代码表示执行task对象中的scheduleTest方法。定时执行的逻辑都在scheduleTest。
          */
         jobDetail.setTargetObject(backUpService);
-        jobDetail.setArguments(null);
+        jobDetail.setArguments(new Object[]{0L});
 
         jobDetail.setTargetMethod("backup");
         return jobDetail;
@@ -59,6 +61,8 @@ public class QuartzConfig {
         // 注册定时触发器
         bean.setTriggers(cronJobTrigger);
         bean.setAutoStartup(false);
+        //单线程调度
+        bean.setTaskExecutor(Executors.newSingleThreadExecutor());
         return bean;
     }
 

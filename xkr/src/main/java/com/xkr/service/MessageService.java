@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author chriszhang
@@ -30,6 +31,12 @@ public class MessageService {
 
     @Autowired
     private XkrMessageAgent messageAgent;
+
+    public static final String RESOURCE_TEMPLATE = "您的资源%s,状态已变更为%s";
+
+    public static final String REMARK_TEMPLATE = "您的留言已收到回复:%s";
+
+    public static final String ORDER_PAY_TEMPLATE = "您已完成充值,充值金额:%s";
 
     //未读消息
     public static final int MESSAGE_FRONT_TYPE_UNREAD = 1;
@@ -48,6 +55,11 @@ public class MessageService {
     @Async
     public void saveMessageToUser(LoginEnum fromUserType, long fromUserId, long userId, String content) {
         messageAgent.saveToUserMessage(fromUserType, fromUserId, LoginEnum.CUSTOMER, userId, content);
+    }
+
+    @Async
+    public void batchSaveMessageToUser(LoginEnum fromUserType, long fromUserId, Map<Long,String> userIdsContentMapperList) {
+        messageAgent.batchSaveToUserMessage(fromUserType, fromUserId, LoginEnum.CUSTOMER, userIdsContentMapperList);
     }
 
     public ListMessageDTO getToUserMessage(int frontType, long userId,int pageNum,int size) {

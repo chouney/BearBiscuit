@@ -7,6 +7,7 @@ package com.xkr.core.config;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.xkr.web.interceptor.BasicAuthInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
 
+    @Bean
+    public BasicAuthInterceptor getBasicAuthInterceptor(){
+        return new BasicAuthInterceptor();
+    }
 
     @Bean
     public HttpMessageConverter<String> responseBodyConverter() {
@@ -42,11 +47,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //todo csrf校验以及basicAuth校验添加
-//        registry.addInterceptor(new BasicAuthInterceptor());
+        registry.addInterceptor(getBasicAuthInterceptor());
     }
 
-        @Override
+    @Override
     public void configureMessageConverters(
             List<HttpMessageConverter<?>> converters) {
         super.configureMessageConverters(converters);

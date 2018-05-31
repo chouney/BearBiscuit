@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.OptEnum;
+import com.xkr.common.OptLogModuleEnum;
+import com.xkr.common.annotation.OptLog;
 import com.xkr.domain.XkrAdminAccountAgent;
 import com.xkr.domain.XkrDatabaseBackUpAgent;
 import com.xkr.domain.dto.ResponseDTO;
@@ -116,6 +119,7 @@ public class BackUpService {
      *
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.DELETE)
     public ResponseDTO<Boolean> batchDelBackUp(List<Long> backUpIds) {
         if (CollectionUtils.isEmpty(backUpIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -176,6 +180,7 @@ public class BackUpService {
      * @param backUpId
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> restore(Long backUpId) {
         if (Objects.isNull(backUpId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -214,6 +219,7 @@ public class BackUpService {
      * @param periodType
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> autoCrontab(int periodType) {
         if (!PERIOD_CRONTAB_MAP.keySet().contains(periodType) && PERIOD_SHUTDOWN_TYPE != periodType) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);

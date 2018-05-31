@@ -7,7 +7,9 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.LoginEnum;
 import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
@@ -24,15 +26,13 @@ import com.xkr.domain.dto.resource.*;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
-import com.xkr.domain.entity.XkrClass;
-import com.xkr.domain.entity.XkrResource;
-import com.xkr.domain.entity.XkrResourceUser;
-import com.xkr.domain.entity.XkrUser;
+import com.xkr.domain.entity.*;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -73,6 +73,9 @@ public class ResourceService {
 
     @Autowired
     private SearchApiService searchApiService;
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private UpLoadApiService upLoadApiService;
@@ -149,7 +152,18 @@ public class ResourceService {
         if(CollectionUtils.isEmpty(resourceIds) || Objects.isNull(resourceStatusEnum)){
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
+        XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
+
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds,resourceStatusEnum);
+        if(success){
+            //给用户发送消息
+            Map<Long,String> userContentMapper = Maps.newHashMap();
+            resources.forEach(resource ->
+                    userContentMapper.put(resource.getUserId(),
+                    String.format(MessageService.RESOURCE_TEMPLATE,resource.getTitle(),resourceStatusEnum.getDesc())));
+            messageService.batchSaveMessageToUser(LoginEnum.ADMIN,adminAccount.getId(),userContentMapper);
+        }
         return new ResponseDTO<>(success);
     }
 
@@ -253,7 +267,7 @@ public class ResourceService {
 
                 adminIndexRedisService.incrUploadCount();
 
-                //todo 富文本过滤
+
                 return new ResponseDTO<>(resource.getId());
 
             }

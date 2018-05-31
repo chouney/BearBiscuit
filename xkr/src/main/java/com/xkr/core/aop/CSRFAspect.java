@@ -8,6 +8,7 @@ import com.xkr.common.annotation.CSRFValid;
 import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.util.UuidUtil;
 import com.xkr.web.model.BasicResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,6 +20,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -41,6 +43,9 @@ public class CSRFAspect {
 
     @Autowired
     private BaseRedisService baseRedisService;
+
+    @Value("${spring.profiles.active}")
+    private String runEnv;
 
     /**
      * 匹配所有带@MethodValidate
@@ -84,6 +89,10 @@ public class CSRFAspect {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
         HttpServletRequest httpServletRequest = sra.getRequest();
+
+        if("dev".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
+            return true;
+        }
 
         CSRFValid csrfValid = targetMethod.getAnnotation(CSRFValid.class);
         if (Objects.isNull(csrfValid)) {

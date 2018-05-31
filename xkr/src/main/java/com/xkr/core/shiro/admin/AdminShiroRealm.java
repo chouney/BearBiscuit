@@ -71,10 +71,6 @@ public class AdminShiroRealm extends AuthorizingRealm {
         if (userInfo == null) {
             throw new UnknownAccountException();
         }
-        //todo 状态检查
-//        if("0".equals(userInfo.getStatus().toString())) {
-//            throw new LockedAccountException(); //帐号锁定
-//        }
 
         //加密方式;
         //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现

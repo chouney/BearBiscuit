@@ -73,18 +73,15 @@ public class SearchApiService {
         return false;
     }
 
-    public boolean bulkUpdateResourceIndexClassId(String typeName, List<Long> docIds, Long newClassId) {
-        if (CollectionUtils.isEmpty(docIds) || Objects.isNull(newClassId)) {
+    public boolean bulkUpdateIndex(String typeName, List<Long> docIds,Map<String,Object> updateMap) {
+        if (CollectionUtils.isEmpty(docIds) || CollectionUtils.isEmpty(updateMap)) {
             return false;
         }
         BulkRequest request = new BulkRequest();
         try {
             docIds.forEach(docId -> {
-                Map<String, Object> jsonMap = new HashMap<>();
-                jsonMap.put("classId", newClassId);
-                jsonMap.put("updateTime", new Date());
                 UpdateRequest updateRequest = new UpdateRequest("xkr", typeName, String.valueOf(docId))
-                        .doc(jsonMap);
+                        .doc(updateMap);
                 request.add(updateRequest);
             });
 

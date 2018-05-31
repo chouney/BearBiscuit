@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/api/admin/cls")
-public class ClassController {
+public class AdminClassController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -9,6 +9,7 @@ import com.xkr.common.LoginEnum;
 import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
+import com.xkr.core.shiro.admin.AdminShiroUtil;
 import com.xkr.domain.XkrRemarkAgent;
 import com.xkr.domain.XkrUserAgent;
 import com.xkr.domain.dto.ResponseDTO;
@@ -18,7 +19,9 @@ import com.xkr.domain.dto.remark.RemarkDetailDTO;
 import com.xkr.domain.dto.remark.RemarkStatusEnum;
 import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrAboutRemark;
+import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrUser;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,9 @@ import java.util.stream.Collectors;
 @Service
 public class RemarkService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private XkrRemarkAgent remarkAgent;
@@ -63,10 +69,20 @@ public class RemarkService {
                 Objects.isNull(parentRemarkId)){
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
+        XkrAboutRemark parentRemark = remarkAgent.getRemarkById(parentRemarkId);
+        if(Objects.isNull(parentRemark)){
+            return new ResponseDTO<>(ErrorStatus.ERROR);
+        }
         XkrAboutRemark remark = remarkAgent.saveNewRemark(parentRemarkId,loginEnum,loginId,null,null,content);
         if(Objects.isNull(remark)){
             return new ResponseDTO<>(ErrorStatus.ERROR);
         }
+
+        //给用户发送消息
+        XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
+        messageService.saveMessageToUser(LoginEnum.ADMIN,adminAccount.getId(),parentRemark.getUserId(),
+                String.format(MessageService.REMARK_TEMPLATE,remark.getContent()));
+
         return new ResponseDTO<>(remark.getId());
     }
 

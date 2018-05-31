@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/api/admin/remark")
-public class RemarkController {
+public class AdminRemarkController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -14,7 +14,7 @@ public enum ResourceStatusEnum {
     STATUS_UNVERIFIED(2, "待审核"),
     STATUS_FREEZED(3, "冻结"),
     STATUS_DELETED(4, "删除"),
-    STATUS_PHYSICAL_DELETED(-1, "物理删除");
+    STATUS_PHYSICAL_DELETED(-1, "永久删除");
     private int code;
 
     private String desc;

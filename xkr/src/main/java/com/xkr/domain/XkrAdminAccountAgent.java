@@ -40,6 +40,7 @@ public class XkrAdminAccountAgent {
         if(Objects.isNull(accountId)){
             return null;
         }
+        logger.info("XkrAdminAccountAgent getById param:{}",accountId);
         return xkrAdminAccountMapper.getById(accountId);
     }
 

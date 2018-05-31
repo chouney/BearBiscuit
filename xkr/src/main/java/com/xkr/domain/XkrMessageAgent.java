@@ -3,6 +3,7 @@ package com.xkr.domain;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.xkr.common.LoginEnum;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrMessageMapper;
@@ -66,6 +67,30 @@ public class XkrMessageAgent {
         logger.info("XkrMessageAgent saveToUserMessage failed, params:{}", JSON.toJSONString(xkrMessage));
         return null;
     }
+
+    public List<Long> batchSaveToUserMessage(LoginEnum sendUserType, long sendUserId,
+                                  LoginEnum toUserType, Map<Long,String> userIdsContentMapperList) {
+        List<XkrMessage> toInsert = Lists.newArrayList();
+        userIdsContentMapperList.forEach( (userId,content) ->{
+            long messageId = idGenerator.generateId();
+            XkrMessage xkrMessage = new XkrMessage();
+            xkrMessage.setId(messageId);
+            xkrMessage.setFromTypeCode(Byte.valueOf(sendUserType.getType()));
+            xkrMessage.setFromId(sendUserId);
+            xkrMessage.setToTypeCode(Byte.valueOf(toUserType.getType()));
+            xkrMessage.setToId(userId);
+            xkrMessage.setContent(content);
+            xkrMessage.setStatus((byte) MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode());
+            logger.info("XkrMessageAgent saveToUserMessage, params:{}", JSON.toJSONString(xkrMessage));
+            toInsert.add(xkrMessage);
+        });
+        if(xkrMessageMapper.insertList(toInsert) != 1){
+            logger.error("XkrMessageAgent saveToUserMessage failed, params:{}", JSON.toJSONString(toInsert));
+            return Lists.newArrayList();
+        }
+        return toInsert.stream().map(XkrMessage::getId).collect(Collectors.toList());
+    }
+
 
     public List<XkrMessage> getUnReadToUserMessage(long userId) {
         Map<String, Object> params = ImmutableMap.of(

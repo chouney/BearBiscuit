@@ -1,6 +1,8 @@
 package com.xkr.core.compress;
 
 import com.xkr.util.CamelCaseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -19,6 +21,8 @@ import java.util.Objects;
 @Component
 public class UnCompressProcessorFacade implements ApplicationContextAware {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private ApplicationContext context;
 
     public File unCompressFile(File file, Class clazz) {
@@ -26,7 +30,6 @@ public class UnCompressProcessorFacade implements ApplicationContextAware {
             return null;
         }
         try {
-            //todo 测试
             String parent = file.getParent() == null ? "" : file.getParent() + "/";
             String desFilePath = parent + file.getName().split("\\.")[0];
             if (ArchiveProcessor.class.isAssignableFrom(clazz)) {
@@ -38,9 +41,8 @@ public class UnCompressProcessorFacade implements ApplicationContextAware {
                 compressor.doUnCompress(file, desFilePath);
                 return new File(desFilePath);
             }
-        } catch (IOException e) {
-            //todo 日志
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("解压缩文件失败 fileName:{}",file.getName(),e);
         }
         return null;
     }

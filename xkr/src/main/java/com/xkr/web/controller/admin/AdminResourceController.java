@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/api/admin/res")
-public class ResourceController {
+public class AdminResourceController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired

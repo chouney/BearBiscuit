@@ -14,6 +14,8 @@ public enum OptLogModuleEnum {
     COMMENT(5,"评论"),
     REMARK(6,"留言"),
     ADMIN(7,"管理后台"),
+    BACKUP(8,"备份"),
+    OPT_LOG(9,"操作日志"),
 
 
     ;

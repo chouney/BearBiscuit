@@ -5,10 +5,12 @@ import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.web.model.BasicResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -30,13 +32,18 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
             "xkr", "a75db4ba27967da94d3ddc3c3675bb9e"
     );
 
+    @Value("${spring.profiles.active}")
+    private String runEnv;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+        if("dev".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
+            return true;
+        }
         if (o instanceof HandlerMethod) {
             HandlerMethod method = (HandlerMethod) o;
             NoBasicAuth noBasicAuth = method.getMethodAnnotation(NoBasicAuth.class);
-            if (Objects.isNull(noBasicAuth)) {
+            if (Objects.nonNull(noBasicAuth)) {
                 return true;
             }
             try {

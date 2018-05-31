@@ -7,6 +7,9 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.LoginEnum;
+import com.xkr.common.OptEnum;
+import com.xkr.common.OptLogModuleEnum;
+import com.xkr.common.annotation.OptLog;
 import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.dao.cache.AdminIndexRedisService;
 import com.xkr.domain.*;
@@ -161,6 +164,7 @@ public class AdminService {
      * @param roleId
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.INSERT)
     public ResponseDTO<Long> saveNewAdminAccount(String accountName, String accountToken, String email, String roleId) {
         if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
                 || StringUtils.isEmpty(email) || StringUtils.isEmpty(roleId)) {
@@ -183,6 +187,7 @@ public class AdminService {
      * @param roleId
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> updateAdminAccountById(Long adminAccountId, String accountName, String accountToken, String email, String roleId) {
         if (Objects.isNull(adminAccountId) || StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
                 || StringUtils.isEmpty(email) || StringUtils.isEmpty(roleId)) {
@@ -222,6 +227,7 @@ public class AdminService {
      * @param accountIds
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.DELETE)
     public ResponseDTO<Boolean> batchDeleteAdminAccount(List<Long> accountIds) {
         if (CollectionUtils.isEmpty(accountIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -299,6 +305,7 @@ public class AdminService {
      * @param permissionIds
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.INSERT)
     public ResponseDTO<Integer> saveNewRole(String roleName, String roleDetail, List<Integer> permissionIds) {
         if (StringUtils.isEmpty(roleDetail) || StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(permissionIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -319,6 +326,7 @@ public class AdminService {
      * @param permissionIds
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> updateRoleById(Integer roleId, String roleName, String roleDetail, List<Integer> permissionIds) {
         if (Objects.isNull(roleDetail) || StringUtils.isEmpty(roleDetail) || StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(permissionIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -332,6 +340,7 @@ public class AdminService {
      * @param roleIds
      * @return
      */
+    @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.DELETE)
     public ResponseDTO<Boolean> batchDeleteRoleById(List<Integer> roleIds) {
         if (CollectionUtils.isEmpty(roleIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);

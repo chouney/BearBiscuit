@@ -1,6 +1,7 @@
 package com.xkr.domain.dto.remark;
 
 import com.google.common.collect.ImmutableList;
+import com.xkr.domain.dto.resource.ResourceStatusEnum;
 
 import java.util.List;
 

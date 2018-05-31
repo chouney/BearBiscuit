@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping("/api/admin/user")
 @Controller
-public class UserController {
+public class AdminUserController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

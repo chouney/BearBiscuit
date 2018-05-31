@@ -3,6 +3,7 @@ package com.xkr.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.hengyi.dzfilter.utils.TextUtils;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
@@ -160,14 +161,26 @@ public class TestController {
     }
 
     /**
-     * 文件上传测试
+     * 调度测试
      * @param type
      * @return
      */
-    @RequestMapping(value = "/backup", method = {RequestMethod.GET})
+    @RequestMapping(value = "/crontab", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult index5(@RequestParam(name = "type") Integer type) {
         backUpService.autoCrontab(type);
+        return new BasicResult(ErrorStatus.OK);
+    }
+
+    /**
+     * 过滤测试
+     * @param keyword
+     * @return
+     */
+    @RequestMapping(value = "/filter", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult index6(@RequestParam(name = "keyword") String keyword) {
+        TextUtils.filter(keyword);
         return new BasicResult(ErrorStatus.OK);
     }
 

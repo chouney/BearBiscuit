@@ -36,8 +36,6 @@ public class XkrAdminRoleAgent {
     public static final int STATUS_DELETED = 2;
 
 
-    //todo 角色删除前需要校验管理员是否有角色
-
     public XkrAdminRole saveNewAdminRole(String roleName,String roleDetail,List<Integer> permissionIds){
         if(StringUtils.isEmpty(roleDetail)|| StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(permissionIds)){
             return null;

@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/api/admin/comment")
-public class CommentController {
+public class AdminCommentController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 

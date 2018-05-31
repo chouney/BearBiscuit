@@ -1,8 +1,10 @@
 package com.xkr.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrResourceCommentMapper;
@@ -60,7 +62,7 @@ public class XkrResourceCommentAgent {
         }
         if(isSuccess){
             if (!searchApiService.bulkUpdateIndexStatus("comment", commentIds, status.getCode())) {
-                logger.error("XkrResourceCommentAgent batchUpdateCommentrByIds failed ,commentIds:{},status:{}", JSON.toJSONString(commentIds),status);
+                logger.error("XkrResourceCommentAgent batchUpdateCommentrByIds index failed ,commentIds:{},status:{}", JSON.toJSONString(commentIds),status);
             }
         }
         return isSuccess;
@@ -74,7 +76,16 @@ public class XkrResourceCommentAgent {
         xkrResourceComment.setId(commentId);
         xkrResourceComment.setContent(content);
         xkrResourceComment.setUpdateTime(new Date());
-        return xkrResourceCommentMapper.updateByPrimaryKeySelective(xkrResourceComment) == 1;
+        if(xkrResourceCommentMapper.updateByPrimaryKeySelective(xkrResourceComment) == 1){
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("content",content);
+            map.put("updateTime",new Date());
+            if(!searchApiService.bulkUpdateIndex("comment", ImmutableList.of(commentId),map)){
+                logger.error("XkrResourceCommentAgent updateCommentById index failed ,commentId:{},content:{}", commentId,content);
+            }
+            return true;
+        }
+        return false;
     }
 
     public List<XkrResourceComment> getCommentsByIds(List<Long> commentIds){

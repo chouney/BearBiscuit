@@ -24,6 +24,8 @@ import java.io.IOException;
 @Component
 public final class MyRar extends ArchiveProcessor {
 
+
+
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"RAR压缩文件(*.rar)", "rar");
 
