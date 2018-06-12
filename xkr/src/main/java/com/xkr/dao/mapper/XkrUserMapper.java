@@ -12,8 +12,6 @@ public interface XkrUserMapper extends CustomerMapper<XkrUser> {
 
     Integer getTotalUser(Map<String,Object> params);
 
-    Integer batchDeleteUserByIds(List<Long> list);
-
     Integer batchUpdateUserByIds(Map<String,Object> params);
 
     XkrUser selectByUserName(Map<String,Object> params);

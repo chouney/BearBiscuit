@@ -1,10 +1,7 @@
-package com.xkr.web.controller;
+package com.xkr.web.controller.test;
 
-import com.xkr.common.Const;
 import com.xkr.service.api.CaptchaService;
 import com.xkr.web.model.BasicResult;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

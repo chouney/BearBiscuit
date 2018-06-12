@@ -83,7 +83,7 @@ CREATE TABLE xkr_login_token(
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段',
 	PRIMARY KEY (`id`),
-	INDEX `idx_user_sta` (`user_id`,`status`)
+	UNIQUE INDEX `idx_user_sta` (`user_id`,`status`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='登录token表';
 
 
@@ -156,7 +156,7 @@ CREATE TABLE xkr_admin_account(
 	`account_name` varchar(64) NOT NULL COMMENT '管理员名称',
 	`account_token` varchar(255) NOT NULL COMMENT '管理员token',
 	`email` varchar(64) NOT NULL DEFAULT '' COMMENT '邮箱,长度限制64',
-	`role_ids` varchar(255) NOT NULL COMMENT '账号角色,以;分割',
+	`role_id` int(10) NOT NULL COMMENT '账号角色id',
 	`status` tinyint(4) NOT NULL COMMENT '账号状态',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',

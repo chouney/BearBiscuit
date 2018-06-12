@@ -13,7 +13,6 @@ public class XkrAdminAccount extends BaseEntity implements Serializable{
      * 管理员id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
@@ -36,8 +35,8 @@ public class XkrAdminAccount extends BaseEntity implements Serializable{
     /**
      * 账号角色,以;分割
      */
-    @Column(name = "role_ids")
-    private String roleIds;
+    @Column(name = "role_id")
+    private Integer roleId;
 
     /**
      * 账号状态
@@ -134,21 +133,21 @@ public class XkrAdminAccount extends BaseEntity implements Serializable{
     }
 
     /**
-     * 获取账号角色,以;分割
+     * 获取账号角色,账号角色id
      *
-     * @return role_ids - 账号角色,以;分割
+     * @return role_id - 账号角色,账号角色id
      */
-    public String getRoleIds() {
-        return roleIds;
+    public Integer getRoleId() {
+        return roleId;
     }
 
     /**
-     * 设置账号角色,以;分割
+     * 设置账号角色,账号角色id
      *
-     * @param roleIds 账号角色,以;分割
+     * @param roleId 账号角色,账号角色id
      */
-    public void setRoleIds(String roleIds) {
-        this.roleIds = roleIds;
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
     /**

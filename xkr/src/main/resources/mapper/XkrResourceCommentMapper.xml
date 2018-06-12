@@ -20,8 +20,8 @@
 
 
   <sql id="resource_comment_field">
-    id,resource_id,user_id,parent_comment_id,root_comment_id,client_ip,content,status
-    create_time,update_time,ext
+    id,resource_id,user_id,parent_comment_id,root_comment_id,client_ip,status,
+    create_time,update_time,ext,content
   </sql>
 
   <select id="getCommentsByIds" parameterType="java.util.Map" resultMap="BaseResultMap">

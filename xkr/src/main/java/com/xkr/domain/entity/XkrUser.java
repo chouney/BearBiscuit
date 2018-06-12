@@ -12,7 +12,6 @@ public class XkrUser implements Serializable{
      * 用户id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

@@ -1,106 +1,55 @@
-package com.xkr.web.controller;
+package com.xkr.web.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.hengyi.dzfilter.utils.TextUtils;
 import com.xkr.common.ErrorStatus;
-import com.xkr.common.annotation.CSRFGen;
-import com.xkr.common.annotation.CSRFValid;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
-import com.xkr.service.BackUpService;
 import com.xkr.service.api.SearchApiService;
-import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import main.java.com.upyun.UpException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.chris.redbud.validator.annotation.MethodValidate;
-import org.chris.redbud.validator.result.ValidResult;
-import org.elasticsearch.search.SearchHits;
-import org.hibernate.validator.constraints.Length;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Min;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author chriszhang
  * @version 1.0
- * @date 2018/5/3
+ * @date 2018/6/11
  */
 @Controller
 @RequestMapping("/test")
-public class TestController {
-    private Logger logger = LoggerFactory.getLogger(TestController.class);
-
-    @Autowired
-    private UpLoadApiService upLoadApiService;
+public class IndexTestController {
 
     @Autowired
     private SearchApiService searchApiService;
-
-    @Autowired
-    private BackUpService backUpService;
-
-    @RequestMapping(value = "/index", method = {RequestMethod.GET})
-    @ResponseBody
-    @MethodValidate
-    public BasicResult index(
-            @Length(min = 3,max=6)
-            @RequestParam String name,
-            @Min(3)
-            @RequestParam Integer age,
-            ValidResult validResult) {
-        if(validResult.hasErrors()){
-            return new BasicResult(validResult);
-        }
-        return new BasicResult(ErrorStatus.OK);
-    }
-
-    @RequestMapping(value = "/test1", method = {RequestMethod.GET})
-    @ResponseBody
-    @CSRFGen
-    public BasicResult index1(Model model) {
-        return new BasicResult(ErrorStatus.OK);
-    }
-
-    @RequestMapping(value = "/test2", method = {RequestMethod.GET})
-    @ResponseBody
-    @CSRFValid
-    public BasicResult index2(Model model) {
-        return new BasicResult(ErrorStatus.OK);
-    }
 
     @RequestMapping(value = "/saveIndex", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult index3(Model model) throws URISyntaxException, IOException, UpException {
         UserIndexDTO r1 = new UserIndexDTO();
         r1.setCreateTime(Date.from(LocalDateTime.now().minusDays(1).toInstant(ZoneOffset.UTC)));
-        r1.setEmail("为此，他也被免去天津国际工程咨询公司党委书记、委员、总经理，天津市政府投资项目评审中心主任职务");
+        r1.setEmail(TextUtils.filter("为此你妈逼，他也被免去天津国际工程咨询公司党委书记、委员、总经理，天津市政府投资项目评审中心主任职务"));
         r1.setStatus(1);
         r1.setUserId(114124124124L);
         r1.setUserName("　天津市长刮骨疗毒：市侨办原党组书记、原主任被问责与周路一同被问责的，还有天津市政府投资项目评审中心原主任陈黎明。");
         UserIndexDTO r2 = new UserIndexDTO();
         r2.setCreateTime(Date.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
-        r2.setEmail("公开资料显示，周路最后一次公开亮相是上月4日，他带领相关部门负责同志，与河西区区长李学义、副区长刘惠杰及区侨办、区投促办负责同志，同区内侨资企业代表举行座谈");
+        r2.setEmail(TextUtils.filter("公开资料显示草他妈，周路最后一次公开亮相是上月4日，他带领相关部门负责同志，与河西区区长李学义、副区长刘惠杰及区侨办、区投促办负责同志，同区内侨资企业代表举行座谈"));
         r2.setStatus(0);
         r2.setUserId(412412123L);
         r2.setUserName("　然而在此次的问责通报中提到，周路作为党政主要负责人，领导素养不高，驾驭能力较弱，不善于抓班子带队伍，作风不民主;业务能力不强，工作思路不够清晰，对侨务工作研究得不够深入，破解所属单位遇到的困难招法不多;工作方法简单生硬，做干部思想政治工作不到位，本单位干部队伍思想较乱，群众认可度不高");
@@ -123,16 +72,8 @@ public class TestController {
         return new BasicResult(ErrorStatus.OK);
     }
 
-    @RequestMapping(value = "/getIndex", method = {RequestMethod.GET})
-    @ResponseBody
-    public BasicResult index5(String id) throws URISyntaxException, IOException, UpException {
-        ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();
-        searchApiService.getAndBuildIndexDTOByIndexId(resourceIndexDTO,id);
-        ImmutableMap result = ImmutableMap.of("searchHit", resourceIndexDTO);
-        return new BasicResult<>(result);
-    }
 
-    @RequestMapping(value = "/seachIndex", method = {RequestMethod.GET})
+    @RequestMapping(value = "/searchIndex", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult index3(String keyword) throws URISyntaxException, IOException, UpException {
         SearchResultListDTO hits = searchApiService.searchByKeyWordInField(UserIndexDTO.class,
@@ -142,48 +83,34 @@ public class TestController {
         return new BasicResult<>(result);
     }
 
-    /**
-     * 文件上传测试
-     * @param reqFile
-     * @return
-     */
-    @RequestMapping(value = "/upload", method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/bulkUpdateIndex", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult index4(@RequestParam(name = "file") MultipartFile reqFile) {
-        File file = new File(System.getProperty("java.io.tmpdir")+"/"+reqFile.getOriginalFilename());
-        try (FileOutputStream outputStream = new FileOutputStream(file)){
-            outputStream.write(reqFile.getBytes());
-            upLoadApiService.upload(UpLoadApiService.COMPRESS_FILE_TYPE,file);
-        } catch (IOException | UpException e) {
-            e.printStackTrace();
-        }
-        return new BasicResult(ErrorStatus.OK);
+    public BasicResult<Boolean> TestBulkUpdateIndex(String email) throws URISyntaxException, IOException, UpException {
+        return new BasicResult<>(searchApiService.bulkUpdateIndex("user", ImmutableList.of(5125121L, 412412123L),
+                ImmutableMap.of(
+                        "email", email
+                )));
     }
 
-    /**
-     * 调度测试
-     * @param type
-     * @return
-     */
-    @RequestMapping(value = "/crontab", method = {RequestMethod.GET})
+    @RequestMapping(value = "/bulkUpdateIndexStatus", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult index5(@RequestParam(name = "type") Integer type) {
-        backUpService.autoCrontab(type);
-        return new BasicResult(ErrorStatus.OK);
+    public BasicResult<Boolean> TestBulkUpdateIndexStatus(Integer status) throws URISyntaxException, IOException, UpException {
+        return new BasicResult<>(searchApiService.bulkUpdateIndexStatus("user", ImmutableList.of(5125121L, 412412123L),status));
     }
 
-    /**
-     * 过滤测试
-     * @param keyword
-     * @return
-     */
-    @RequestMapping(value = "/filter", method = {RequestMethod.GET})
+    @RequestMapping(value = "/getAndBuildIndexDTOByIndexId", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult index6(@RequestParam(name = "keyword") String keyword) {
-        TextUtils.filter(keyword);
-        return new BasicResult(ErrorStatus.OK);
+    public BasicResult<String> TestGetAndBuildIndexDTOByIndexId(Integer docId) throws URISyntaxException, IOException, UpException {
+        UserIndexDTO userIndexDTO = new UserIndexDTO();
+        searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(docId));
+        return new BasicResult<>(JSON.toJSONString(userIndexDTO));
     }
 
-
+    @RequestMapping(value = "/searchByFilterField", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult<String> TestSearchByFilterField(Integer status,Integer offset,Integer size) throws URISyntaxException, IOException, UpException {
+        SearchResultListDTO searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status",status),null,null,null,offset,size);
+        return new BasicResult<>(JSON.toJSONString(searchResultListDTO));
+    }
 
 }

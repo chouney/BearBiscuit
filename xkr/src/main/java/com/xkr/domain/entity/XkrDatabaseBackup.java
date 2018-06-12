@@ -9,7 +9,6 @@ public class XkrDatabaseBackup {
      * 数据库备份id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

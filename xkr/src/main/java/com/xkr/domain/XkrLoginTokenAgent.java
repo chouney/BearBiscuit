@@ -1,5 +1,6 @@
 package com.xkr.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xkr.common.Const;
 import com.xkr.common.LoginEnum;
@@ -51,20 +52,20 @@ public class XkrLoginTokenAgent {
             xkrLoginToken.setClientIp(session.getHost());
             xkrLoginToken.setUserId(userId);
             xkrLoginToken.setStatus((byte) 1);
-            xkrLoginToken.setLoginToken((String) session.getAttribute(Const.SESSION_COOKIE_NAME));
+            xkrLoginToken.setLoginToken(String.valueOf(session.getId()));
             //存储token
-            session.setAttribute(Const.SESSION_LOGIN_TOKEN_KEY,xkrLoginToken);
-            xkrLoginTokenMapper.insert(xkrLoginToken);
+            session.setAttribute(Const.SESSION_LOGIN_TOKEN_KEY, JSON.toJSONString(xkrLoginToken));
+            xkrLoginTokenMapper.insertSelective(xkrLoginToken);
             return ;
         }
         xkrLoginToken.setClientIp(session.getHost());
         Integer count = xkrLoginToken.getLoginCount() == null ? 0 : xkrLoginToken.getLoginCount();
         xkrLoginToken.setLoginCount(count+1);
         xkrLoginToken.setUpdateTime(new Date());
-        xkrLoginToken.setLoginToken((String) session.getAttribute(Const.SESSION_COOKIE_NAME));
+        xkrLoginToken.setLoginToken(String.valueOf(session.getId()));
         //存储token
-        session.setAttribute(Const.SESSION_LOGIN_TOKEN_KEY,xkrLoginToken);
-        xkrLoginTokenMapper.updateByPrimaryKey(xkrLoginToken);
+        session.setAttribute(Const.SESSION_LOGIN_TOKEN_KEY,JSON.toJSONString(xkrLoginToken));
+        xkrLoginTokenMapper.updateByPrimaryKeySelective(xkrLoginToken);
     }
 
     public XkrLoginToken getUserLoginRecordById(Long userId){

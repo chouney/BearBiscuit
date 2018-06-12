@@ -9,7 +9,6 @@ public class XkrClass {
      * 分类id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

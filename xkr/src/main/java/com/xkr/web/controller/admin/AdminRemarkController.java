@@ -15,7 +15,7 @@ import com.xkr.web.model.vo.remark.ListRemarkVO;
 import com.xkr.web.model.vo.remark.RemarkDetailVO;
 import com.xkr.web.model.vo.remark.RemarkVO;
 import org.apache.shiro.SecurityUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -72,7 +72,7 @@ public class AdminRemarkController {
 
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult getDetailRemark(
             @IsNumberic
             @RequestParam(name = "remarkId") String  remarkId,
@@ -122,7 +122,7 @@ public class AdminRemarkController {
 
     @RequestMapping(value = "/reply", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult replyRemark(
             @IsNumberic
             @RequestParam(name = "remarkId") String  remarkId,

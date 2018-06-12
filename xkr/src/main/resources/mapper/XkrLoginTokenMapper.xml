@@ -22,8 +22,8 @@
 
   <select id="getLoginTokensByIds" parameterType="java.util.List" resultMap="BaseResultMap">
     SELECT  <include refid="login_token_fields"/>
-    FROM xkr_login_token WHERE id IN
-    <foreach collection="ids" item="id" separator="," open="(" close=")">
+    FROM xkr_login_token WHERE user_id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
       #{id}
     </foreach>
     AND status = 1

@@ -48,7 +48,7 @@ public class XkrResourceUserAgent {
 
     public boolean saveNewPayRecord(Long userId, Long resourceId) {
         if (Objects.isNull(userId) || Objects.isNull(resourceId)) {
-            logger.error("XkrResourceUserAgent getResourceByUserId empty userId:{} , resourceId:{}",userId,resourceId);
+            logger.error("XkrResourceUserAgent saveNewPayRecord empty userId:{} , resourceId:{}",userId,resourceId);
             return false;
         }
         Long id = idGenerator.generateId();
@@ -58,7 +58,7 @@ public class XkrResourceUserAgent {
         resourceUser.setStatus((byte)STATUS_PAYED);
         resourceUser.setResourceId(resourceId);
         resourceUser.setUserId(userId);
-        return xkrResourceUserMapper.insert(resourceUser) == 1;
+        return xkrResourceUserMapper.insertSelective(resourceUser) == 1;
     }
 
 

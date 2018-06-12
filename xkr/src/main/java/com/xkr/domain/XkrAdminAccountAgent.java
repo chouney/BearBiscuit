@@ -70,9 +70,9 @@ public class XkrAdminAccountAgent {
     }
 
     public XkrAdminAccount saveNewAdminAccount(String accountName,
-                                    String accountToken,String email,String roleIds){
+                                    String accountToken,String email,Integer roleId){
         if(StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || StringUtils.isEmpty(roleIds)){
+                || StringUtils.isEmpty(email) || Objects.isNull(roleId)){
             return null;
         }
         XkrAdminAccount adminAccount = new XkrAdminAccount();
@@ -80,16 +80,16 @@ public class XkrAdminAccountAgent {
         adminAccount.setAccountName(accountName);
         adminAccount.setAccountToken(accountToken);
         adminAccount.setEmail(email);
-        adminAccount.setRoleIds(roleIds);
+        adminAccount.setRoleId(roleId);
         adminAccount.setStatus((byte)STATUS_NORMAL);
-        if(xkrAdminAccountMapper.insert(adminAccount) == 1){
+        if(xkrAdminAccountMapper.insertSelective(adminAccount) == 1){
             return adminAccount;
         }
         return null;
     }
 
     public boolean updateAdminAccountById(Long adminAccountId,String accountName,
-                                          String accountToken,String email,String roleIds){
+                                          String accountToken,String email,Integer roleId){
         if(Objects.isNull(adminAccountId)){
             return false;
         }
@@ -98,7 +98,7 @@ public class XkrAdminAccountAgent {
                 "accountName",accountName,
                 "accountToken",accountToken,
                 "email",email,
-                "roleIds",roleIds
+                "roleId",roleId
         )) == 1;
     }
 

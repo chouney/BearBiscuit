@@ -17,13 +17,13 @@
     id,permission_name,status,create_time,update_time,ext
   </sql>
 
-  <select id="selectByIds" parameterType="String" resultMap="BaseResultMap">
+  <select id="selectByIds" parameterType="java.util.List" resultMap="BaseResultMap">
     SELECT <include refid="permission_field"/>
     FROM xkr_admin_permission
     WHERE status = 1
-    <if test="ids!=null and ids.size()!=0">
+    <if test="list!=null and list.size()!=0">
       AND id IN
-      <foreach collection="ids" item="permissionId" index="index"
+      <foreach collection="list" item="permissionId" index="index"
                open="(" close=")" separator=",">
         #{permissionId}
       </foreach>

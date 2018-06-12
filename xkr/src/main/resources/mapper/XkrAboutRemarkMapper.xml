@@ -9,26 +9,26 @@
     <result column="user_id" property="userId" jdbcType="BIGINT" />
     <result column="user_type_code" property="userTypeCode" jdbcType="TINYINT" />
     <result column="parent_remark_id" property="parentRemarkId" jdbcType="BIGINT" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
-    <result column="content" property="content" jdbcType="LONGVARCHAR" />
   </resultMap>
 
   <sql id="about_remark_field">
-    id,user_id,user_type_code,parent_remark_id,content,status
-    create_time,update_time,ext
+    id,user_id,user_type_code,parent_remark_id,status,
+    create_time,update_time,ext,content
   </sql>
   <select id="getAllList"  resultMap="BaseResultMap">
     SELECT <include refid="about_remark_field"/>
-    FROM xkr_about_remark WHERE status in (1,2)
+    FROM xkr_about_remark WHERE status = 1
   </select>
 
   <select id="getRemarkById" parameterType="java.lang.Long" resultMap="BaseResultMap">
     SELECT  <include refid="about_remark_field"/>
     FROM xkr_about_remark WHERE id = #{id}
-    AND status in (1,2)
+    AND status = 1
   </select>
 
   <update id="batchUpdateRemarkByIds" parameterType="java.util.Map">

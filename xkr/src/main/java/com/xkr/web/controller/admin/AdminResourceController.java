@@ -18,7 +18,7 @@ import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.resource.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.hibernate.validator.constraints.NotBlank;
@@ -106,7 +106,7 @@ public class AdminResourceController {
      */
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult batchOptResource(
             @RequestParam(name = "resIds[]") String[] resourceIds,
             @ContainsInt(value = {1,3,4,-1}) @RequestParam(name = "optType") Integer optType,

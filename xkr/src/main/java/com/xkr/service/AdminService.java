@@ -165,9 +165,9 @@ public class AdminService {
      * @return
      */
     @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.INSERT)
-    public ResponseDTO<Long> saveNewAdminAccount(String accountName, String accountToken, String email, String roleId) {
+    public ResponseDTO<Long> saveNewAdminAccount(String accountName, String accountToken, String email, Integer roleId) {
         if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || StringUtils.isEmpty(roleId)) {
+                || StringUtils.isEmpty(email) || Objects.isNull(roleId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount newAccount = xkrAdminAccountAgent.saveNewAdminAccount(accountName, accountToken, email, roleId);
@@ -188,9 +188,9 @@ public class AdminService {
      * @return
      */
     @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.UPDATE)
-    public ResponseDTO<Boolean> updateAdminAccountById(Long adminAccountId, String accountName, String accountToken, String email, String roleId) {
+    public ResponseDTO<Boolean> updateAdminAccountById(Long adminAccountId, String accountName, String accountToken, String email, Integer roleId) {
         if (Objects.isNull(adminAccountId) || StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || StringUtils.isEmpty(roleId)) {
+                || StringUtils.isEmpty(email) || Objects.isNull(roleId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         return new ResponseDTO<>(xkrAdminAccountAgent.updateAdminAccountById(adminAccountId, accountName, accountToken, email, roleId));
@@ -420,7 +420,7 @@ public class AdminService {
 
         XkrAdminAccount adminAccount = (XkrAdminAccount) subject.getPrincipal();
 
-        Integer roleId = Integer.valueOf(adminAccount.getRoleIds());
+        Integer roleId = adminAccount.getRoleId();
 
         XkrAdminRole role = xkrAdminRoleAgent.getAdminRoleById(roleId);
         if (Objects.isNull(role)) {
@@ -443,7 +443,7 @@ public class AdminService {
         result.setAccountName(adminAccount.getAccountName());
         result.setAdminAccountId(adminAccount.getId());
         result.setEmail(adminAccount.getEmail());
-        result.setRoleId(Integer.valueOf(adminAccount.getRoleIds()));
+        result.setRoleId(adminAccount.getRoleId());
     }
 
 

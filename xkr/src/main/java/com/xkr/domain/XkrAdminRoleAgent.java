@@ -47,7 +47,7 @@ public class XkrAdminRoleAgent {
         adminRole.setRoleName(roleName);
         adminRole.setStatus((byte)STATUS_NORMARL);
         adminRole.setExt(ext.toJSONString());
-        boolean isSuccess = xkrAdminRoleMapper.insert(adminRole) == 1;
+        boolean isSuccess = xkrAdminRoleMapper.insertSelective(adminRole) == 1;
         if(isSuccess){
             return adminRole;
         }

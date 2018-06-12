@@ -49,7 +49,7 @@ public class XkrAdminOptLogAgent {
         log.setOptDetail(detail);
         log.setOptModule((byte)logModuleEnum.getCode());
         log.setStatus((byte)STATUS_NORMAL);
-        return xkrAdminOptLogMapper.insert(log) == 1;
+        return xkrAdminOptLogMapper.insertSelective(log) == 1;
     }
 
     public List<XkrAdminOptLog> getAllList(Long adminAccountId){

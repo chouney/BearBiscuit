@@ -131,7 +131,7 @@ public class XkrUserAgent {
         XkrUser user = new XkrUser();
         user.setId(userId);
         user.setStatus((byte)UserStatusEnum.USER_STATUS_NORMAL.getCode());
-        if(xkrUserMapper.updateByPrimaryKey(user) == 1){
+        if(xkrUserMapper.updateByPrimaryKeySelective(user) == 1){
             UserIndexDTO userIndexDTO = new UserIndexDTO();
             searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(user.getId()));
             userIndexDTO.setStatus(UserStatusEnum.USER_STATUS_NORMAL.getCode());
@@ -190,7 +190,7 @@ public class XkrUserAgent {
             return false;
         }
         user.setWealth(user.getWealth() - toTakeOff);
-        return xkrUserMapper.updateByPrimaryKey(user) == 1;
+        return xkrUserMapper.updateByPrimaryKeySelective(user) == 1;
     }
 
     private void buildUserIndexDTO(UserIndexDTO userIndexDTO,XkrUser xkrUser){

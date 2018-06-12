@@ -8,10 +8,14 @@ import com.xkr.dao.mapper.XkrMessageMapper;
 import com.xkr.domain.XkrMessageAgent;
 import com.xkr.domain.dto.message.MessageStatusEnum;
 import com.xkr.domain.entity.XkrMessage;
+import com.xkr.service.MessageService;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.plugin2.message.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -21,37 +25,16 @@ import java.util.Map;
  * @version 1.0
  * @date 2018/5/16
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MessageDaoTestCase extends BaseDaoTest{
 
     @Autowired
     private XkrMessageMapper xkrMessageMapper;
 
 
-    @Before
-    public void init(){
-        XkrMessage xkrMessage = new XkrMessage();
-        xkrMessage.setId(1L);
-        xkrMessage.setFromTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
-        xkrMessage.setFromId(2L);
-        xkrMessage.setToTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
-        xkrMessage.setToId(3L);
-        xkrMessage.setContent("2给3发了一个消息");
-        xkrMessage.setStatus((byte) 1);
-        xkrMessageMapper.insert(xkrMessage);
-        xkrMessage = new XkrMessage();
-        xkrMessage.setId(2L);
-        xkrMessage.setFromTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
-        xkrMessage.setFromId(4L);
-        xkrMessage.setToTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
-        xkrMessage.setToId(3L);
-        xkrMessage.setContent("4给3发了一个消息");
-        xkrMessage.setStatus((byte) 1);
-        xkrMessageMapper.insert(xkrMessage);
-    }
-
     @Test
-    public void testInsert(){
-        long messageId = 4124124124124L;
+    public void testAInsert(){
+        long messageId = 3L;
         XkrMessage xkrMessage = new XkrMessage();
         xkrMessage.setId(messageId);
         xkrMessage.setFromTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
@@ -64,19 +47,24 @@ public class MessageDaoTestCase extends BaseDaoTest{
     }
 
     @Test
-    public void testUpdateMessageStatus(){
-        List<Long> list = ImmutableList.of(
-                1L,2L
+    public void testGetFromSource(){
+        Map<String, Object> params = ImmutableMap.of(
+                "fromTypeCode", Integer.valueOf(LoginEnum.CUSTOMER.getType()),
+                "fromId", 4L,
+                "statuses", ImmutableList.of(MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode())
         );
-        xkrMessageMapper.updateMessageStatus(ImmutableMap.of(
-                "status",2,
-                "messageIds",list
-        ));
-        List<XkrMessage> result = xkrMessageMapper.selectAll();
-        result.forEach(xkrMessage -> {
-            System.out.println(xkrMessage.getStatus());
-            Assert.assertEquals(xkrMessage.getStatus(),Byte.valueOf("2"));
-        });
+        List<XkrMessage> list = xkrMessageMapper.getMessagesByFromSource(params);
+        Assert.assertEquals(1,list.size());
+    }
+
+    @Test
+    public void testGetFromALLSource(){
+        Map<String, Object> params = ImmutableMap.of(
+                "fromTypeCode", Integer.valueOf(LoginEnum.CUSTOMER.getType()),
+                "fromId", 2L
+        );
+        List<XkrMessage> list = xkrMessageMapper.getMessagesByFromSource(params);
+        Assert.assertEquals(1,list.size());
     }
 
     @Test
@@ -84,7 +72,7 @@ public class MessageDaoTestCase extends BaseDaoTest{
         Map<String, Object> params = ImmutableMap.of(
                 "toTypeCode", Integer.valueOf(LoginEnum.CUSTOMER.getType()),
                 "toId", 3L,
-                "status", MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode()
+                "statuses", ImmutableList.of(MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode())
         );
         List<XkrMessage> list = xkrMessageMapper.getMessagesByToSource(params);
         Assert.assertEquals(1,list.size());
@@ -98,6 +86,21 @@ public class MessageDaoTestCase extends BaseDaoTest{
         );
         List<XkrMessage> list = xkrMessageMapper.getMessagesByToSource(params);
         Assert.assertEquals(2,list.size());
+    }
+
+    @Test
+    public void testUpdateMessageStatus(){
+        List<Long> list = ImmutableList.of(
+                1L,2L,3L
+        );
+        xkrMessageMapper.updateMessageStatus(ImmutableMap.of(
+                "status",2,
+                "messageIds",list
+        ));
+        List<XkrMessage> result = xkrMessageMapper.selectAll();
+        result.forEach(xkrMessage -> {
+            Assert.assertEquals(xkrMessage.getStatus(),Byte.valueOf("2"));
+        });
     }
 
 

@@ -4,6 +4,7 @@
 
 package com.xkr.core.shiro.admin;
 
+import com.google.common.collect.ImmutableSet;
 import com.xkr.domain.XkrAdminAccountAgent;
 import com.xkr.domain.XkrAdminPermissionAgent;
 import com.xkr.domain.XkrAdminRoleAgent;
@@ -111,8 +112,7 @@ public class AdminShiroRealm extends AuthorizingRealm {
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         XkrAdminAccount userInfo = (XkrAdminAccount) principals.getPrimaryPrincipal();
-        Set<String> roleIds = Arrays.stream(userInfo.getRoleIds().split(";")).
-                collect(Collectors.toSet());
+        Set<String> roleIds = ImmutableSet.of(String.valueOf(userInfo.getRoleId()));
 
         if (Collections.isEmpty(roleIds)) {
             return authorizationInfo;

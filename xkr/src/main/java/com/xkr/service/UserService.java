@@ -16,6 +16,7 @@ import com.xkr.domain.dto.user.UserDetailDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrLoginToken;
 import com.xkr.domain.entity.XkrUser;
+import com.xkr.exception.RegUserException;
 import com.xkr.service.api.MailApiService;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.util.EncodeUtil;
@@ -209,7 +210,7 @@ public class UserService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ResponseDTO<Long> createUserAccount(String userName, String email, String userToken) {
+    public ResponseDTO<Long> createUserAccount(String userName, String email, String userToken) throws RegUserException {
         if (StringUtils.isEmpty(userName) ||
                 StringUtils.isEmpty(userToken) ||
                 StringUtils.isEmpty(email)) {
@@ -233,13 +234,13 @@ public class UserService {
 
             adminIndexRedisService.incrRegCount();
 
-            mailApiService.sendCaptcha(newUser.getEmail(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
+            mailApiService.sendRegValidCaptcha(newUser.getEmail(),newUser.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
                     String.valueOf(newUser.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_REG)));
             return new ResponseDTO<>(newUser.getId());
         } catch (MessagingException e) {
             logger.error("UserService sendCaptcha failed ,userEmail:{},userName:{},userToken:{}", email, userName, userToken, e);
         }
-        return new ResponseDTO<>(ErrorStatus.ERROR);
+        throw new RegUserException();
     }
 
     /**
@@ -289,7 +290,7 @@ public class UserService {
                 return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
             }
             //发送邮箱验证
-            mailApiService.sendCaptcha(user.getEmail(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
+            mailApiService.sendPasswordUpdateValidCaptcha(user.getEmail(),user.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
                     String.valueOf(user.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD)));
             return new ResponseDTO<>(true);
         } catch (MessagingException e) {

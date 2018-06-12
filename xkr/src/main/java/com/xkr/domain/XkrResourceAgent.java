@@ -158,7 +158,7 @@ public class XkrResourceAgent {
         ext.put(ResourceService.EXT_MD5_UNCOMPRESS_FILE_KEY, unCompressMd5);
         resource.setExt(ext.toJSONString());
         resource.setResourceUrl(compressMd5);
-        if (xkrResourceMapper.insert(resource) == 1) {
+        if (xkrResourceMapper.insertSelective(resource) == 1) {
 
             //创建资源索引
             ResourceIndexDTO resourceIndexDTO = new ResourceIndexDTO();

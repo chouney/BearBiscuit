@@ -9,7 +9,6 @@ public class XkrResource {
      * 资源id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

@@ -57,15 +57,11 @@ public class XkrRemarkAgent {
         }
         Long id = idGenerator.generateId();
         XkrAboutRemark xkrAboutRemark = new XkrAboutRemark();
-
+        xkrAboutRemark.setStatus((byte) RemarkStatusEnum.STATUS_NORMAL_USER_REMARK.getCode());
+        xkrAboutRemark.setParentRemarkId(DEFAULT_PARENT_REMARK_ID);
         if(Objects.nonNull(parentRemarkId)){
-            xkrAboutRemark.setStatus((byte) RemarkStatusEnum.STATUS_NORMAL_ADMIN_REPLY.getCode());
             xkrAboutRemark.setParentRemarkId(parentRemarkId);
-        }else{
-            xkrAboutRemark.setStatus((byte) RemarkStatusEnum.STATUS_NORMAL_USER_REMARK.getCode());
-            xkrAboutRemark.setParentRemarkId(DEFAULT_PARENT_REMARK_ID);
         }
-
         if(StringUtils.isEmpty(qq) && StringUtils.isEmpty(phone)) {
             JSONObject ext = new JSONObject();
             ext.put("qq", qq);
@@ -78,7 +74,7 @@ public class XkrRemarkAgent {
         xkrAboutRemark.setUserId(userId);
         xkrAboutRemark.setUserTypeCode(Byte.valueOf(loginEnum.getType()));
 
-        return xkrAboutRemarkMapper.insert(xkrAboutRemark) == 1 ? xkrAboutRemark : null;
+        return xkrAboutRemarkMapper.insertSelective(xkrAboutRemark) == 1 ? xkrAboutRemark : null;
     }
 
     public XkrAboutRemark getRemarkById(Long id){

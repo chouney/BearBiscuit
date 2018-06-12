@@ -12,7 +12,7 @@ import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.clazz.ClassMenuVO;
 import com.xkr.web.model.vo.optlog.ListOptLogVO;
 import com.xkr.web.model.vo.optlog.OptLogVO;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class OptLogController {
 
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult getOptLogList(
             @IsNumberic
             @RequestParam(name = "adminAccountId") String adminAccountId,

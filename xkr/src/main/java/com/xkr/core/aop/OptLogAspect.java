@@ -50,7 +50,7 @@ public class OptLogAspect {
         if(Objects.nonNull(optLog)){
             OptLogModuleEnum moduleEnum = optLog.moduleEnum();
             OptEnum optEnum = optLog.optEnum();
-            String detail = optEnum.getDesc()+ JSON.toJSONString(joinPoint.getArgs());
+            String detail = optEnum.getDesc()+ ",参数:"+ JSON.toJSONString(joinPoint.getArgs());
             optLogService.saveOptLog(moduleEnum,detail);
         }
         return joinPoint.proceed(joinPoint.getArgs());

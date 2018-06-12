@@ -14,7 +14,7 @@ import com.xkr.web.model.vo.admin.account.ListAdminAccountVO;
 import com.xkr.web.model.vo.admin.role.AdminRoleVO;
 import com.xkr.web.model.vo.admin.role.ListAdminRoleVO;
 import com.xkr.web.model.vo.admin.role.RoleDetailVO;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class RoleController {
      */
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult roleDetail(
             @IsNumberic
             @RequestParam(name = "roleId") String roleId,
@@ -109,7 +109,7 @@ public class RoleController {
      */
     @RequestMapping(value = "/add", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult addRole(
             @NotBlank
             @RequestParam(name = "roleName") String roleName,
@@ -147,7 +147,7 @@ public class RoleController {
      */
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult updateRole(
             @IsNumberic
             @RequestParam(name = "roleId") String roleId,

@@ -9,12 +9,13 @@ import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.backup.ListBackUpDTO;
 import com.xkr.domain.entity.XkrAdminAccount;
+import com.xkr.exception.BackUpException;
 import com.xkr.service.BackUpService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.backup.BackUpVO;
 import com.xkr.web.model.vo.backup.ListBackUpVO;
 import org.apache.shiro.SecurityUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public class DbBackUpController {
      */
     @RequestMapping(value = "/auto_opt", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult autoOpt(
             @ContainsInt({1, 2, 3, -1})
             @RequestParam(name = "type") Integer type,
@@ -156,7 +157,7 @@ public class DbBackUpController {
      */
     @RequestMapping(value = "/restore", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult restoreDB(
             @IsNumberic
             @RequestParam(name = "backUpId") String backUpId,
@@ -184,7 +185,6 @@ public class DbBackUpController {
      */
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
-    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.INSERT)
     public BasicResult backup() {
         try {
 

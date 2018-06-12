@@ -189,7 +189,7 @@ public class SearchApiService {
             T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
 
 
-            SearchRequest request = new SearchRequest(targetObject.getIndexKey())
+            SearchRequest request = new SearchRequest(targetObject.getIndexName())
                     .types(targetObject.getTypeName())
                     .source(builder);
 

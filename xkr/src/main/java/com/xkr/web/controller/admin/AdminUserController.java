@@ -14,7 +14,7 @@ import com.xkr.web.model.vo.user.ListUserDetailVO;
 import com.xkr.web.model.vo.user.UserDetailVO;
 import com.xkr.web.model.vo.user.UserVO;
 import org.apache.commons.lang3.StringUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.slf4j.Logger;
@@ -90,7 +90,7 @@ public class AdminUserController {
      *
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchOptUser(

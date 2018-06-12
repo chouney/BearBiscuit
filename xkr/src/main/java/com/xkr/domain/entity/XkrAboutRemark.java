@@ -9,7 +9,6 @@ public class XkrAboutRemark {
      * 留言d
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

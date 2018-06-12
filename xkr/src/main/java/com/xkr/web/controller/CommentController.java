@@ -16,7 +16,7 @@ import com.xkr.web.model.vo.comment.CommentVO;
 import com.xkr.web.model.vo.comment.ListCommentVO;
 import com.xkr.web.model.vo.message.ListMessageVO;
 import org.apache.shiro.SecurityUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class CommentController {
 
     @RequestMapping(value = "/list",method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult getCommentByResourceId(
             @IsNumberic
             @RequestParam(name = "resId") String resId,
@@ -81,7 +81,7 @@ public class CommentController {
 
     @RequestMapping(value = "/submit",method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> submitUserComment(
             @IsNumberic
             @RequestParam(name = "resId") String resId,

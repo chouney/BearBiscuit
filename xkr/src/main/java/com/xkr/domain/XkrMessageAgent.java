@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,7 +62,7 @@ public class XkrMessageAgent {
         xkrMessage.setContent(content);
         xkrMessage.setStatus((byte) MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode());
         logger.info("XkrMessageAgent saveToUserMessage, params:{}", JSON.toJSONString(xkrMessage));
-        if(xkrMessageMapper.insert(xkrMessage) == 1){
+        if(xkrMessageMapper.insertSelective(xkrMessage) == 1){
             return messageId;
         }
         logger.info("XkrMessageAgent saveToUserMessage failed, params:{}", JSON.toJSONString(xkrMessage));
@@ -81,6 +82,9 @@ public class XkrMessageAgent {
             xkrMessage.setToId(userId);
             xkrMessage.setContent(content);
             xkrMessage.setStatus((byte) MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode());
+            xkrMessage.setCreateTime(new Date());
+            xkrMessage.setUpdateTime(new Date());
+            xkrMessage.setExt("{}");
             logger.info("XkrMessageAgent saveToUserMessage, params:{}", JSON.toJSONString(xkrMessage));
             toInsert.add(xkrMessage);
         });

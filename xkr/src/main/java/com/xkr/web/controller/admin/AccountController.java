@@ -8,14 +8,12 @@ import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.admin.account.AdminAccountDetailDTO;
 import com.xkr.domain.dto.admin.account.ListAdminAccountDTO;
-import com.xkr.domain.dto.message.ListMessageDTO;
 import com.xkr.service.AdminService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.admin.account.AdminAccountDetailVO;
 import com.xkr.web.model.vo.admin.account.AdminAccountVO;
 import com.xkr.web.model.vo.admin.account.ListAdminAccountVO;
-import com.xkr.web.model.vo.message.ListMessageVO;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -53,7 +51,7 @@ public class AccountController {
      *
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/login", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult adminLogin(
@@ -139,7 +137,7 @@ public class AccountController {
      */
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult getAccountDetail(
             @IsNumberic
             @RequestParam(name = "adminAccountId") String adminAccountId,
@@ -170,7 +168,7 @@ public class AccountController {
      *
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/add", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult addAdmin(
@@ -188,7 +186,7 @@ public class AccountController {
         }
         try {
 
-            ResponseDTO<Long> responseDTO = adminService.saveNewAdminAccount(accountName, accountToken, email, roleId);
+            ResponseDTO<Long> responseDTO = adminService.saveNewAdminAccount(accountName, accountToken, email, Integer.valueOf(roleId));
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult<>(responseDTO.getStatus());
@@ -208,7 +206,7 @@ public class AccountController {
      *
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult updateAdmin(
@@ -228,7 +226,7 @@ public class AccountController {
         }
         try {
 
-            ResponseDTO<Boolean> responseDTO = adminService.updateAdminAccountById(Long.valueOf(adminAccountId), accountName, accountToken, email, roleId);
+            ResponseDTO<Boolean> responseDTO = adminService.updateAdminAccountById(Long.valueOf(adminAccountId), accountName, accountToken, email, Integer.valueOf(roleId));
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult<>(responseDTO.getStatus());

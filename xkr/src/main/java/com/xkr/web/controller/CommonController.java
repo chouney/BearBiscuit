@@ -6,7 +6,7 @@ import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
 import main.java.com.upyun.UpException;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class CommonController {
 
     @RequestMapping(value = "/file_upload", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult submitRemark(
             @RequestParam(name = "file") MultipartFile reqFile,
             @ContainsInt({0, 1})

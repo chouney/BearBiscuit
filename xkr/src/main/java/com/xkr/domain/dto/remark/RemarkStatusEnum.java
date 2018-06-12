@@ -13,8 +13,7 @@ import java.util.List;
 public enum RemarkStatusEnum {
 
     STATUS_NORMAL_USER_REMARK(1, "用户留言"),
-    STATUS_NORMAL_ADMIN_REPLY(2, "管理员回复"),
-    STATUS_DELETED(3, "删除"),;
+    STATUS_DELETED(2, "删除"),;
 
     private int code;
 
@@ -37,7 +36,7 @@ public enum RemarkStatusEnum {
      * 非删除状态集合
      */
     public static List<RemarkStatusEnum> NON_DELETE_STATUSED = ImmutableList.of(
-            STATUS_NORMAL_USER_REMARK, STATUS_NORMAL_ADMIN_REPLY
+            STATUS_NORMAL_USER_REMARK
     );
 
     public static RemarkStatusEnum getByCode(int code) {

@@ -28,7 +28,7 @@
 
     <update id="updateRoleById" parameterType="java.util.Map">
         UPDATE xkr_admin_role
-        <trim prefix="set" suffixOverrides=",">
+        <trim prefix="set">
             <if test="roleName!=null">
                 role_name = #{roleName} ,
             </if>

@@ -20,7 +20,7 @@ import com.xkr.web.model.vo.comment.ListCommentDetailVO;
 import com.xkr.web.model.vo.resource.ListResourceVO;
 import com.xkr.web.model.vo.resource.ResourceVO;
 import org.apache.commons.lang3.StringUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.hibernate.validator.constraints.NotBlank;
@@ -95,7 +95,7 @@ public class AdminCommentController {
      */
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult getCommentDetail(
             @IsNumberic
             @RequestParam(name = "commentId") String commentId,
@@ -130,7 +130,7 @@ public class AdminCommentController {
      */
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult batchOptResource(
             @RequestParam(name = "commentIds[]") String[] commentIds,
             @ContainsInt(value = {1,3}) @RequestParam(name = "optType") Integer optType,
@@ -161,7 +161,7 @@ public class AdminCommentController {
      */
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult batchOptResource(
             @IsNumberic
             @RequestParam(name = "commentId") String commentId,

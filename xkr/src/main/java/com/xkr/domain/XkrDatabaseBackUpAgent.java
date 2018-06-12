@@ -75,7 +75,7 @@ public class XkrDatabaseBackUpAgent {
         backup.setStatus((byte)1);
         backup.setExt(JSON.toJSONString(ext));
         backup.setId(id);
-        if(xkrDatabaseBackupMapper.insert(backup) == 1){
+        if(xkrDatabaseBackupMapper.insertSelective(backup) == 1){
             return id;
         }
         return null;

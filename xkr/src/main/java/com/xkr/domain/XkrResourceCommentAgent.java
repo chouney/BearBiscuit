@@ -147,7 +147,7 @@ public class XkrResourceCommentAgent {
         resourceComment.setUserId(user.getId());
         resourceComment.setStatus((byte)CommentStatusEnum.STATUS_TOVERIFY.getCode());
 
-        if(xkrResourceCommentMapper.insert(resourceComment) == 1){
+        if(xkrResourceCommentMapper.insertSelective(resourceComment) == 1){
             CommentIndexDTO commentIndexDTO = new CommentIndexDTO();
             buildCommentIndexDTO(commentIndexDTO,user,resourceComment,xkrResource);
             if(!searchApiService.upsertIndex(commentIndexDTO)){

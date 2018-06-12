@@ -9,7 +9,6 @@ public class XkrResourceComment {
      * 评论id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

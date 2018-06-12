@@ -2,6 +2,7 @@ package com.xkr.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.OptEnum;
@@ -14,6 +15,7 @@ import com.xkr.domain.dto.backup.BackUpDTO;
 import com.xkr.domain.dto.backup.ListBackUpDTO;
 import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrDatabaseBackup;
+import com.xkr.exception.BackUpException;
 import com.xkr.service.api.DbBackUpApiService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
@@ -95,20 +97,30 @@ public class BackUpService {
      * @param adminAccountId
      * @return
      */
-    public ResponseDTO<Long> backup(Long adminAccountId) {
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.INSERT)
+    public ResponseDTO<Long> backup(Long adminAccountId){
         adminAccountId = Objects.isNull(adminAccountId) ? AUTO_BACKUP_ADMIN_ACCOUNT_ID : adminAccountId;
         String backUpName = "dbbackup-" + DateUtil.getCurrentDate() + "-" + IdUtil.randomAlphanumeric(10);
-        String localFilePath = backUpApiService.backup(backUpName, null);
-        if (!StringUtils.isEmpty(localFilePath)) {
+        String localFilePath = backUpApiService.getBackupPath() + backUpName;
+        String upyunFilePath = String.format(UpLoadApiService.getExtFilePathFormat(), backUpName);
+        Long id = xkrDatabaseBackUpAgent.saveNewBackUpDate(backUpName, localFilePath,
+                upyunFilePath, adminAccountId);
+        if (Objects.nonNull(id)) {
             try {
-                String upyunFilePath = upLoadApiService.extFileUpload(backUpName, new File(localFilePath));
-                if (!StringUtils.isEmpty(upyunFilePath)) {
-                    Long id = xkrDatabaseBackUpAgent.saveNewBackUpDate(backUpName, localFilePath,
-                            upyunFilePath, adminAccountId);
-                    return new ResponseDTO<>(Objects.isNull(id) ? ErrorStatus.ERROR : ErrorStatus.OK);
+                localFilePath = backUpApiService.backup(localFilePath, null);
+                if (StringUtils.isEmpty(localFilePath)) {
+                    throw new BackUpException();
                 }
-            } catch (UpException | IOException e) {
+                upyunFilePath = upLoadApiService.extFileUpload(upyunFilePath, new File(localFilePath));
+                if (StringUtils.isEmpty(upyunFilePath)) {
+                    throw new BackUpException();
+                }
+                return new ResponseDTO<>(id);
+            } catch (BackUpException | UpException | IOException e) {
                 logger.error("backup service save backup failed adminAccountId:{},error:{}", adminAccountId, e);
+            }
+            if (!xkrDatabaseBackUpAgent.batchDeleteBackUpByIds(ImmutableList.of(id))){
+                logger.error("冗余backup记录,backUpId:{}",id);
             }
         }
         return new ResponseDTO<>(ErrorStatus.ERROR);
@@ -119,7 +131,7 @@ public class BackUpService {
      *
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.DELETE)
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP, optEnum = OptEnum.DELETE)
     public ResponseDTO<Boolean> batchDelBackUp(List<Long> backUpIds) {
         if (CollectionUtils.isEmpty(backUpIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -137,18 +149,18 @@ public class BackUpService {
                 isSuccess = localFile.delete();
                 upLoadApiService.deleteFile(yunFilePath, false);
             } catch (UpException | IOException e) {
-                logger.error("云盘删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath, e);
+                logger.error("云盘删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(), localFilePath, yunFilePath, e);
                 isSuccess = false;
-            } catch (Exception e){
-                logger.error("删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath, e);
+            } catch (Exception e) {
+                logger.error("删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(), localFilePath, yunFilePath, e);
                 isSuccess = false;
             }
-            if(!isSuccess){
-                logger.error("本地删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(),localFilePath,yunFilePath);
+            if (!isSuccess) {
+                logger.error("本地删除该备份文件失败 backUpId:{},localFilePath:{},yunFilePath:{},error:{}", xkrDatabaseBackup.getId(), localFilePath, yunFilePath);
             }
         });
 
-        if(!xkrDatabaseBackUpAgent.batchDeleteBackUpByIds(backUpIds)){
+        if (!xkrDatabaseBackUpAgent.batchDeleteBackUpByIds(backUpIds)) {
             return new ResponseDTO<>(ErrorStatus.ERROR);
         }
         return new ResponseDTO<>(true);
@@ -180,7 +192,7 @@ public class BackUpService {
      * @param backUpId
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.UPDATE)
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP, optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> restore(Long backUpId) {
         if (Objects.isNull(backUpId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -219,7 +231,7 @@ public class BackUpService {
      * @param periodType
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.UPDATE)
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP, optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> autoCrontab(int periodType) {
         if (!PERIOD_CRONTAB_MAP.keySet().contains(periodType) && PERIOD_SHUTDOWN_TYPE != periodType) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);

@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Service
 public interface XkrAdminOptLogMapper extends CustomerMapper<XkrAdminOptLog> {
-    List<XkrAdminOptLog> getAllOptLogByAdminAccount(Long adminAccount);
+    List<XkrAdminOptLog> getAllOptLogByAdminAccount(Long adminAccountId);
 
     Integer batchUpdateOptLogByIds(Map<String,Object> params);
 }

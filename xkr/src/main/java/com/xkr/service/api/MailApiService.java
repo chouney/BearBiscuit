@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
+import java.util.Properties;
+
+import static io.github.biezhi.ome.OhMyEmail.defaultConfig;
 
 /**
  * @author chriszhang
@@ -16,27 +19,29 @@ public class MailApiService {
 
     @PostConstruct
     public void init(){
-        OhMyEmail.config(OhMyEmail.SMTP_QQ(true),"64568559@qq.com","Zqx19921221");
+        Properties props = defaultConfig(false);
+        props.put("mail.smtp.host", "smtp.ym.163.com");
+        props.put("mail.smtp.port", "994");
+        OhMyEmail.config(props,"administrator@sharecoder.cn","hellotest520");
     }
 
-    public boolean sendCaptcha(String email,String captcha) throws MessagingException {
-        OhMyEmail.subject("这是一封测试HTML邮件")
-                .from("64568559@qq.com")
+    public boolean sendRegValidCaptcha(String email,String userName,String captcha) throws MessagingException {
+        OhMyEmail.subject("sharecoder邮箱验证")
+                .from("sharecoder.cn")
                 .to(email)
-                .html("<h1 font=red>信件内容:<a href=\"index#?token="+ captcha +"\">click here to verify</h1>")
+                .html("您好，您的账号<b>"+userName+"</b>已经注册成功，请您<a href=\"index#?token=" + captcha + "\">点此链接</a>进行激活操作，没有激活的账号无法正常使用，此链接转发无效。")
                 .send();
         return true;
     }
 
-    public static void main(String[] args) throws MessagingException {
-        OhMyEmail.config(OhMyEmail.SMTP_QQ(true),"64568559@qq.com","Zqx19921221");
-
-        OhMyEmail.subject("这是一封测试HTML邮件")
-                .from("64568559@qq.com")
-                .to("chris_zqx@163.com")
-                .html("<h1 font=red>信件内容</h1>")
+    public boolean sendPasswordUpdateValidCaptcha(String email,String userName,String captcha) throws MessagingException {
+        OhMyEmail.subject("sharecoder邮箱验证")
+                .from("sharecoder.cn")
+                .to(email)
+                .html("您好，您的账号<b>"+userName+"</b>正在进行修改密码操作，请您<a href=\"index#?token=" + captcha + "\">点此链接</a>进行密码修改操作，此链接转发无效。")
                 .send();
-
+        return true;
     }
+
 
 }

@@ -132,14 +132,13 @@ public class UpLoadApiService {
     /**
      * 内部文件上传服务
      *
-     * @param fileName
+     * @param filePath
      * @param file
      * @return 云盘文件路径
      * @throws UpException
      * @throws IOException
      */
-    public String extFileUpload(String fileName, File file) throws UpException, IOException {
-        String filePath = String.format(EXT_FILE_PATH_FORMAT, fileName);
+    public String extFileUpload(String filePath, File file) throws UpException, IOException {
         if (Objects.nonNull(getFileInto(filePath))) {
             throw new UpFileExistException("file already exist");
         }

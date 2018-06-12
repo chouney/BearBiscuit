@@ -1,34 +1,25 @@
 package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.xkr.common.Const;
 import com.xkr.common.ErrorStatus;
-import com.xkr.common.LoginEnum;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.domain.dto.ResponseDTO;
-import com.xkr.domain.dto.message.ListMessageDTO;
 import com.xkr.domain.dto.user.UserDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.UserService;
 import com.xkr.util.EncodeUtil;
-import com.xkr.util.IpUtil;
 import com.xkr.web.model.BasicResult;
-import com.xkr.web.model.vo.message.ListMessageVO;
 import com.xkr.web.model.vo.user.UserVO;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,7 +55,7 @@ public class UserController {
      */
     @RequestMapping(value = "/reg", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> regUser(
             @NotBlank
             @RequestParam(name = "userName") String userName,
@@ -100,7 +91,7 @@ public class UserController {
     @CSRFGen
     @RequestMapping(value = "/validate", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> validateEmail(
             @NotBlank
             @RequestParam(name = "token") String token,
@@ -148,7 +139,7 @@ public class UserController {
      * @param result
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public BasicResult<JSONObject> login(
@@ -212,7 +203,7 @@ public class UserController {
      * @param result
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/pre_update", method = RequestMethod.POST)
     @ResponseBody
     public BasicResult<JSONObject> preUpdate(
@@ -243,7 +234,7 @@ public class UserController {
      * @param result
      * @return
      */
-    @HttpValidate
+    @MethodValidate
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public BasicResult<JSONObject> update(

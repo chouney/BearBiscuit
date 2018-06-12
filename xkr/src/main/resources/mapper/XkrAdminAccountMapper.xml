@@ -9,7 +9,7 @@
         <result column="account_name" property="accountName" jdbcType="VARCHAR"/>
         <result column="account_token" property="accountToken" jdbcType="VARCHAR"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
-        <result column="role_ids" property="roleIds" jdbcType="VARCHAR"/>
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
         <result column="status" property="status" jdbcType="TINYINT"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -17,12 +17,12 @@
     </resultMap>
 
     <sql id="admin_fields">
-    id,account_name,account_token,email,role_ids,status,create_time,update_time,ext
+    id,account_name,account_token,email,role_id,status,create_time,update_time,ext
   </sql>
 
     <update id="updateAdminAccountById" parameterType="java.util.Map">
         UPDATE xkr_admin_account
-        <trim prefix="set" suffixOverrides=",">
+        <trim prefix="set" >
             <if test="accountName!=null">
                 account_name = #{accountName} ,
             </if>
@@ -32,8 +32,8 @@
             <if test="email!=null">
                 email = #{email} ,
             </if>
-            <if test="roleIds!=null">
-                role_ids = #{roleIds} ,
+            <if test="roleId!=null">
+                role_id = #{roleId} ,
             </if>
         </trim>
         update_time = now()
@@ -79,12 +79,10 @@
         AND status = 1
     </select>
 
-    <!--目前role_ids字段之存储单个角色-->
     <select id="getAdminAccountByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         SELECT
         <include refid="admin_fields"/>
-        FROM xkr_admin_account WHERE role_ids == #{roleId}
-
+        FROM xkr_admin_account WHERE role_id = #{roleId}
         AND status = 1
     </select>
 

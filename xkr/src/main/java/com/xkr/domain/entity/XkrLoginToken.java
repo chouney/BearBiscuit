@@ -9,7 +9,6 @@ public class XkrLoginToken {
      * 登录tokenId
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

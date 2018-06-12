@@ -16,16 +16,14 @@
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="admin_opt_log">
-    id,admin_account_id,opt_module,opt_detail,client_ip,status
+    id,admin_account_id,opt_module,opt_detail,client_ip,status,
     create_time,update_time,ext
   </sql>
 
-  <select id="getAllOptLogByAdminAccount"  resultMap="BaseResultMap">
+  <select id="getAllOptLogByAdminAccount"  parameterType="java.lang.Long" resultMap="BaseResultMap">
     SELECT <include refid="admin_opt_log"/>
     FROM xkr_admin_opt_log WHERE status = 1
-    <if test="adminAccountId!=null">
-      AND admin_account_id = #{adminAccountId}
-    </if>
+    AND admin_account_id = #{adminAccountId}
   </select>
 
   <update id="batchUpdateOptLogByIds" parameterType="java.util.Map">

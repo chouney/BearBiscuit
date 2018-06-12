@@ -96,7 +96,7 @@ public class XkrClassAgent {
         xkrClass.setClassName(className);
         xkrClass.setUpdateTime(new Date());
         if(xkrClassMapper.updateByPrimaryKeySelective(xkrClass) == 1){
-            childClassCache.cleanUp();
+            childClassCache.invalidateAll();
             return true;
         }
         return false;
@@ -113,7 +113,7 @@ public class XkrClassAgent {
             return false;
         }
         if(xkrClassMapper.deleteClassByClassId(classId) == 1){
-            childClassCache.cleanUp();
+            childClassCache.invalidateAll();
             return true;
         }
         return false;
@@ -130,7 +130,7 @@ public class XkrClassAgent {
             return false;
         }
         classIds.forEach(classId-> xkrClassMapper.deleteClassByClassId(classId));
-        childClassCache.cleanUp();
+        childClassCache.invalidateAll();
         return true;
     }
 
@@ -153,8 +153,8 @@ public class XkrClassAgent {
             xkrClass.setClassName(parentClass.getPath()+"-"+classId);
             xkrClass.setParentClassId(parendClassId);
         }
-        if(xkrClassMapper.insert(xkrClass) == 1){
-            childClassCache.cleanUp();
+        if(xkrClassMapper.insertSelective(xkrClass) == 1){
+            childClassCache.invalidateAll();
             return true;
         }
         return false;

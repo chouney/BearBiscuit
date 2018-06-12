@@ -18,7 +18,7 @@ import com.xkr.service.ResourceService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.resource.*;
 import org.apache.shiro.SecurityUtils;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.hibernate.validator.constraints.NotBlank;
@@ -58,7 +58,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/cls/list", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<ListResourceVO> getResourceListByClass(
             @IsNumberic
             @RequestParam(name = "classId") String classId,
@@ -99,7 +99,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/user_relation/list", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<ListResourceVO> getResourceListByUser(
             @IsNumberic
             @RequestParam(name = "userId") String userId,
@@ -139,7 +139,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/search_list", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<ListResourceVO> getResourceListBySearchWord(
             @NotBlank
             @RequestParam(name = "keyWord") String keyWord,
@@ -177,7 +177,7 @@ public class ResourceController {
     @CSRFGen
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<ResourceDetailVO> getResourceDetail(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
@@ -211,7 +211,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/res_list", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<ListResourceFolderVO> getResourceMenuList(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
@@ -250,7 +250,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/res_upload", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> resourceUpload(
             @NotBlank
             @RequestParam(name = "resTitle") String resTitle,
@@ -298,7 +298,7 @@ public class ResourceController {
     @CSRFValid
     @RequestMapping(value = "/res_download", method = {RequestMethod.GET})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> resourceDownLoad(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
@@ -333,7 +333,7 @@ public class ResourceController {
      */
     @RequestMapping(value = "/report", method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult<JSONObject> reportResource(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,

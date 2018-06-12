@@ -8,7 +8,7 @@ import com.xkr.domain.dto.clazz.ClassMenuDTO;
 import com.xkr.service.ClassService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.clazz.ClassMenuVO;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class AdminClassController {
 
     @RequestMapping(value = "/update",method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult updateClassName(
             @IsNumberic
             @RequestParam(name = "classId") String classId,
@@ -100,7 +100,7 @@ public class AdminClassController {
 
     @RequestMapping(value = "/add",method = {RequestMethod.POST})
     @ResponseBody
-    @HttpValidate
+    @MethodValidate
     public BasicResult saveNewClass(
             @NotBlank
             @RequestParam(name = "className") String className,

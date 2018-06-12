@@ -61,15 +61,14 @@ public class DbBackUpApiService {
     /**
      * 备份数据库，如果指定路径的文件不存在会自动生成
      *
-     * @param backFile 备份文件
+     * @param dest 备份文件
      * @param dbname   要备份的数据库
      * @return 返回文件本地路径
      */
-    public String backup(String backFile, String dbname) {
+    public String backup(String dest, String dbname) {
         if (StringUtils.isEmpty(dbname)) {
             dbname = "--all-databases";
         }
-        String dest = backupPath + backFile;
         String[] commands = new String[]{
                 mysqlBinPath + "mysqldump", "-u" + username, "-p" + password, dbname, "-r" + dest, "--default-character-set=utf8"
         };
@@ -77,7 +76,7 @@ public class DbBackUpApiService {
             Process process = Runtime.getRuntime().exec(commands);
             int processComplete = process.waitFor();
             if (processComplete == 0) {
-                logger.info("backup success backFile:{},dbname:{}", backFile, dbname);
+                logger.info("backup success dest:{},dbname:{}", dest, dbname);
                 return dest;
             }
             StringBuilder stb = new StringBuilder();
@@ -88,7 +87,7 @@ public class DbBackUpApiService {
                 logger.error("backup failed failed info:{}, error:{}",stb.toString(),e);
             }
         } catch (IOException | InterruptedException e) {
-            logger.error("backup failed backFile:{},dbname:[],error: ", backFile, dbname, e);
+            logger.error("backup failed dest:{},dbname:[],error: ", dest, dbname, e);
         }
         return null;
     }
@@ -96,11 +95,13 @@ public class DbBackUpApiService {
     /**
      * 恢复数据库
      *
-     * @param backFile 备份文件
+     * @param dest 备份文件路径
      */
-    public boolean restore(String backFile) {
+    public boolean restore(String dest) {
+        if(StringUtils.isEmpty(dest)){
+            return false;
+        }
         try {
-            String dest = backupPath + backFile;
             String[] commands = new String[]{
                     mysqlBinPath + "mysql", "-u" + username, "-p" + password, "-e source " + dest
             };
@@ -108,7 +109,7 @@ public class DbBackUpApiService {
 
             int processComplete = process.waitFor();
             if (processComplete == 0) {
-                logger.info("restore success backFile:{}", backFile);
+                logger.info("restore success dest:{}", dest);
                 return true;
             }
             StringBuilder stb = new StringBuilder();
@@ -119,9 +120,13 @@ public class DbBackUpApiService {
                 logger.error("restore failed info:{}, error:{}",stb.toString(),e);
             }
         } catch (InterruptedException | IOException e) {
-            logger.error("restore failed backFile:{}, error: ", backFile, e);
+            logger.error("restore failed dest:{}, error: ", dest, e);
         }
         return false;
+    }
+
+    public String getBackupPath() {
+        return backupPath;
     }
 
 //    public void test(){

@@ -12,7 +12,6 @@ public class XkrMessage extends BaseEntity implements Serializable{
      * 消息id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

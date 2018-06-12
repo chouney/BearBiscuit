@@ -9,7 +9,6 @@ public class XkrPayOrder {
      * 账单id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

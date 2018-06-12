@@ -14,7 +14,7 @@ import com.xkr.web.model.vo.admin.AdminIndexVO;
 import com.xkr.web.model.vo.admin.account.AdminAccountDetailVO;
 import com.xkr.web.model.vo.admin.account.AdminAccountVO;
 import com.xkr.web.model.vo.admin.account.ListAdminAccountVO;
-import org.chris.redbud.validator.annotation.HttpValidate;
+import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
