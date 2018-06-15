@@ -6,6 +6,7 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -94,6 +95,9 @@ public class OptLogVO implements Serializable {
     }
 
     public void setDate(Date date) {
+        if(Objects.isNull(date)){
+            return;
+        }
         this.date = DateUtil.yyyyMMddHHmmss.format(date);
     }
 }

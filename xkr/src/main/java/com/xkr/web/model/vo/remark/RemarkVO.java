@@ -6,6 +6,7 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -40,6 +41,9 @@ public class RemarkVO implements Serializable{
     }
 
     public void setSubmitDate(Date submitDate) {
+        if(Objects.isNull(submitDate)){
+            return;
+        }
         this.submitDate = DateUtil.yyyyMMdd.format(submitDate);
     }
 

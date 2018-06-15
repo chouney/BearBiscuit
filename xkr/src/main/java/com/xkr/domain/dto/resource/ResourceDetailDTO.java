@@ -1,6 +1,7 @@
 package com.xkr.domain.dto.resource;
 
 import com.google.common.collect.Maps;
+import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.dto.BaseDTO;
 import com.xkr.domain.entity.XkrClass;
 
@@ -127,7 +128,7 @@ public class ResourceDetailDTO extends BaseDTO implements Serializable{
         classList.forEach(xkrClass -> tmpMap.put(xkrClass.getId(), xkrClass));
         XkrClass parent = currentClass;
         ParentClass currentIndex = this.pClass;
-        while((parent = tmpMap.get(parent.getParentClassId())) !=null){
+        while((parent = tmpMap.get(parent.getParentClassId())).getId().intValue() != XkrClassAgent.ROOT_CLASS_ID){
             ParentClass parentClass = new ParentClass();
             parentClass.setClassName(parent.getClassName());
             parentClass.setClassId(parent.getId());

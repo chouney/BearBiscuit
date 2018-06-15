@@ -6,6 +6,7 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -62,6 +63,9 @@ public class UserVO implements Serializable {
     }
 
     public void setCreateTime(Date createTime) {
+        if(Objects.isNull(createTime)){
+            return;
+        }
         this.createTime = DateUtil.yyyyMMdd.format(createTime);
     }
 

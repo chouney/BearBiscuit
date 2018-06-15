@@ -3,6 +3,7 @@ package com.xkr.web.model.vo.message;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -37,6 +38,9 @@ public class MessageVO implements Serializable{
     }
 
     public void setDate(Date date) {
+        if(Objects.isNull(date)){
+            return;
+        }
         this.date = DATE_FORMAT.format(date);
     }
 }

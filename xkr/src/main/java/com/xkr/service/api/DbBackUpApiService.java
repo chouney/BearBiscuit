@@ -133,14 +133,4 @@ public class DbBackUpApiService {
 //        System.out.println("测试");
 //    }
 
-    public static void main(String[] args) {
-        DbBackUpApiService dbBackUpApiService = new DbBackUpApiService();
-        dbBackUpApiService.mysqlBinPath = "/usr/local/mysql/bin";
-        dbBackUpApiService.backupPath = "/Users/chriszhang/mysql_backup";
-        dbBackUpApiService.username = "root";
-        dbBackUpApiService.password = "123456";
-        dbBackUpApiService.init();
-        dbBackUpApiService.restore( "db.bak");
-//        dbBackUpService.backup("db.bak", null);
-    }
 }

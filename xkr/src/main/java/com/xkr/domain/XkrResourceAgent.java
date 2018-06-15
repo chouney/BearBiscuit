@@ -90,16 +90,19 @@ public class XkrResourceAgent {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean batchUpdateResourceClassByIds(List<Long> resourceIds,Long newClassId){
-        if (CollectionUtils.isEmpty(resourceIds) || Objects.isNull(newClassId)) {
+        if (Objects.isNull(newClassId)) {
             return false;
+        }
+        if(CollectionUtils.isEmpty(resourceIds)){
+            return true;
         }
         boolean isSuccess = xkrResourceMapper.batchUpdateResourceClassByIds(ImmutableMap.of(
                 "list",resourceIds,"classId",newClassId
-        )) == 1;
+        )) > 0;
         if(isSuccess){
             Map<String,Object> map = Maps.newHashMap();
             map.put("classId",newClassId);
-            map.put("updateTime",new Date());
+            map.put("updateTime",new Date().getTime());
             if (!searchApiService.bulkUpdateIndex("resource", resourceIds, map)) {
                 logger.error("XkrResourceAgent batchUpdateResourceClassByIds failed ,resourceIds:{},newClassId:{}", JSON.toJSONString(resourceIds),newClassId);
                 throw new RuntimeException();
@@ -120,7 +123,7 @@ public class XkrResourceAgent {
         } else if (ResourceStatusEnum.TOUPDATE_STATUSED.contains(status)) {
             isSuccess = xkrResourceMapper.batchUpdateResourceByIds(ImmutableMap.of(
                     "list", resourceIds, "status", status.getCode()
-            )) == 1;
+            )) > 0;
         }
         if (isSuccess) {
             if (!searchApiService.bulkUpdateIndexStatus("resource", resourceIds, status.getCode())) {
@@ -134,7 +137,7 @@ public class XkrResourceAgent {
 
     @Transactional(rollbackFor = Exception.class)
     public XkrResource saveNewResource(String title, String detail, Integer cost, XkrClass xkrClass, Long userId,
-                                       String compressMd5, String unCompressMd5, String fileSize) {
+                                       String compressMd5, String unCompressMd5, String fileSize,String fileName) {
         if(Objects.isNull(xkrClass)){
             return null;
         }
@@ -156,8 +159,12 @@ public class XkrResourceAgent {
         resource.setUserId(userId);
         JSONObject ext = new JSONObject();
         ext.put(ResourceService.EXT_MD5_UNCOMPRESS_FILE_KEY, unCompressMd5);
+        ext.put(ResourceService.EXT_FILE_NAME_KEY,fileName);
         resource.setExt(ext.toJSONString());
         resource.setResourceUrl(compressMd5);
+        resource.setDownloadCount(0);
+        resource.setCreateTime(new Date());
+        resource.setUpdateTime(new Date());
         if (xkrResourceMapper.insertSelective(resource) == 1) {
 
             //创建资源索引
@@ -273,6 +280,7 @@ public class XkrResourceAgent {
         indexDTO.setStatus((int) resource.getStatus());
         indexDTO.setTitle(resource.getTitle());
         indexDTO.setUpdateTime(resource.getUpdateTime());
+        indexDTO.setDownloadCount(resource.getDownloadCount());
         indexDTO.setUserId(resource.getUserId());
         indexDTO.setType(resType);
         XkrUser user = xkrUserAgent.getUserById(resource.getUserId());

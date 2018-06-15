@@ -94,7 +94,7 @@ public class XkrRemarkAgent {
         }
         return xkrAboutRemarkMapper.batchUpdateRemarkByIds(ImmutableMap.of(
                 "status",status,"list",ids
-        )) == 1;
+        )) > 0;
     }
 
 }

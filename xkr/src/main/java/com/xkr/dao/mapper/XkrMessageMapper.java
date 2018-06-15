@@ -14,6 +14,8 @@ public interface XkrMessageMapper extends CustomerMapper<XkrMessage> {
 
     List<XkrMessage> getMessagesByToSource(Map<String,Object> params);
 
+    Integer insertMessageList(List<XkrMessage> list);
+
     Integer updateMessageStatus(Map<String,Object> params);
 
 }

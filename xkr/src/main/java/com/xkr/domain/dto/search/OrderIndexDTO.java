@@ -41,7 +41,7 @@ public class OrderIndexDTO extends BaseIndexDTO implements Serializable{
     private Integer status;
 
     public OrderIndexDTO() {
-        super("xkr", "order");
+        super("order", "order");
     }
 
     public Long getOrderId() {

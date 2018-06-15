@@ -50,6 +50,13 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                 String date = httpServletRequest.getHeader("Date");
                 String uri = httpServletRequest.getRequestURI();
                 String signature = httpServletRequest.getHeader("Authorization");
+                if(StringUtils.isEmpty(signature)){
+                    logger.info("Basic Auth认证未通过");
+                    httpServletResponse.setCharacterEncoding("UTF-8");
+                    httpServletResponse.setContentType("application/json");
+                    httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.BASIC_AUTH_ERROR)));
+                    return false;
+                }
                 String[] s = signature.split(":");
                 String secret = PROJECT_SCCURITY_MAP.get(s[0]);
 
@@ -57,11 +64,12 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                 if (signature.equals(needValidate)) {
                     return true;
                 }
-                logger.info("Basic Auth认证异常,uri:{}, date:{}", uri, date);
+                logger.info("Basic Auth认证未通过,uri:{}, date:{}", uri, date);
             } catch (Exception e) {
                 logger.error("Basic Auth认证异常 ", e);
             }
         }
+        logger.info("Basic Auth认证未通过");
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.BASIC_AUTH_ERROR)));

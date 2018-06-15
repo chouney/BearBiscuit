@@ -58,7 +58,7 @@ public class XkrResourceCommentAgent {
         if(CommentStatusEnum.TOUPDATE_STATUSED.contains(status)){
             isSuccess = xkrResourceCommentMapper.batchUpdateCommentByIds(ImmutableMap.of(
                     "list",commentIds,"status",status.getCode()
-            )) == 1;
+            )) > 0;
         }
         if(isSuccess){
             if (!searchApiService.bulkUpdateIndexStatus("comment", commentIds, status.getCode())) {
@@ -79,7 +79,7 @@ public class XkrResourceCommentAgent {
         if(xkrResourceCommentMapper.updateByPrimaryKeySelective(xkrResourceComment) == 1){
             Map<String,Object> map = Maps.newHashMap();
             map.put("content",content);
-            map.put("updateTime",new Date());
+            map.put("updateTime",new Date().getTime());
             if(!searchApiService.bulkUpdateIndex("comment", ImmutableList.of(commentId),map)){
                 logger.error("XkrResourceCommentAgent updateCommentById index failed ,commentId:{},content:{}", commentId,content);
             }
@@ -146,7 +146,7 @@ public class XkrResourceCommentAgent {
         resourceComment.setResourceId(resourceId);
         resourceComment.setUserId(user.getId());
         resourceComment.setStatus((byte)CommentStatusEnum.STATUS_TOVERIFY.getCode());
-
+        resourceComment.setUpdateTime(new Date());
         if(xkrResourceCommentMapper.insertSelective(resourceComment) == 1){
             CommentIndexDTO commentIndexDTO = new CommentIndexDTO();
             buildCommentIndexDTO(commentIndexDTO,user,resourceComment,xkrResource);

@@ -30,7 +30,7 @@ public class UserIndexDTO extends BaseIndexDTO {
     private Integer status;
 
     public UserIndexDTO() {
-        super("xkr", "user");
+        super("user", "user");
     }
 
     public Long getUserId() {

@@ -85,7 +85,7 @@ insert into xkr_resource_user VALUES ('1','1','2','1',now(),now(),'{}');
 insert into xkr_resource_user VALUES ('2','2','1','1',now(),now(),'{}');
 insert into xkr_resource_user VALUES ('3','4','3','1',now(),now(),'{}');
 insert into xkr_resource_user VALUES ('4','3','4','1',now(),now(),'{}');
-insert into xkr_resource_user VALUES ('4','1','4','1',now(),now(),'{}');
+insert into xkr_resource_user VALUES ('5','1','4','1',now(),now(),'{}');
 
 DROP TABLE IF EXISTS xkr_login_token;
 CREATE TABLE xkr_login_token(

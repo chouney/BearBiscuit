@@ -16,8 +16,14 @@ public class FileDownloadResponseDTO implements Serializable{
 
     private String token;
 
-    public FileDownloadResponseDTO(String token) {
+    private String downloadUrl;
+
+    private String date;
+
+    public FileDownloadResponseDTO(String token, String downloadUrl, String date) {
         this.token = token;
+        this.downloadUrl = downloadUrl;
+        this.date = date;
     }
 
     public FileDownloadResponseDTO(ErrorStatus errorStatus) {
@@ -38,5 +44,21 @@ public class FileDownloadResponseDTO implements Serializable{
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

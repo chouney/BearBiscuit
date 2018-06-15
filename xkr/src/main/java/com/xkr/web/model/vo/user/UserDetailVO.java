@@ -4,6 +4,7 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -95,6 +96,9 @@ public class UserDetailVO implements Serializable {
     }
 
     public void setLastLoginDate(Date lastLoginDate) {
+        if(Objects.isNull(lastLoginDate)){
+            return;
+        }
         this.lastLoginDate = DateUtil.yyyyMMddHHmmss.format(lastLoginDate);
     }
 

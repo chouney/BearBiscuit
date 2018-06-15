@@ -6,13 +6,14 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
  * @version 1.0
  * @date 2018/5/30
  */
-public class BackUpVO implements Serializable{
+public class BackUpVO implements Serializable {
 
     private static final long serialVersionUID = 6895213521983598132L;
 
@@ -54,6 +55,8 @@ public class BackUpVO implements Serializable{
     }
 
     public void setDate(Date date) {
-        this.date = DateUtil.yyyyMMddHHmmss.format(date);
+        if (Objects.nonNull(date)) {
+            this.date = DateUtil.yyyyMMddHHmmss.format(date);
+        }
     }
 }

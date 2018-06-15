@@ -18,7 +18,7 @@ import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.XkrResourceAgent;
 import com.xkr.domain.XkrResourceUserAgent;
 import com.xkr.domain.XkrUserAgent;
-import com.xkr.domain.dto.*;
+import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.file.FileInfoDTO;
 import com.xkr.domain.dto.file.FolderItemDTO;
@@ -29,10 +29,13 @@ import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.*;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
+import com.xkr.util.DateUtil;
+import main.java.com.UpYun;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -43,10 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,6 +89,9 @@ public class ResourceService {
     @Value("${upyun.opt.password}")
     private String optPassword;
 
+    @Value("${upyun.bucket.file}")
+    private String fileBucket;
+
     public static final int ORDER_BY_UPDATE_TIME = 1;
 
     public static final int ORDER_BY_DOWNLOAD_COUNT = 2;
@@ -99,12 +102,15 @@ public class ResourceService {
 
     public static final String EXT_MD5_UNCOMPRESS_FILE_KEY = "unCompressMd5";
 
+    public static final String EXT_FILE_NAME_KEY = "fileName";
+
 
     /**
      * ------------------- 管理员服务 ----------------------
      */
     /**
      * 管理员搜索
+     *
      * @param keyword
      * @param startDate
      * @param endDate
@@ -117,52 +123,53 @@ public class ResourceService {
      */
     public ListResourceDTO getResourceSearchByAdmin(String keyword, Date startDate,
                                                     Date endDate, Integer resType, ResourceStatusEnum status,
-                                                    Integer report, int pageNum, int size){
+                                                    Integer report, int pageNum, int size) {
         ListResourceDTO result = new ListResourceDTO();
-        if(StringUtils.isEmpty(keyword) && Objects.isNull(startDate) && Objects.isNull(endDate) &&
-                Objects.isNull(resType) && Objects.isNull(report) && Objects.isNull(status)){
+        if (StringUtils.isEmpty(keyword) && Objects.isNull(startDate) && Objects.isNull(endDate) &&
+                Objects.isNull(resType) && Objects.isNull(report) && Objects.isNull(status)) {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
         int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
         SearchResultListDTO<ResourceIndexDTO> resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
-                keyword,null,
+                keyword, null,
                 ImmutableMap.of(
-                "type",resType,"report",report,"status",status.getCode()
-        ), Pair.of(startDate,endDate),"updateTime",null,null,offset,size);
+                        "type", resType, "report", report, "status", status.getCode()
+                ), Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
 
         List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
 
         List<XkrClass> xkrClasses = xkrClassAgent.getClassByIds(classIds);
 
-        buildListResourceDTO(result,xkrClasses,resultListDTO);
+        buildListResourceDTO(result, xkrClasses, resultListDTO);
 
         return result;
     }
 
     /**
      * 批量操作资源
+     *
      * @param resourceIds
      * @param resourceStatusEnum
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.RESOURCE,optEnum = OptEnum.UPDATE)
-    public ResponseDTO<Boolean> batchUpdateResourceStatus(List<Long> resourceIds,ResourceStatusEnum resourceStatusEnum){
-        if(CollectionUtils.isEmpty(resourceIds) || Objects.isNull(resourceStatusEnum)){
+    @OptLog(moduleEnum = OptLogModuleEnum.RESOURCE, optEnum = OptEnum.UPDATE)
+    public ResponseDTO<Boolean> batchUpdateResourceStatus(List<Long> resourceIds, ResourceStatusEnum resourceStatusEnum) {
+        if (CollectionUtils.isEmpty(resourceIds) || Objects.isNull(resourceStatusEnum)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
         List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
 
-        Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds,resourceStatusEnum);
-        if(success){
+        Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, resourceStatusEnum);
+        if (success) {
             //给用户发送消息
-            Map<Long,String> userContentMapper = Maps.newHashMap();
+            Map<Long, String> userContentMapper = Maps.newHashMap();
             resources.forEach(resource ->
                     userContentMapper.put(resource.getUserId(),
-                    String.format(MessageService.RESOURCE_TEMPLATE,resource.getTitle(),resourceStatusEnum.getDesc())));
-            messageService.batchSaveMessageToUser(LoginEnum.ADMIN,adminAccount.getId(),userContentMapper);
+                            String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), resourceStatusEnum.getDesc())));
+            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
         }
         return new ResponseDTO<>(success);
     }
@@ -172,6 +179,7 @@ public class ResourceService {
      */
     /**
      * 生成签名，放在Authorization头部
+     *
      * @param downloadUser
      * @param resourceId
      * @return
@@ -202,11 +210,11 @@ public class ResourceService {
                 return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_PAY_FAILED);
             }
 
-            if(!xkrUserAgent.dealUserPurchase(downloadUser,resource.getCost())){
+            if (!xkrUserAgent.dealUserPurchase(downloadUser, resource.getCost())) {
                 throw new RuntimeException("dealUserPruchase failed");
             }
 
-            if(!xkrResourceUserAgent.saveNewPayRecord(downloadUser.getId(),resourceId)){
+            if (!xkrResourceUserAgent.saveNewPayRecord(downloadUser.getId(), resourceId)) {
                 throw new RuntimeException("saveNew userRelationShip failed");
             }
 
@@ -220,13 +228,17 @@ public class ResourceService {
             //增加下载数
             adminIndexRedisService.incDownLoadCount();
 
-            return new FileDownloadResponseDTO(UpYunUtils.sign("GET",
-                    LocalDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
-                    String.format(UpLoadApiService.getCompressFilePathFormat(),resource.getUserId(),resource.getResourceUrl()),
-                    optUser,optPassword,null));
+            JSONObject ext = JSON.parseObject(resource.getExt());
+            String fileName = ext.getString(ResourceService.EXT_FILE_NAME_KEY);
+            String downloadUrl = String.format(UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
+            String date = DateUtil.getGMTRFCUSDate();
+
+            return new FileDownloadResponseDTO(
+                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
+                    downloadUrl, date);
         } catch (UpException e) {
-            logger.error("ResourceService build response token failed",e);
-            throw new RuntimeException("generate download token failed",e);
+            logger.error("ResourceService build response token failed", e);
+            throw new RuntimeException("generate download token failed", e);
         }
 
     }
@@ -244,8 +256,8 @@ public class ResourceService {
      * @return
      */
     public ResponseDTO<Long> saveNewResource(String title, String detail, Integer cost, Long classId, Long userId,
-                                       String compressMd5, String unCompressMd5) {
-        String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, compressMd5);
+                                             String compressMd5, String unCompressMd5, String fileName) {
+        String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, compressMd5, fileName);
         try {
             FileInfoDTO fileInfoDTO = upLoadApiService.getFileInto(filePath);
             if (Objects.isNull(fileInfoDTO)) {
@@ -262,10 +274,12 @@ public class ResourceService {
             }
 
             XkrResource resource = xkrResourceAgent.saveNewResource(title, detail, cost, xkrClass,
-                    userId, compressMd5, unCompressMd5, fileInfoDTO.getSize());
+                    userId, compressMd5, unCompressMd5, fileInfoDTO.getSize(), fileName);
             if (Objects.nonNull(resource)) {
 
                 adminIndexRedisService.incrUploadCount();
+                //上传者可免费下载
+                xkrResourceUserAgent.saveNewPayRecord(userId, resource.getId());
 
 
                 return new ResponseDTO<>(resource.getId());
@@ -298,7 +312,7 @@ public class ResourceService {
             logger.error("ResourceService getResourceMenuList md5FileList is null : resource:{}", JSON.toJSONString(resource));
             return list;
         }
-        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), "/" + unCompressMd5 +"/" + resUri);
+        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), "/" + unCompressMd5 + "/" + resUri);
         return upLoadApiService.getDirInfo(dicPath);
     }
 
@@ -315,19 +329,19 @@ public class ResourceService {
         ));
         if (Objects.isNull(resource)) {
             logger.error("ResourceService getResourceMenuList resource info is null : resId:{}", resourceId);
-            list.setStatus(ErrorStatus.PARAM_ERROR);
+            list.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
             return list;
         }
         String rootUri = "";
-        List<FolderItemDTO> currentMenuList = getResourceMenuList(resource,rootUri);
+        List<FolderItemDTO> currentMenuList = getResourceMenuList(resource, rootUri);
         currentMenuList.forEach(folderItemDTO -> {
             ResourceFolderDTO resourceFolderDTO = new ResourceFolderDTO();
             resourceFolderDTO.setName(folderItemDTO.getName());
-            if(folderItemDTO.isFolder()){
-                String uri = rootUri+folderItemDTO.getName();
+            if (folderItemDTO.isFolder()) {
+                String uri = rootUri + folderItemDTO.getName();
                 resourceFolderDTO.setFileType("d");
-                buildResourceSubFolder(resourceFolderDTO,resource,uri);
-            }else{
+                buildResourceSubFolder(resourceFolderDTO, resource, uri);
+            } else {
                 resourceFolderDTO.setFileType("-");
             }
             list.getList().add(resourceFolderDTO);
@@ -335,18 +349,18 @@ public class ResourceService {
         return list;
     }
 
-    private void buildResourceSubFolder(ResourceFolderDTO resourceFolderDTO,XkrResource resource,String currentUri){
-        if(Objects.nonNull(resourceFolderDTO) && "d".equals(resourceFolderDTO.getFileType())){
+    private void buildResourceSubFolder(ResourceFolderDTO resourceFolderDTO, XkrResource resource, String currentUri) {
+        if (Objects.nonNull(resourceFolderDTO) && "d".equals(resourceFolderDTO.getFileType())) {
             resourceFolderDTO.setSubFolders(Lists.newArrayList());
-            List<FolderItemDTO> subList = getResourceMenuList(resource,currentUri);
+            List<FolderItemDTO> subList = getResourceMenuList(resource, currentUri);
             subList.forEach(folderItemDTO -> {
                 ResourceFolderDTO subFolder = new ResourceFolderDTO();
                 subFolder.setName(folderItemDTO.getName());
-                if(folderItemDTO.isFolder()){
-                    String uri = currentUri+"/"+folderItemDTO.getName();
-                    resourceFolderDTO.setFileType("d");
-                    buildResourceSubFolder(subFolder,resource,uri);
-                }else{
+                if (folderItemDTO.isFolder()) {
+                    String uri = currentUri + "/" + folderItemDTO.getName();
+                    subFolder.setFileType("d");
+                    buildResourceSubFolder(subFolder, resource, uri);
+                } else {
                     subFolder.setFileType("-");
                 }
                 resourceFolderDTO.getSubFolders().add(subFolder);
@@ -367,7 +381,7 @@ public class ResourceService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        XkrResource xkrResource = xkrResourceAgent.getResourceById(resourceId,ImmutableList.of(
+        XkrResource xkrResource = xkrResourceAgent.getResourceById(resourceId, ImmutableList.of(
                 ResourceStatusEnum.STATUS_NORMAL.getCode()
         ));
         if (Objects.isNull(xkrResource)) {
@@ -395,9 +409,9 @@ public class ResourceService {
                                                       int pageNum, int size) {
         // TODO: 2018/5/17 参数校验，日志
         ListResourceDTO result = new ListResourceDTO();
-        if(StringUtils.isEmpty(keyword) ||(
-                ORDER_BY_DOWNLOAD_COUNT !=orderType &&
-                ORDER_BY_UPDATE_TIME != orderType)){
+        if (StringUtils.isEmpty(keyword) || (
+                ORDER_BY_DOWNLOAD_COUNT != orderType &&
+                        ORDER_BY_UPDATE_TIME != orderType)) {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
@@ -429,7 +443,7 @@ public class ResourceService {
 
         List<XkrClass> classList = xkrClassAgent.getClassByIds(classIds);
 
-        buildListResourceDTO(result,classList,searchResultListDTO);
+        buildListResourceDTO(result, classList, searchResultListDTO);
 
         return result;
 
@@ -446,7 +460,7 @@ public class ResourceService {
      * @return
      */
     public ListResourceDTO getResourcesByClassId(Long rootClassId, int orderType,
-                                                  int pageNum, int size, boolean needSearch) {
+                                                 int pageNum, int size, boolean needSearch) {
         ListResourceDTO result = new ListResourceDTO();
         if (Objects.isNull(rootClassId)) {
             result.setStatus(ErrorStatus.PARAM_ERROR);
@@ -496,7 +510,7 @@ public class ResourceService {
             }
             List<Long> resIds = resourceUsers.stream().map(XkrResourceUser::getResourceId).collect(Collectors.toList());
             page = PageHelper.startPage(pageNum, size, "update_time desc");
-            list = xkrResourceAgent.getResourceListByIds(resIds,ImmutableList.of(
+            list = xkrResourceAgent.getResourceListByIds(resIds, ImmutableList.of(
                     ResourceStatusEnum.STATUS_NORMAL.getCode()
             ));
         }
@@ -510,12 +524,12 @@ public class ResourceService {
 
         XkrUser user = xkrUserAgent.getUserById(userId);
 
-        buildListResourceDTO(result,list,classList,user);
+        buildListResourceDTO(result, list, classList, user);
 
         return result;
     }
 
-    public boolean reportResource(Long resourceId){
+    public boolean reportResource(Long resourceId) {
         return xkrResourceAgent.reportIllegalResource(resourceId);
     }
 
@@ -543,7 +557,7 @@ public class ResourceService {
 
         result.setTotalCount((int) searchResultListDTO.getTotalCount());
 
-        buildListResourceDTO(result,classList,searchResultListDTO);
+        buildListResourceDTO(result, classList, searchResultListDTO);
     }
 
     private void buildResourceByClassIdsOnOffline(ListResourceDTO result, List<XkrClass> classList, int orderType,
@@ -555,7 +569,7 @@ public class ResourceService {
         List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 
         //获取分类下所有资源
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(classIds,ImmutableList.of(
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(classIds, ImmutableList.of(
                 ResourceStatusEnum.STATUS_NORMAL.getCode()
         ));
 
@@ -566,29 +580,29 @@ public class ResourceService {
         List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
 
 
-        buildListResourceDTO(result,resources,classList,users);
+        buildListResourceDTO(result, resources, classList, users);
 
 
     }
 
-    private void buildListResourceDTO(ListResourceDTO listResourceDTO,List<XkrResource> list, List<XkrClass> xkrClassList, List<XkrUser> users) {
+    private void buildListResourceDTO(ListResourceDTO listResourceDTO, List<XkrResource> list, List<XkrClass> xkrClassList, List<XkrUser> users) {
         list.forEach(xkrResource -> {
             ResourceDTO resourceDTO = new ResourceDTO();
             XkrUser user = users.stream().filter(user1 -> xkrResource.getUserId().equals(user1.getId())).findFirst().orElse(null);
             XkrClass classBean = xkrClassList.stream().
                     filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElseThrow(RuntimeException::new);
-            buildResourceDTO(resourceDTO, xkrResource, classBean,user);
+            buildResourceDTO(resourceDTO, xkrResource, classBean, user);
             listResourceDTO.getResList().add(resourceDTO);
         });
     }
 
-    private void buildListResourceDTO(ListResourceDTO listResourceDTO,List<XkrResource> list, List<XkrClass> xkrClassList, XkrUser user) {
+    private void buildListResourceDTO(ListResourceDTO listResourceDTO, List<XkrResource> list, List<XkrClass> xkrClassList, XkrUser user) {
         list.forEach(xkrResource -> {
             ResourceDTO resourceDTO = new ResourceDTO();
             XkrClass classBean = xkrClassList.stream().
                     filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElseThrow(RuntimeException::new);
 
-            buildResourceDTO(resourceDTO, xkrResource,classBean,user);
+            buildResourceDTO(resourceDTO, xkrResource, classBean, user);
 
             listResourceDTO.getResList().add(resourceDTO);
         });
@@ -598,8 +612,8 @@ public class ResourceService {
         listResourceDTO.setTotalCount((int) searchResultListDTO.getTotalCount());
 
 
-        if(!CollectionUtils.isEmpty(xkrClassList)){
-            return ;
+        if (CollectionUtils.isEmpty(xkrClassList)) {
+            return;
         }
 
         searchResultListDTO.getSearchResultDTO().forEach(resourceIndexDTO -> {
@@ -611,14 +625,23 @@ public class ResourceService {
             XkrClass rootClass = paths.length > 1 ?
                     xkrClassAgent.getClassById(Long.valueOf(paths[1])) : xkrClass;
 
-            buildResourceDTO(resourceDTO,resourceIndexDTO,xkrClass,rootClass);
+            buildResourceDTO(resourceDTO, resourceIndexDTO, xkrClass, rootClass);
 
             listResourceDTO.getResList().add(resourceDTO);
         });
     }
 
-    private void buildResourceDTO(ResourceDTO resourceDTO,ResourceIndexDTO resourceIndexDTO,XkrClass currentClass,XkrClass rootClass){
-        BeanUtils.copyProperties(resourceIndexDTO,resourceDTO);
+    private void buildResourceDTO(ResourceDTO resourceDTO, ResourceIndexDTO resourceIndexDTO, XkrClass currentClass, XkrClass rootClass) {
+        resourceDTO.setContent(resourceIndexDTO.getContent());
+        resourceDTO.setCost(resourceIndexDTO.getCost());
+        resourceDTO.setDownloadCount(resourceIndexDTO.getDownloadCount());
+        resourceDTO.setReport(resourceIndexDTO.getReport());
+        resourceDTO.setResourceId(resourceIndexDTO.getResourceId());
+        resourceDTO.setStatus(resourceIndexDTO.getStatus());
+        resourceDTO.setTitle(resourceIndexDTO.getTitle());
+        resourceDTO.setUpdateTime(resourceIndexDTO.getUpdateTime());
+        resourceDTO.setUserId(resourceIndexDTO.getUserId());
+        resourceDTO.setUserName(resourceIndexDTO.getUserName());
         resourceDTO.setClassId(currentClass.getId());
         resourceDTO.setClassName(currentClass.getClassName());
         resourceDTO.setRootClassId(rootClass.getId());
@@ -626,7 +649,7 @@ public class ResourceService {
 
     }
 
-    private void buildResourceDTO(ResourceDTO resourceDTO,XkrResource resource,XkrClass currentClass,XkrUser user){
+    private void buildResourceDTO(ResourceDTO resourceDTO, XkrResource resource, XkrClass currentClass, XkrUser user) {
         String[] paths = currentClass.getPath().split("-");
         XkrClass rootClass = paths.length > 1 ?
                 xkrClassAgent.getClassById(Long.valueOf(paths[1])) : currentClass;
@@ -653,7 +676,20 @@ public class ResourceService {
     }
 
     private void buildResourceDetailDTO(ResourceDetailDTO detailDTO, XkrResource resource) {
-        BeanUtils.copyProperties(resource, detailDTO);
+        detailDTO.setDetail(resource.getDetail());
+        detailDTO.setCost(resource.getCost());
+        detailDTO.setDownloadCount(String.valueOf(resource.getDownloadCount()));
+        detailDTO.setFileSize(resource.getFileSize());
+        detailDTO.setResourceId(resource.getId());
+        detailDTO.setTitle(resource.getTitle());
+        detailDTO.setUserId(resource.getUserId());
+        detailDTO.setUpdateTime(resource.getUpdateTime());
+        XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
+        if (Objects.isNull(user)) {
+            detailDTO.setUserName("未知账号");
+        } else {
+            detailDTO.setUserName(user.getUserName());
+        }
 
         XkrClass currentClass = xkrClassAgent.getClassById(resource.getClassId());
         if (Objects.nonNull(currentClass)) {
@@ -665,13 +701,9 @@ public class ResourceService {
         }
 
 
-        XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
-        if (Objects.isNull(user)) {
-            detailDTO.setUserName("未知账号");
-        } else {
-            detailDTO.setUserName(user.getUserName());
-        }
+
     }
+
 
 
 }

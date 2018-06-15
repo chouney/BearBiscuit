@@ -14,6 +14,8 @@ public class FileUploadResponseVO implements Serializable{
 
     private String unCompressMd5;
 
+    private String fileName;
+
     private String imageMd5;
 
     public FileUploadResponseVO() {
@@ -26,6 +28,14 @@ public class FileUploadResponseVO implements Serializable{
 
     public void setCompressMd5(String compressMd5) {
         this.compressMd5 = compressMd5;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getUnCompressMd5() {

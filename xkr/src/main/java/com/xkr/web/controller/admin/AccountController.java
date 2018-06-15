@@ -275,7 +275,7 @@ public class AccountController {
         listAdminAccountDTO.getList().forEach(adminAccountDTO -> {
             AdminAccountVO adminAccountVO = new AdminAccountVO();
             adminAccountVO.setAccountName(adminAccountDTO.getAccountName());
-            adminAccountVO.setAdminACcountId(adminAccountDTO.getAdminACcountId());
+            adminAccountVO.setAdminAccountId(adminAccountDTO.getAdminAccountId());
             adminAccountVO.setClientIp(adminAccountDTO.getClientIp());
             adminAccountVO.setCreateDate(adminAccountDTO.getCreateDate());
             adminAccountVO.setEmail(adminAccountDTO.getEmail());

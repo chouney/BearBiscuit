@@ -6,10 +6,7 @@ package com.xkr.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 日期时间工具类
@@ -30,6 +27,8 @@ public class DateUtil {
     public static SimpleDateFormat yyyyMMddHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     public static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat yyyyMMddHH_NOT_ = new SimpleDateFormat("yyyyMMdd");
+    public static SimpleDateFormat RFCUSFormatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+
     public static long DATEMM = 86400L;
 
     /**
@@ -421,5 +420,9 @@ public class DateUtil {
         return result;
     }
 
+    public static String getGMTRFCUSDate() {
+        RFCUSFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return RFCUSFormatter.format(new Date());
+    }
 
 }

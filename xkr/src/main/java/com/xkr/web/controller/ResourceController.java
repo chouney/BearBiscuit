@@ -264,6 +264,8 @@ public class ResourceController {
             @RequestParam(name = "compressMd5") String compressMd5,
             @NotBlank
             @RequestParam(name = "unCompressMd5") String unCompressMd5,
+            @NotBlank
+            @RequestParam(name = "fileName") String fileName,
             @Captcha
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
@@ -274,7 +276,7 @@ public class ResourceController {
         try {
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,unCompressMd5);
+            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,unCompressMd5,fileName);
 
             if(!ErrorStatus.OK.equals(resId.getStatus())){
                 return new BasicResult<>(resId.getStatus());
@@ -296,7 +298,7 @@ public class ResourceController {
      * @return
      */
     @CSRFValid
-    @RequestMapping(value = "/res_download", method = {RequestMethod.GET})
+    @RequestMapping(value = "/res_download", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
     public BasicResult<JSONObject> resourceDownLoad(
@@ -317,6 +319,8 @@ public class ResourceController {
             }
 
             output.put("token",responseDTO.getToken());
+            output.put("downloadUrl",responseDTO.getDownloadUrl());
+            output.put("date",responseDTO.getDate());
 
             return new BasicResult<>(output);
         } catch (Exception e) {

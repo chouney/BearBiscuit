@@ -68,7 +68,7 @@ public final class MyRar extends ArchiveProcessor {
 			}
 			a.close();
 		} catch (RarException e) {
-			throw new RuntimeException("unarchive error");
+			throw new RuntimeException("unarchive error",e);
 		}
 	}
 

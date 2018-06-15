@@ -73,14 +73,14 @@ public class SearchApiService {
         return false;
     }
 
-    public boolean bulkUpdateIndex(String typeName, List<Long> docIds,Map<String,Object> updateMap) {
+    public boolean bulkUpdateIndex(String module, List<Long> docIds,Map<String,Object> updateMap) {
         if (CollectionUtils.isEmpty(docIds) || CollectionUtils.isEmpty(updateMap)) {
             return false;
         }
         BulkRequest request = new BulkRequest();
         try {
             docIds.forEach(docId -> {
-                UpdateRequest updateRequest = new UpdateRequest("xkr", typeName, String.valueOf(docId))
+                UpdateRequest updateRequest = new UpdateRequest(module, module, String.valueOf(docId))
                         .doc(updateMap);
                 request.add(updateRequest);
             });
@@ -94,7 +94,7 @@ public class SearchApiService {
         return false;
     }
 
-    public boolean bulkUpdateIndexStatus(String typeName, List<Long> docIds, Integer status) {
+    public boolean bulkUpdateIndexStatus(String module, List<Long> docIds, Integer status) {
         if (CollectionUtils.isEmpty(docIds) || Objects.isNull(status)) {
             return false;
         }
@@ -103,10 +103,10 @@ public class SearchApiService {
             docIds.forEach(docId -> {
                 Map<String, Object> jsonMap = new HashMap<>();
                 jsonMap.put("status", status);
-                if ("comment".equals(typeName) || "resource".equals(typeName)) {
-                    jsonMap.put("updateTime", new Date());
+                if ("comment".equals(module) || "resource".equals(module)) {
+                    jsonMap.put("updateTime", new Date().getTime());
                 }
-                UpdateRequest updateRequest = new UpdateRequest("xkr", typeName, String.valueOf(docId))
+                UpdateRequest updateRequest = new UpdateRequest(module, module, String.valueOf(docId))
                         .doc(jsonMap);
                 request.add(updateRequest);
             });
@@ -164,7 +164,7 @@ public class SearchApiService {
                         return;
                     }
                     if (Collection.class.isAssignableFrom(v.getClass())) {
-                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
+                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k,((Collection) v).toArray()));
                     } else {
                         boolQueryBuilder.filter(QueryBuilders.termQuery(k, v));
                     }
@@ -200,7 +200,7 @@ public class SearchApiService {
 
             SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
-            buildSearchResultListDTO(resultListDTO, targetObject, hits);
+            buildSearchResultListDTO(resultListDTO, resultIndexDTO,hits);
 
             return resultListDTO;
 
@@ -258,7 +258,7 @@ public class SearchApiService {
                         return;
                     }
                     if (Collection.class.isAssignableFrom(v.getClass())) {
-                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k, v));
+                        boolQueryBuilder.filter(QueryBuilders.termsQuery(k,((Collection) v).toArray()));
                     } else {
                         boolQueryBuilder.filter(QueryBuilders.termQuery(k, v));
                     }
@@ -302,7 +302,7 @@ public class SearchApiService {
 
             SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
-            buildSearchResultListDTO(resultListDTO, targetObject, hits);
+            buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
 
             return resultListDTO;
 
@@ -311,9 +311,10 @@ public class SearchApiService {
         }
     }
 
-    private <T> void buildSearchResultListDTO(SearchResultListDTO<T> resultListDTO, T targetObject, SearchHits hits) {
+    private <T> void buildSearchResultListDTO(SearchResultListDTO<T> resultListDTO,Class<T> resultIndexDTO, SearchHits hits) {
         hits.forEach(hit -> {
             try {
+                T targetObject = org.springframework.beans.BeanUtils.instantiate(resultIndexDTO);
                 BeanUtils.populate(targetObject, hit.getSourceAsMap());
                 hit.getHighlightFields().forEach((k, v) -> {
                     if (v.getFragments().length > 0) {

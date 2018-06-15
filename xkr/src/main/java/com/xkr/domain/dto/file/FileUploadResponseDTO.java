@@ -17,15 +17,18 @@ public class FileUploadResponseDTO extends BaseDTO implements Serializable{
 
     private String unCompressMd5;
 
+    private String fileName;
+
     private String imageMd5;
 
     public FileUploadResponseDTO(ErrorStatus status) {
         super(status);
     }
 
-    public FileUploadResponseDTO(String compressMd5, String unCompressMd5) {
+    public FileUploadResponseDTO(String compressMd5, String unCompressMd5,String fileName) {
         this.compressMd5 = compressMd5;
         this.unCompressMd5 = unCompressMd5;
+        this.fileName = fileName;
     }
 
     public FileUploadResponseDTO(String imageMd5) {
@@ -34,6 +37,14 @@ public class FileUploadResponseDTO extends BaseDTO implements Serializable{
 
     public String getCompressMd5() {
         return compressMd5;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setCompressMd5(String compressMd5) {

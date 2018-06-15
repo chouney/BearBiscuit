@@ -66,9 +66,22 @@ public class FilterConfig {
         //可以未登录访问的链接
         filterChainDefinitionMap.put("/**/login", "anon");
         filterChainDefinitionMap.put("/test/**", "anon");
+
         filterChainDefinitionMap.put("/api/user/reg", "anon");
         filterChainDefinitionMap.put("/api/user/pre_update", "anon");
         filterChainDefinitionMap.put("/api/user/validate", "anon");
+        filterChainDefinitionMap.put("/api/user/update", "anon");
+
+        filterChainDefinitionMap.put("/api/res/cls/list", "anon");
+        filterChainDefinitionMap.put("/api/res/detail", "anon");
+        filterChainDefinitionMap.put("/api/res/res_list", "anon");
+        filterChainDefinitionMap.put("/api/res/search_list", "anon");
+        filterChainDefinitionMap.put("/api/res/search_list", "anon");
+        filterChainDefinitionMap.put("/api/res/search_list", "anon");
+
+        filterChainDefinitionMap.put("/api/cls/list", "anon");
+
+        filterChainDefinitionMap.put("/api/comment/list", "anon");
 
         //必须登录的url
         filterChainDefinitionMap.put("/api/admin/**", "adminLogin");

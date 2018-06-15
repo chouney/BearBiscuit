@@ -2,6 +2,7 @@ package com.xkr.web.controller;
 
 import com.xkr.common.ErrorStatus;
 import com.xkr.domain.dto.file.FileUploadResponseDTO;
+import com.xkr.exception.UpFileExistException;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
@@ -43,7 +44,7 @@ public class CommonController {
     @RequestMapping(value = "/file_upload", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
-    public BasicResult submitRemark(
+    public BasicResult fileUpload(
             @RequestParam(name = "file") MultipartFile reqFile,
             @ContainsInt({0, 1})
             @RequestParam(name = "type") Integer type,
@@ -51,7 +52,7 @@ public class CommonController {
         if (result.hasErrors()) {
             return new BasicResult(result);
         }
-        String filePath = String.join("/",TMP_DIR_PATH,String.valueOf(reqFile.getOriginalFilename()+"-"+System.currentTimeMillis()));
+        String filePath = String.join("/",TMP_DIR_PATH,String.valueOf(reqFile.getOriginalFilename()));
         File file = new File(filePath);
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(reqFile.getBytes());
@@ -64,6 +65,9 @@ public class CommonController {
             buildFileUploadResponseVO(responseVO,responseDTO);
 
             return new BasicResult<>(responseVO);
+        } catch (UpFileExistException e){
+            logger.info("文件已存在 reqFileName:{},type:{}", reqFile.getOriginalFilename(), type);
+            return new BasicResult(ErrorStatus.RESOURCE_ALREADY_EXIST);
         } catch (IOException | UpException e) {
             logger.error("文件上传异常 reqFileName:{},type:{}", reqFile.getOriginalFilename(), type, e);
         }
@@ -74,5 +78,6 @@ public class CommonController {
         responseVO.setCompressMd5(responseDTO.getCompressMd5());
         responseVO.setImageMd5(responseDTO.getImageMd5());
         responseVO.setUnCompressMd5(responseDTO.getUnCompressMd5());
+        responseVO.setFileName(responseDTO.getFileName());
     }
 }

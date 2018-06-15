@@ -193,6 +193,10 @@ public class AdminService {
                 || StringUtils.isEmpty(email) || Objects.isNull(roleId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
+        XkrAdminAccount xkrAdminAccount = xkrAdminAccountAgent.getAdminAccountByName(accountName);
+        if(Objects.nonNull(xkrAdminAccount)){
+            return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
+        }
         return new ResponseDTO<>(xkrAdminAccountAgent.updateAdminAccountById(adminAccountId, accountName, accountToken, email, roleId));
     }
 
@@ -399,7 +403,7 @@ public class AdminService {
             AdminAccountDTO adminAccountDTO = new AdminAccountDTO();
             XkrLoginToken currentToken = loginTokens.stream().filter(loginToken -> loginToken.getUserId().equals(adminAccount.getId())).findFirst().orElse(null);
             adminAccountDTO.setAccountName(adminAccount.getAccountName());
-            adminAccountDTO.setAdminACcountId(adminAccount.getId());
+            adminAccountDTO.setAdminAccountId(adminAccount.getId());
             adminAccountDTO.setCreateDate(adminAccount.getCreateTime());
             adminAccountDTO.setEmail(adminAccount.getEmail());
             if (Objects.nonNull(currentToken)) {

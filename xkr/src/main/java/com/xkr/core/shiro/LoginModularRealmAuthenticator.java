@@ -8,6 +8,7 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.CollectionUtils;
@@ -51,7 +52,7 @@ public class LoginModularRealmAuthenticator extends ModularRealmAuthenticator {
                 throw new ShiroException("token不存在!");
             }
         } catch (Exception e) {
-            throw new ShiroException("用户名或者密码错误!");
+            throw new IncorrectCredentialsException("用户名或者密码错误!");
         }
         return info;
     }

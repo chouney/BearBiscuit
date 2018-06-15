@@ -64,9 +64,4 @@ public class EncodeUtil {
     }
 
 
-    public static void main(String[] args){
-        String code = createEmailValidateString(new Date().toString(),"4124124124");
-        System.out.println(code);
-        System.out.println(Arrays.toString(getEmailValidateString(code)));
-    }
 }

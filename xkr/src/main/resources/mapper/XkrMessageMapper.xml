@@ -19,8 +19,17 @@
 
   <sql id="message_field" >
     id,from_type_code,from_id,to_type_code,to_id,
-    content,status,create_time,update_time,ext
+    content,status
   </sql>
+
+  <insert id="insertMessageList" parameterType="java.util.List">
+    insert into xkr_message(<include refid="message_field"/>)
+    values
+    <foreach collection="list" index="index" item="item"  separator="," >
+      (#{item.id}, #{item.fromTypeCode},#{item.fromId},#{item.toTypeCode},#{item.toId},#{item.content},
+      #{item.status})
+    </foreach>
+  </insert>
 
   <update id="updateMessageStatus" parameterType="java.util.Map">
     UPDATE xkr_message SET status = #{status}, update_time = now()

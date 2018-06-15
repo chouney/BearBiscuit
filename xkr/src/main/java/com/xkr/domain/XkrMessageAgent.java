@@ -82,13 +82,10 @@ public class XkrMessageAgent {
             xkrMessage.setToId(userId);
             xkrMessage.setContent(content);
             xkrMessage.setStatus((byte) MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode());
-            xkrMessage.setCreateTime(new Date());
-            xkrMessage.setUpdateTime(new Date());
-            xkrMessage.setExt("{}");
             logger.info("XkrMessageAgent saveToUserMessage, params:{}", JSON.toJSONString(xkrMessage));
             toInsert.add(xkrMessage);
         });
-        if(xkrMessageMapper.insertList(toInsert) != 1){
+        if(xkrMessageMapper.insertMessageList(toInsert) <= 0){
             logger.error("XkrMessageAgent saveToUserMessage failed, params:{}", JSON.toJSONString(toInsert));
             return Lists.newArrayList();
         }

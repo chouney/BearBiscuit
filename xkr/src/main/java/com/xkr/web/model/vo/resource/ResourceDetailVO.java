@@ -8,6 +8,7 @@ import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -118,6 +119,9 @@ public class ResourceDetailVO implements Serializable{
     }
 
     public void setUpdateTime(Date updateTime) {
+        if(Objects.isNull(updateTime)){
+            return;
+        }
         this.updateTime = DateUtil.yyyyMMdd.format(updateTime);
     }
 

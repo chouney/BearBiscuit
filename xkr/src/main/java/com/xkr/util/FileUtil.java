@@ -57,7 +57,4 @@ public class FileUtil {
         return FileTypeEnum.getEnumByFileDesc(postfix);
     }
 
-    public static void main(String[] args){
-        System.out.println("33".split("\\.")[1]);
-    }
 }

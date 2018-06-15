@@ -2,9 +2,11 @@ package com.xkr.domain;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrAdminAccountMapper;
 import com.xkr.domain.entity.XkrAdminAccount;
+import com.xkr.util.EncodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -78,7 +81,7 @@ public class XkrAdminAccountAgent {
         XkrAdminAccount adminAccount = new XkrAdminAccount();
         adminAccount.setId(idGenerator.generateId());
         adminAccount.setAccountName(accountName);
-        adminAccount.setAccountToken(accountToken);
+        adminAccount.setAccountToken(EncodeUtil.md5(accountToken));
         adminAccount.setEmail(email);
         adminAccount.setRoleId(roleId);
         adminAccount.setStatus((byte)STATUS_NORMAL);
@@ -93,13 +96,15 @@ public class XkrAdminAccountAgent {
         if(Objects.isNull(adminAccountId)){
             return false;
         }
-        return xkrAdminAccountMapper.updateAdminAccountById(ImmutableMap.of(
-                "id",adminAccountId,
-                "accountName",accountName,
-                "accountToken",accountToken,
-                "email",email,
-                "roleId",roleId
-        )) == 1;
+        Map<String,Object> param = Maps.newHashMap();
+        param.put("id",adminAccountId);
+        param.put("accountName",accountName);
+        param.put("roleId",roleId);
+        param.put("email",email);
+        if(!StringUtils.isEmpty(accountToken)){
+            param.put("accountToken",EncodeUtil.md5(accountToken));
+        }
+        return xkrAdminAccountMapper.updateAdminAccountById(param) == 1;
     }
 
     public boolean batchUpdateAdminAccountByIds(List<Long> ids,Integer status){
@@ -108,6 +113,6 @@ public class XkrAdminAccountAgent {
         }
         return xkrAdminAccountMapper.batchUpdateAdminAccountByIds(ImmutableMap.of(
                 "ids",ids,"status",status
-        )) == 1;
+        )) > 0;
     }
 }

@@ -62,7 +62,7 @@ public class XkrAdminOptLogAgent {
         }
         return xkrAdminOptLogMapper.batchUpdateOptLogByIds(ImmutableMap.of(
                 "list",ids,"status",STATUS_DELETE
-        )) == 1;
+        )) > 0;
     }
 
 }

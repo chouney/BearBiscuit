@@ -27,7 +27,7 @@ public class AdminAccountDTO  implements Serializable{
      "lastLoginDate":"YY-mm-dd" //最后登录时间
      */
 
-    private Long adminACcountId;
+    private Long adminAccountId;
 
     private String accountName;
 
@@ -39,12 +39,12 @@ public class AdminAccountDTO  implements Serializable{
 
     private Date lastLoginDate;
 
-    public Long getAdminACcountId() {
-        return adminACcountId;
+    public Long getAdminAccountId() {
+        return adminAccountId;
     }
 
-    public void setAdminACcountId(Long adminACcountId) {
-        this.adminACcountId = adminACcountId;
+    public void setAdminAccountId(Long adminAccountId) {
+        this.adminAccountId = adminAccountId;
     }
 
     public String getAccountName() {

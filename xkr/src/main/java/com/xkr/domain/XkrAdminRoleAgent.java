@@ -61,7 +61,7 @@ public class XkrAdminRoleAgent {
         }
         return xkrAdminRoleMapper.batchUpdateRoleByIds(ImmutableMap.of(
                 "status",status,"ids",roleIds
-        )) == 1;
+        )) > 0;
     }
 
     public boolean updateRoleById(Integer roleId, String roleName,String roleDetail,List<Integer> pIds){

@@ -91,7 +91,7 @@ public class CSRFAspect {
         HttpServletRequest httpServletRequest = sra.getRequest();
 
         if("dev".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
-            return true;
+            return joinPoint.proceed(joinPoint.getArgs());
         }
 
         CSRFValid csrfValid = targetMethod.getAnnotation(CSRFValid.class);

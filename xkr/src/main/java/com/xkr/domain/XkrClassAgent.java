@@ -150,7 +150,7 @@ public class XkrClassAgent {
             xkrClass.setPath(ROOT_CLASS_ID+"-"+classId);
             xkrClass.setParentClassId(Long.valueOf(ROOT_CLASS_ID));
         }else {
-            xkrClass.setClassName(parentClass.getPath()+"-"+classId);
+            xkrClass.setPath(parentClass.getPath()+"-"+classId);
             xkrClass.setParentClassId(parendClassId);
         }
         if(xkrClassMapper.insertSelective(xkrClass) == 1){

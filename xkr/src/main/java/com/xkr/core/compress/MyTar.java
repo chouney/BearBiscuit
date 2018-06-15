@@ -108,7 +108,7 @@ public final class MyTar extends ArchiveProcessor {
             }
             tais.close();
         } catch (Exception e) {
-            throw new UnArchiverException("unarchiver error");
+            throw new UnArchiverException("unarchiver error",e);
         }
     }
 

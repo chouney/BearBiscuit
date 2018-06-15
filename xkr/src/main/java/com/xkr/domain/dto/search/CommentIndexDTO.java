@@ -42,7 +42,7 @@ public class CommentIndexDTO extends BaseIndexDTO implements Serializable{
     private Integer status;
 
     public CommentIndexDTO() {
-        super("xkr", "comment");
+        super("comment", "comment");
     }
 
 

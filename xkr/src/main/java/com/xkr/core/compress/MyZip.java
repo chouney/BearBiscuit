@@ -111,7 +111,7 @@ public final class MyZip extends ArchiveProcessor {
 				zis.closeEntry();
 			}
 		}catch (Exception e){
-			throw new UnArchiverException("unarchiver error");
+			throw new UnArchiverException("unarchiver error" ,e);
 		}
 	}
 

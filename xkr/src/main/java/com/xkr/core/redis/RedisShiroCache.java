@@ -52,7 +52,6 @@ public class RedisShiroCache<K, V> implements Cache<K, V> {
         try {
             V v = get(key);
             redisTemplate.boundValueOps(getCacheKey(key)).set(value);
-            System.out.println(redisTemplate.boundValueOps(getCacheKey(key)).get().toString());
             return v;
         }catch (Throwable t){
             throw  new CacheException(t);

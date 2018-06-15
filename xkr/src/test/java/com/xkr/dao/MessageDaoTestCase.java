@@ -9,6 +9,7 @@ import com.xkr.domain.XkrMessageAgent;
 import com.xkr.domain.dto.message.MessageStatusEnum;
 import com.xkr.domain.entity.XkrMessage;
 import com.xkr.service.MessageService;
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -17,6 +18,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import sun.plugin2.message.Message;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,31 @@ public class MessageDaoTestCase extends BaseDaoTest{
         xkrMessage.setContent("阿斯顿好的后期我和哦IQ王洪迪请和我还欠我");
         xkrMessage.setStatus((byte) 1);
         Assert.assertEquals(1,xkrMessageMapper.insert(xkrMessage));
+    }
+
+    @Test
+    public void testABatchInsert(){
+        long messageId = 4L;
+        XkrMessage xkrMessage = new XkrMessage();
+        xkrMessage.setId(messageId);
+        xkrMessage.setFromTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
+        xkrMessage.setFromId(412412412L);
+        xkrMessage.setToTypeCode(Byte.valueOf(LoginEnum.ADMIN.getType()));
+        xkrMessage.setToId(12312312312L);
+        xkrMessage.setContent("阿斯顿好的后期我和哦IQ王洪迪请和我还欠我");
+        xkrMessage.setStatus((byte) 1);
+        List<XkrMessage> list = Lists.newArrayList();
+        list.add(xkrMessage);
+        XkrMessage xkrMessage1 = new XkrMessage();
+        xkrMessage1.setId(5L);
+        xkrMessage1.setFromTypeCode(Byte.valueOf(LoginEnum.CUSTOMER.getType()));
+        xkrMessage1.setFromId(412412412L);
+        xkrMessage1.setToTypeCode(Byte.valueOf(LoginEnum.ADMIN.getType()));
+        xkrMessage1.setToId(12312312312L);
+        xkrMessage1.setContent("阿斯顿好的后期我和哦IQ王洪迪请和我还欠我");
+        xkrMessage1.setStatus((byte) 1);
+        list.add(xkrMessage1);
+        Assert.assertEquals(2,xkrMessageMapper.insertMessageList(list).intValue());
     }
 
     @Test

@@ -58,7 +58,7 @@ public class ResourceIndexDTO extends BaseIndexDTO implements Serializable{
     private Date updateTime;
 
     public ResourceIndexDTO() {
-        super("xkr", "resource");
+        super("resource", "resource");
     }
 
     @Override

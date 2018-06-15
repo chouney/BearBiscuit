@@ -7,6 +7,10 @@ package com.xkr.exception;
  * @date 2018/5/9
  */
 public class UnArchiverException extends RuntimeException {
+    public UnArchiverException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public UnArchiverException(String msg) {
         super(msg);
     }

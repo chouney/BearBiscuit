@@ -50,7 +50,7 @@ public class XkrUserAgent {
         if(UserStatusEnum.TOUPDATE_STATUSED.contains(status)){
             isSuccess = xkrUserMapper.batchUpdateUserByIds(ImmutableMap.of(
                     "list",userIds,"status",status.getCode()
-            )) == 1;
+            )) > 0;
         }
         if(isSuccess){
             if (!searchApiService.bulkUpdateIndexStatus("user", userIds, status.getCode())) {
@@ -167,6 +167,7 @@ public class XkrUserAgent {
         user.setEmail(email);
         user.setTotalRecharge(0L);
         user.setWealth(0L);
+        user.setCreateTime(new Date());
         user.setStatus((byte)UserStatusEnum.USER_STATUS_UNVERIFIED.getCode());
         if(xkrUserMapper.insertSelective(user) == 1){
             //创建用户索引

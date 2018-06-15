@@ -1,0 +1,6 @@
+<project>
+    <modelVersion>1.0.0</modelVersion>
+    <groupId>org.chris.redbud</groupId>
+    <artifactId>unrar</artifactId>
+    <version>1.0</version>
+</project>

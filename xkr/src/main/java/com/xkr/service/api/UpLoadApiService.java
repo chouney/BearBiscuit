@@ -14,7 +14,8 @@ import main.java.com.UpYun;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.UnauthenticatedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -41,6 +42,8 @@ import java.util.stream.Collectors;
 @Service
 public class UpLoadApiService {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Resource(name = "fileYun")
     private UpYun upYun;
 
@@ -57,7 +60,7 @@ public class UpLoadApiService {
     @Value("${upyun.root.path}")
     private String rootPath;
 
-    //userId:md5FileName
+    //userId:md5FileName:fileName+postFix
     private static String COMPRESS_FILE_PATH_FORMAT;
     //userId:md5FileName
     private static String UNCOMPRESS_FILE_PATH_FORMAT;
@@ -69,13 +72,14 @@ public class UpLoadApiService {
     @PostConstruct
     public void init() {
         EXT_FILE_PATH_FORMAT = rootPath + "/ext/%s";
-        COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/compress/%s";
-        UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/uncompress/%s";
+        COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
+        UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s";
         IMAGE_FILE_PATH_FORMAT = rootPath + "/image/%d%d%d%d%d%d-%s";
     }
 
     /**
      * 下载文件
+     *
      * @param upyunFilePath
      * @param targetFile
      * @return
@@ -83,6 +87,7 @@ public class UpLoadApiService {
      * @throws UpException
      */
     public boolean downLoadFile(String upyunFilePath, File targetFile) throws IOException, UpException {
+        logger.info("云盘下载文件,upyunPath:{},fileName:{}", upyunFilePath, targetFile.getName());
         return upYun.readFile(upyunFilePath, targetFile);
     }
 
@@ -102,6 +107,7 @@ public class UpLoadApiService {
                 return null;
             }
         } catch (FileNotFoundException e) {
+//            logger.error("云盘服务未找到该文件,filePath:{},error:", filePath, e);
             return null;
         }
         return new FileInfoDTO(map);
@@ -122,8 +128,7 @@ public class UpLoadApiService {
             return folderItems.stream().map(folderItem -> new FolderItemDTO(folderItem.name, "Folder".equals(folderItem.type),
                     folderItem.size, folderItem.date)).collect(Collectors.toList());
         } catch (IOException | UpException e) {
-            // TODO: 2018/5/18 日志
-            e.printStackTrace();
+            logger.error("云盘服务返回目录信息异常，dicPath:{}", dicPath, e);
         }
         return Lists.newArrayList();
     }
@@ -143,7 +148,7 @@ public class UpLoadApiService {
             throw new UpFileExistException("file already exist");
         }
         if (upYun.writeFile(filePath, file, true)) {
-            //todo 日志
+            logger.info("云盘服务上传内部文件成功,filePath:{},fileName:{}", filePath, file);
             return filePath;
         }
         return null;
@@ -160,7 +165,7 @@ public class UpLoadApiService {
         if (COMPRESS_FILE_TYPE == fileType) {
             FileTypeEnum fileTypeEnum = FileUtil.getFileType(uploadFile);
             if (fileTypeEnum == null || fileTypeEnum.getProcessorClazz() == null) {
-                //todo 格式异常
+                logger.info("云盘服务未找到上传文件的文件格式,fileType:{},uploadFile:{}", fileType, uploadFile.getName());
                 return new FileUploadResponseDTO(ErrorStatus.PARAM_ERROR);
             }
             //上传压缩文件
@@ -171,21 +176,24 @@ public class UpLoadApiService {
             boolean isSuccess;
             File unCompressDic = compressProcessorFacade.unCompressFile(uploadFile, fileTypeEnum.getProcessorClazz());
             if (Objects.isNull(unCompressDic)) {
+                logger.info("云盘服务解压缩文件失败,fileType:{},uploadFile:{}", fileType, uploadFile.getName());
                 return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
             String unCompressMd5 = UpYunUtils.md5(unCompressDic.getName());
             isSuccess = uploadUnCompressDic(String.valueOf(user.getId()), unCompressMd5, unCompressDic);
             if (!isSuccess) {
+                logger.info("云盘服务上传解压缩文件失败,unCompressDic:{},fileType:{},uploadFile:{}", unCompressDic.getName(), fileType, uploadFile.getName());
                 return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
             String compressMd5 = UpYunUtils.md5(uploadFile.getName());
             isSuccess = uploadCompressFile(String.valueOf(user.getId()), compressMd5, uploadFile, true);
             if (!isSuccess) {
                 //若失败则删除解压缩上传文件
+                logger.info("云盘服务上传压缩文件失败,回滚删除解压缩文件,unCompressDic:{},fileType:{},uploadFile:{}", unCompressDic.getName(), fileType, uploadFile.getName());
                 String unComDicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, String.valueOf(user.getId()), unCompressMd5);
                 deleteFile(unComDicPath, true);
             }
-            return new FileUploadResponseDTO(compressMd5, unCompressMd5);
+            return new FileUploadResponseDTO(compressMd5, unCompressMd5, uploadFile.getName());
         } else if (IMAGE_FILE_TYPE == fileType) {
             String imageMd5 = UpYunUtils.md5(uploadFile.getName());
             if (uploadImageFile(imageMd5, uploadFile)) {
@@ -211,6 +219,7 @@ public class UpLoadApiService {
                 date.getHour(), date.getMinute(), date.getSecond(), md5FileName);
         boolean isSuccess = imageYun.writeFile(picPath, imageFile, true);
         if (!isSuccess) {
+            logger.info("云盘服务上传图片失败,回滚删除图片,md5FileName:{},imageFile:{}", md5FileName, imageFile.getName());
             deleteFile(picPath, false);
         }
         return isSuccess;
@@ -227,13 +236,14 @@ public class UpLoadApiService {
      * @throws UpException
      */
     private boolean uploadCompressFile(String userId, String md5FileName, File file, boolean auto) throws IOException, UpException {
-        String filePath = String.format(COMPRESS_FILE_PATH_FORMAT, userId, md5FileName);
+        String filePath = String.format(COMPRESS_FILE_PATH_FORMAT, userId, md5FileName, file.getName());
         if (Objects.nonNull(getFileInto(filePath))) {
-            throw new UpFileExistException("file already exist");
+            throw new UpFileExistException("file already exist,filePath:"+filePath);
         }
         upYun.setContentMD5(UpYun.md5(file));
         boolean isSuccess = upYun.writeFile(filePath, file, auto);
         if (!isSuccess) {
+            logger.info("云盘服务上传压缩文件失败,回滚删除压缩文件,userId:{},md5FileName:{},file:{}", userId, md5FileName, file.getName());
             deleteFile(filePath, false);
         }
         return isSuccess;
@@ -260,11 +270,11 @@ public class UpLoadApiService {
         try {
             isSuccess = doUploadUnCompressDic(dicPath, dictionary);
         } catch (Exception e) {
-            e.printStackTrace();
-            deleteFile(dicPath, true);
+            logger.error("云盘服务上传解压缩文件异常,dicPath:{},dictionary:{}", dicPath, dictionary.getName(), e);
             isSuccess = false;
         }
         if (!isSuccess) {
+            logger.info("云盘服务上传解压缩文件失败,回滚删除解压缩文件,userId:{},md5FileName:{},file:{}", userId, md5FileName, dictionary.getName());
             deleteFile(dicPath, true);
         }
         return isSuccess;
@@ -297,7 +307,7 @@ public class UpLoadApiService {
                     upYun.writeFile(subPath, file, true);
                 }
             } catch (IOException | UpException e) {
-                e.printStackTrace();
+                logger.error("云盘服务上传解压缩恩建异常,dicPath:{},dictionary:{}", dicPath, dictionary.getName(), e);
                 isSuccess[0] = false;
             }
         });
@@ -313,6 +323,7 @@ public class UpLoadApiService {
     @Async
     public void deleteFile(String path, boolean isDictionary) throws IOException, UpException {
         if (Objects.isNull(getFileInto(path))) {
+            logger.info("云盘服务未找到该文件,path:{}", path);
             return;
         }
         if (isDictionary) {
@@ -345,4 +356,5 @@ public class UpLoadApiService {
     public static String getImageFilePathFormat() {
         return IMAGE_FILE_PATH_FORMAT;
     }
+
 }
