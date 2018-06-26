@@ -283,6 +283,22 @@
             <version>${mapper.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>local</groupId>
+            <artifactId>unrar</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/unrar.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>local</groupId>
+            <artifactId>validator</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/validator-1.0.jar</systemPath>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>
