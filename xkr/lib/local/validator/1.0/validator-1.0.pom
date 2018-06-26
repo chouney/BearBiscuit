@@ -1,6 +1,6 @@
 <project>
     <modelVersion>1.0.0</modelVersion>
-    <groupId>org.chris.redbud</groupId>
-    <artifactId>unrar</artifactId>
+    <groupId>local</groupId>
+    <artifactId>validator</artifactId>
     <version>1.0</version>
 </project>
