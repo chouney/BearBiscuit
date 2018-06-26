@@ -15,7 +15,7 @@ if [ $profile != pro ] ; then
     java_opt=${java_opt}:"-Xdebug -Xrunjdwp,transport=dt_socket,server=y,address=8301,suspend=n,onthrow=java.io.IOException,launch=/sbin/echo"
 fi
 echo ${JAVA_HOME}/bin/java -d64 -jar ${CODE_DIR}/target/xkr.jar $java_opt
-nohup ${JAVA_HOME}/bin/java -jar ${CODE_DIR}/target/xkr.jar $java_opt > /dev/null
+nohup ${JAVA_HOME}/bin/java -jar ${CODE_DIR}/target/xkr.jar $java_opt > /dev/null &
 
 #check app
 APP_NAME=xkr
@@ -28,5 +28,5 @@ for (( i=1; i<100;i++))
             break
         else
             sleep 1
+        fi
     done
-fi
