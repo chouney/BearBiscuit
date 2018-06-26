@@ -5,20 +5,15 @@ import com.google.common.collect.ImmutableMap;
 import com.xkr.BaseDaoTest;
 import com.xkr.common.LoginEnum;
 import com.xkr.dao.mapper.XkrMessageMapper;
-import com.xkr.domain.XkrMessageAgent;
 import com.xkr.domain.dto.message.MessageStatusEnum;
 import com.xkr.domain.entity.XkrMessage;
-import com.xkr.service.MessageService;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.plugin2.message.Message;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

@@ -287,16 +287,12 @@
             <groupId>local</groupId>
             <artifactId>unrar</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/unrar.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>local</groupId>
             <artifactId>validator</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/validator-1.0.jar</systemPath>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -321,6 +317,18 @@
     </dependencies>
     <build>
         <finalName>xkr</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -336,6 +344,7 @@
                     <fork>true</fork><!-- 如果没有该项配置，这个devtools不会起作用，即应用不会restart -->
                 </configuration>
             </plugin>
+
             <!--<plugin>-->
                 <!--<groupId>org.mybatis.generator</groupId>-->
                 <!--<artifactId>mybatis-generator-maven-plugin</artifactId>-->

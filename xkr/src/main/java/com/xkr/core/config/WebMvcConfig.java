@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 @Configuration
-@ImportResource("classpath:validation-configuration.xml")
+@ImportResource("classpath*:validation-configuration.xml")
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
