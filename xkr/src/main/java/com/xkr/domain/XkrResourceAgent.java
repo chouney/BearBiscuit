@@ -137,7 +137,7 @@ public class XkrResourceAgent {
 
     @Transactional(rollbackFor = Exception.class)
     public XkrResource saveNewResource(String title, String detail, Integer cost, XkrClass xkrClass, Long userId,
-                                       String compressMd5, String unCompressMd5, String fileSize,String fileName) {
+                                       String compressMd5, String fileSize,String fileName) {
         if(Objects.isNull(xkrClass)){
             return null;
         }
@@ -158,7 +158,6 @@ public class XkrResourceAgent {
         resource.setStatus((byte) ResourceStatusEnum.STATUS_UNVERIFIED.getCode());
         resource.setUserId(userId);
         JSONObject ext = new JSONObject();
-        ext.put(ResourceService.EXT_MD5_UNCOMPRESS_FILE_KEY, unCompressMd5);
         ext.put(ResourceService.EXT_FILE_NAME_KEY,fileName);
         resource.setExt(ext.toJSONString());
         resource.setResourceUrl(compressMd5);

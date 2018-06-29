@@ -31,7 +31,7 @@ public class UnCompressProcessorFacade implements ApplicationContextAware {
         }
         try {
             String parent = file.getParent() == null ? "" : file.getParent() + "/";
-            String desFilePath = parent + file.getName().split("\\.")[0];
+            String desFilePath = parent + System.currentTimeMillis()+file.getName().split("\\.")[0];
             if (ArchiveProcessor.class.isAssignableFrom(clazz)) {
                 ArchiveProcessor archiveProcessor = context.getBean(CamelCaseUtil.toLowwerCamelCase(clazz.getSimpleName()), ArchiveProcessor.class);
                 archiveProcessor.doUnArchiver(file, desFilePath, null);

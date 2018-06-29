@@ -15,8 +15,6 @@ public class FileUploadResponseDTO extends BaseDTO implements Serializable{
     private static final long serialVersionUID = -5011995111976061889L;
     private String compressMd5;
 
-    private String unCompressMd5;
-
     private String fileName;
 
     private String imageMd5;
@@ -25,9 +23,8 @@ public class FileUploadResponseDTO extends BaseDTO implements Serializable{
         super(status);
     }
 
-    public FileUploadResponseDTO(String compressMd5, String unCompressMd5,String fileName) {
+    public FileUploadResponseDTO(String compressMd5,String fileName) {
         this.compressMd5 = compressMd5;
-        this.unCompressMd5 = unCompressMd5;
         this.fileName = fileName;
     }
 
@@ -49,14 +46,6 @@ public class FileUploadResponseDTO extends BaseDTO implements Serializable{
 
     public void setCompressMd5(String compressMd5) {
         this.compressMd5 = compressMd5;
-    }
-
-    public String getUnCompressMd5() {
-        return unCompressMd5;
-    }
-
-    public void setUnCompressMd5(String unCompressMd5) {
-        this.unCompressMd5 = unCompressMd5;
     }
 
     public String getImageMd5() {

@@ -6,6 +6,7 @@
  */
 package com.xkr.core.compress;
 
+import com.xkr.exception.UnArchiverException;
 import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
 import de.innosystec.unrar.rarfile.FileHeader;
@@ -40,6 +41,9 @@ public final class MyRar extends ArchiveProcessor {
 			String password) throws IOException {
 		try {
 			Archive a = new Archive(srcfile, password, false);
+			if(!a.isPass()){
+				throw new UnArchiverException("UnRar file error!");
+			}
 			FileHeader fh;
 			while ((fh = a.nextFileHeader()) != null) {
 				File f = new File(destpath + "/"

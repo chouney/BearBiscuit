@@ -77,7 +77,6 @@ public class CommonController {
     private void buildFileUploadResponseVO(FileUploadResponseVO responseVO,FileUploadResponseDTO responseDTO){
         responseVO.setCompressMd5(responseDTO.getCompressMd5());
         responseVO.setImageMd5(responseDTO.getImageMd5());
-        responseVO.setUnCompressMd5(responseDTO.getUnCompressMd5());
         responseVO.setFileName(responseDTO.getFileName());
     }
 }

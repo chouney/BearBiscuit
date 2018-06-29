@@ -52,9 +52,13 @@ public class FileUtil {
         if(file.isDirectory()){
             return FileTypeEnum.DIR;
         }
-        String[] names = file.getName().split("\\.");
-        String postfix = names.length == 1 ? "" : names[names.length-1];
-        return FileTypeEnum.getEnumByFileDesc(postfix);
+        String fileName = file.getName();
+        int firstDotIndex = fileName.indexOf(".")+1;
+        if(firstDotIndex == -1){
+            return null;
+        }
+        String fullPostfixName = fileName.substring(firstDotIndex).toLowerCase();
+        return FileTypeEnum.getEnumByFileDesc(fullPostfixName);
     }
 
 }

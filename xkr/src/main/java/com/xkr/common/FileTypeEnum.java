@@ -2,6 +2,7 @@ package com.xkr.common;
 
 import com.xkr.core.compress.MyRar;
 import com.xkr.core.compress.MyTar;
+import com.xkr.core.compress.MyTarGz;
 import com.xkr.core.compress.MyZip;
 
 import java.util.Arrays;
@@ -14,9 +15,11 @@ import java.util.Arrays;
 public enum FileTypeEnum {
 
     DIR(-1,"-"),
-    RAR(0,"rar", MyRar.class),
-    TAR(1,"tar", MyTar.class),
-    ZIP(2,"zip", MyZip.class),
+    //tar.gz需要先放到tar之前，否则会被tar处理器进行处理
+    GZ(0,"tar.gz", MyTarGz.class),
+    RAR(1,"rar", MyRar.class),
+    TAR(2,"tar", MyTar.class),
+    ZIP(3,"zip", MyZip.class),
     PNG(10,"png"),
     JSP(11,"jpg"),
     JPEG(12,"jpeg"),
@@ -50,9 +53,9 @@ public enum FileTypeEnum {
         return processorClazz;
     }
 
-    public static FileTypeEnum getEnumByFileDesc(String s){
+    public static FileTypeEnum getEnumByFileDesc(String fullPostFixName){
         return Arrays.stream(FileTypeEnum.values()).
-                filter(fileTypeEnum -> fileTypeEnum.getDesc().equals(s)).
+                filter(fileTypeEnum -> fullPostFixName.contains(fileTypeEnum.getDesc())).
                 findFirst().orElse(null);
     }
 }

@@ -90,7 +90,7 @@ public class CSRFAspect {
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
         HttpServletRequest httpServletRequest = sra.getRequest();
 
-        if("dev".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
+        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
             return joinPoint.proceed(joinPoint.getArgs());
         }
 

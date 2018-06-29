@@ -185,7 +185,7 @@ public class ResourceService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public FileDownloadResponseDTO downloadResouce(XkrUser downloadUser, Long resourceId) {
+    public FileDownloadResponseDTO downloadResource(XkrUser downloadUser, Long resourceId) {
         //资源检查1.是否存在,2是否异常
         XkrResource resource = xkrResourceAgent.getResourceById(resourceId);
         if (Objects.isNull(resource)) {
@@ -252,17 +252,16 @@ public class ResourceService {
      * @param classId
      * @param userId
      * @param compressMd5
-     * @param unCompressMd5
      * @return
      */
     public ResponseDTO<Long> saveNewResource(String title, String detail, Integer cost, Long classId, Long userId,
-                                             String compressMd5, String unCompressMd5, String fileName) {
+                                             String compressMd5, String fileName) {
         String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, compressMd5, fileName);
         try {
-            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInto(filePath);
+            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInfo(filePath);
             if (Objects.isNull(fileInfoDTO)) {
-                logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},unCompressMd5:{},filePath:{}",
-                        classId, userId, compressMd5, unCompressMd5, filePath);
+                logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},filePath:{}",
+                        classId, userId, compressMd5, filePath);
                 return new ResponseDTO<>(ErrorStatus.RESOURCE_NOT_FOUND);
             }
 
@@ -274,7 +273,7 @@ public class ResourceService {
             }
 
             XkrResource resource = xkrResourceAgent.saveNewResource(title, detail, cost, xkrClass,
-                    userId, compressMd5, unCompressMd5, fileInfoDTO.getSize(), fileName);
+                    userId, compressMd5, fileInfoDTO.getSize(), fileName);
             if (Objects.nonNull(resource)) {
 
                 adminIndexRedisService.incrUploadCount();
@@ -286,8 +285,8 @@ public class ResourceService {
 
             }
         } catch (IOException | UpException e) {
-            logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},unCompressMd5:{},filePath:{}",
-                    classId, userId, compressMd5, unCompressMd5, filePath);
+            logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},filePath:{}",
+                    classId, userId, compressMd5, filePath);
         }
         return new ResponseDTO<>(ErrorStatus.ERROR);
 
@@ -307,12 +306,13 @@ public class ResourceService {
             logger.error("ResourceService getResourceMenuList resource info is null : resId:{},resUri:{}", "null", resUri);
             return list;
         }
-        String unCompressMd5 = JSONObject.parseObject(resource.getExt()).getString(EXT_MD5_UNCOMPRESS_FILE_KEY);
-        if (StringUtils.isEmpty(unCompressMd5)) {
-            logger.error("ResourceService getResourceMenuList md5FileList is null : resource:{}", JSON.toJSONString(resource));
+        String fileName = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
+        if (StringUtils.isEmpty(fileName)) {
+            logger.error("ResourceService getResourceMenuList fileName is null : resource:{}", JSON.toJSONString(resource));
             return list;
         }
-        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), "/" + unCompressMd5 + "/" + resUri);
+        String filePrefixName = fileName.split("\\.")[0];
+        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()),resource.getResourceUrl() ,  filePrefixName + "/" + resUri);
         return upLoadApiService.getDirInfo(dicPath);
     }
 

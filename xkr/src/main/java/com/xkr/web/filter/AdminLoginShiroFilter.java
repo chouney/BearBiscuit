@@ -39,7 +39,7 @@ public class AdminLoginShiroFilter extends AdviceFilter {
      */
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        if("dev".equals(runEnv) && StringUtils.isNotEmpty(request.getParameter("debug"))){
+        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(request.getParameter("debug"))){
             return true;
         }
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;

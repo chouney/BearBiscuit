@@ -57,14 +57,16 @@ public class UpLoadApiService {
 
     public static final int IMAGE_FILE_TYPE = 1;
 
+    private static final int DEFAULT_BLOCK_SIZE = 512;
+
     @Value("${upyun.root.path}")
     private String rootPath;
 
     //userId:md5FileName:fileName+postFix
     private static String COMPRESS_FILE_PATH_FORMAT;
-    //userId:md5FileName
+    //userId:md5FileName:filePrefixName
     private static String UNCOMPRESS_FILE_PATH_FORMAT;
-    //年月日时分秒:md5FileName
+    //年月日时分秒:md5ImageName
     private static String IMAGE_FILE_PATH_FORMAT;
     //filename
     private static String EXT_FILE_PATH_FORMAT;
@@ -73,7 +75,7 @@ public class UpLoadApiService {
     public void init() {
         EXT_FILE_PATH_FORMAT = rootPath + "/ext/%s";
         COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
-        UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s";
+        UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
         IMAGE_FILE_PATH_FORMAT = rootPath + "/image/%d%d%d%d%d%d-%s";
     }
 
@@ -99,7 +101,7 @@ public class UpLoadApiService {
      * @throws IOException
      * @throws UpException
      */
-    public FileInfoDTO getFileInto(String filePath) throws IOException, UpException {
+    public FileInfoDTO getFileInfo(String filePath) throws IOException, UpException {
         Map<String, String> map;
         try {
             map = upYun.getFileInfo(filePath);
@@ -144,7 +146,7 @@ public class UpLoadApiService {
      * @throws IOException
      */
     public String extFileUpload(String filePath, File file) throws UpException, IOException {
-        if (Objects.nonNull(getFileInto(filePath))) {
+        if (Objects.nonNull(getFileInfo(filePath))) {
             throw new UpFileExistException("file already exist");
         }
         if (upYun.writeFile(filePath, file, true)) {
@@ -179,23 +181,23 @@ public class UpLoadApiService {
                 logger.info("云盘服务解压缩文件失败,fileType:{},uploadFile:{}", fileType, uploadFile.getName());
                 return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
-            String unCompressMd5 = UpYunUtils.md5(unCompressDic.getName());
-            isSuccess = uploadUnCompressDic(String.valueOf(user.getId()), unCompressMd5, unCompressDic);
+            String compressMd5 = UpYun.md5(uploadFile);
+            String filePrefixName = uploadFile.getName().split("\\.")[0];
+            isSuccess = uploadUnCompressDic(String.valueOf(user.getId()), compressMd5, filePrefixName ,unCompressDic);
             if (!isSuccess) {
                 logger.info("云盘服务上传解压缩文件失败,unCompressDic:{},fileType:{},uploadFile:{}", unCompressDic.getName(), fileType, uploadFile.getName());
                 return new FileUploadResponseDTO(ErrorStatus.ERROR);
             }
-            String compressMd5 = UpYunUtils.md5(uploadFile.getName());
             isSuccess = uploadCompressFile(String.valueOf(user.getId()), compressMd5, uploadFile, true);
             if (!isSuccess) {
                 //若失败则删除解压缩上传文件
                 logger.info("云盘服务上传压缩文件失败,回滚删除解压缩文件,unCompressDic:{},fileType:{},uploadFile:{}", unCompressDic.getName(), fileType, uploadFile.getName());
-                String unComDicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, String.valueOf(user.getId()), unCompressMd5);
+                String unComDicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, String.valueOf(user.getId()), compressMd5, filePrefixName);
                 deleteFile(unComDicPath, true);
             }
-            return new FileUploadResponseDTO(compressMd5, unCompressMd5, uploadFile.getName());
+            return new FileUploadResponseDTO(compressMd5, uploadFile.getName());
         } else if (IMAGE_FILE_TYPE == fileType) {
-            String imageMd5 = UpYunUtils.md5(uploadFile.getName());
+            String imageMd5 = UpYun.md5(uploadFile);
             if (uploadImageFile(imageMd5, uploadFile)) {
                 return new FileUploadResponseDTO(imageMd5);
             }
@@ -237,10 +239,10 @@ public class UpLoadApiService {
      */
     private boolean uploadCompressFile(String userId, String md5FileName, File file, boolean auto) throws IOException, UpException {
         String filePath = String.format(COMPRESS_FILE_PATH_FORMAT, userId, md5FileName, file.getName());
-        if (Objects.nonNull(getFileInto(filePath))) {
+        if (Objects.nonNull(getFileInfo(filePath))) {
             throw new UpFileExistException("file already exist,filePath:"+filePath);
         }
-        upYun.setContentMD5(UpYun.md5(file));
+        upYun.setContentMD5(md5FileName);
         boolean isSuccess = upYun.writeFile(filePath, file, auto);
         if (!isSuccess) {
             logger.info("云盘服务上传压缩文件失败,回滚删除压缩文件,userId:{},md5FileName:{},file:{}", userId, md5FileName, file.getName());
@@ -258,12 +260,12 @@ public class UpLoadApiService {
      * @throws UpException
      * @throws IOException
      */
-    public boolean uploadUnCompressDic(String userId, String md5FileName, File dictionary) throws UpException, IOException {
+    public boolean uploadUnCompressDic(String userId, String md5FileName, String filePrefixName, File dictionary) throws UpException, IOException {
         if (Objects.isNull(dictionary) || !dictionary.isDirectory()) {
             throw new UpException("file is not dictionary");
         }
-        String dicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, userId, md5FileName);
-        if (Objects.nonNull(getFileInto(dicPath))) {
+        String dicPath = String.format(UNCOMPRESS_FILE_PATH_FORMAT, userId, md5FileName, filePrefixName);
+        if (Objects.nonNull(getFileInfo(dicPath))) {
             throw new UpFileExistException("dictionary already exist");
         }
         boolean isSuccess = true;
@@ -322,7 +324,7 @@ public class UpLoadApiService {
      */
     @Async
     public void deleteFile(String path, boolean isDictionary) throws IOException, UpException {
-        if (Objects.isNull(getFileInto(path))) {
+        if (Objects.isNull(getFileInfo(path))) {
             logger.info("云盘服务未找到该文件,path:{}", path);
             return;
         }

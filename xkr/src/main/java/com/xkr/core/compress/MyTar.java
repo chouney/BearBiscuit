@@ -21,7 +21,7 @@ import java.util.Objects;
  * @author ben
  */
 @Component
-public final class MyTar extends ArchiveProcessor {
+public class MyTar extends ArchiveProcessor {
 
     private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
             "TAR打包文件(*.tar)", "tar");
@@ -57,7 +57,7 @@ public final class MyTar extends ArchiveProcessor {
     }
 
     @Override
-    public final void doArchiver(File[] files, String destpath)
+    public void doArchiver(File[] files, String destpath)
             throws IOException {
         /*
 		 * 定义一个TarArchiveOutputStream 对象
@@ -113,7 +113,7 @@ public final class MyTar extends ArchiveProcessor {
     }
 
     @Override
-    public final FileNameExtensionFilter getFileFilter() {
+    public FileNameExtensionFilter getFileFilter() {
         return filter;
     }
 }

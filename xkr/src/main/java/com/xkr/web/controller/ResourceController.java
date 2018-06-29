@@ -243,7 +243,6 @@ public class ResourceController {
      * @param classId
      * @param detail
      * @param compressMd5
-     * @param unCompressMd5
      * @param captcha
      * @param result
      * @return
@@ -263,8 +262,6 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "compressMd5") String compressMd5,
             @NotBlank
-            @RequestParam(name = "unCompressMd5") String unCompressMd5,
-            @NotBlank
             @RequestParam(name = "fileName") String fileName,
             @Captcha
             @RequestParam(name = "captcha") String captcha,
@@ -276,7 +273,7 @@ public class ResourceController {
         try {
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,unCompressMd5,fileName);
+            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,fileName);
 
             if(!ErrorStatus.OK.equals(resId.getStatus())){
                 return new BasicResult<>(resId.getStatus());
@@ -286,7 +283,7 @@ public class ResourceController {
 
             return new BasicResult<>(output);
         } catch (Exception e) {
-            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},compressMd5:{},unCompressMd5:{}", resTitle,resCost,detail,classId,compressMd5,unCompressMd5, e);
+            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},compressMd5:{}", resTitle,resCost,detail,classId,compressMd5, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }
@@ -312,7 +309,7 @@ public class ResourceController {
         try {
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
-            FileDownloadResponseDTO responseDTO = resourceService.downloadResouce(user,Long.valueOf(resourceId));
+            FileDownloadResponseDTO responseDTO = resourceService.downloadResource(user,Long.valueOf(resourceId));
 
             if(!ErrorStatus.OK.equals(responseDTO.getStatus())){
                 return new BasicResult<>(responseDTO.getStatus());

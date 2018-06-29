@@ -37,7 +37,7 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-        if("dev".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
+        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
             return true;
         }
         if (o instanceof HandlerMethod) {
