@@ -21,7 +21,7 @@ public class UserDetailVO implements Serializable {
      * "userToken":"用户token",
      * "wealth":11,//财富值
      * "totalRecharge":"3333",//充值金额,单位为分
-     * "lastLoginDate":"YY-mm-dd HH:MM",
+     * "lastLoginDate":"YY-mm-dd HH:MM:SS",
      * "status":1, //会员属性
      * "clientIp":"客户端ip地址"
      */

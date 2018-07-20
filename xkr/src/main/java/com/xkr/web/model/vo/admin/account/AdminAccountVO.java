@@ -76,7 +76,7 @@ public class AdminAccountVO implements Serializable {
 
     public void setCreateDate(Date createDate) {
         if (Objects.nonNull(createDate)) {
-            this.createDate = DateUtil.yyyyMMdd.format(createDate);
+            this.createDate = DateUtil.yyyyMMddHHmmss.format(createDate);
         }
     }
 

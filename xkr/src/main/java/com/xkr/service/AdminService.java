@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.LoginEnum;
@@ -14,15 +15,19 @@ import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.dao.cache.AdminIndexRedisService;
 import com.xkr.domain.*;
 import com.xkr.domain.dto.ResponseDTO;
-import com.xkr.domain.dto.admin.AdminIndexDTO;
+import com.xkr.domain.dto.admin.index.AdminIndexDTO;
 import com.xkr.domain.dto.admin.account.AdminAccountDTO;
 import com.xkr.domain.dto.admin.account.AdminAccountDetailDTO;
 import com.xkr.domain.dto.admin.account.ListAdminAccountDTO;
+import com.xkr.domain.dto.admin.index.ResourceAccountDTO;
+import com.xkr.domain.dto.admin.index.UserAccountDTO;
 import com.xkr.domain.dto.admin.permission.ListPermissionDTO;
 import com.xkr.domain.dto.admin.permission.PermissionDTO;
 import com.xkr.domain.dto.admin.role.AdminRoleDTO;
 import com.xkr.domain.dto.admin.role.ListAdminRoleDTO;
 import com.xkr.domain.dto.admin.role.RoleDetailDTO;
+import com.xkr.domain.dto.resource.ResourceStatusEnum;
+import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.domain.entity.XkrAdminPermission;
 import com.xkr.domain.entity.XkrAdminRole;
@@ -54,6 +59,9 @@ import java.util.stream.Collectors;
 @Service
 public class AdminService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private XkrResourceAgent xkrResourceAgent;
 
     @Autowired
     private XkrAdminAccountAgent xkrAdminAccountAgent;
@@ -432,16 +440,48 @@ public class AdminService {
             return;
         }
 
+        UserAccountDTO userAccountDTO = new UserAccountDTO();
+
+        ResourceAccountDTO resourceAccountDTO = new ResourceAccountDTO();
+        ResourceAccountDTO designAccountDTO = new ResourceAccountDTO();
+
+        buildUserAccountDTO(userAccountDTO);
+
+        buildResourceAccountDTO(XkrClassAgent.ROOT_RESOURCE_CLASS_ID,resourceAccountDTO);
+
+        buildResourceAccountDTO(XkrClassAgent.ROOT_DESIGN_CLASS_ID,designAccountDTO);
+
         indexDTO.setRoleName(role.getRoleName());
         indexDTO.setAccountName(adminAccount.getAccountName());
         indexDTO.setLastLoginDate(session.getLastAccessTime());
-        indexDTO.setDownloadCount(adminIndexRedisService.getDownLoadCount());
-        indexDTO.setLoginCount(adminIndexRedisService.getLoginCount());
-        indexDTO.setRegCount(adminIndexRedisService.getRegCount());
-        indexDTO.setUploadCount(adminIndexRedisService.getUploadCount());
-        indexDTO.setUserTotalCount(xkrUserAgent.getUserTotalCount());
+
+        indexDTO.setUserAccountDTO(userAccountDTO);
+
+        indexDTO.setResoureAccountDTO(resourceAccountDTO);
+
+        indexDTO.setDesignAccountDTO(designAccountDTO);
+
     }
 
+    private void buildUserAccountDTO(UserAccountDTO userAccountDTO){
+        Integer userTotal = xkrUserAgent.getUserTotalCount();
+        Integer userActiveTotal = xkrUserAgent.getUserTotalCountByStatues(ImmutableList.of(UserStatusEnum.USER_STATUS_NORMAL));
+
+        userAccountDTO.setLoginCount(adminIndexRedisService.getLoginCount());
+        userAccountDTO.setRegCount(adminIndexRedisService.getRegCount());
+        userAccountDTO.setUserActiveTotalCount(userActiveTotal);
+        userAccountDTO.setUserTotalCount(userTotal);
+    }
+
+    private void buildResourceAccountDTO(int classId, ResourceAccountDTO resourceAccountDTO){
+        Integer totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED,classId);
+        Integer unverifiedCount = xkrResourceAgent.getResourceTotal(ImmutableList.of(ResourceStatusEnum.STATUS_UNVERIFIED),classId);
+
+        resourceAccountDTO.setDownloadCount(adminIndexRedisService.getDownLoadCount(classId));
+        resourceAccountDTO.setUploadCount(adminIndexRedisService.getUploadCount(classId));
+        resourceAccountDTO.setTotalCount(totalCount);
+        resourceAccountDTO.setUnverifiedCount(unverifiedCount);
+    }
 
     private void buildAdminAccountDetailDTO(AdminAccountDetailDTO result, XkrAdminAccount adminAccount) {
         result.setAccountName(adminAccount.getAccountName());

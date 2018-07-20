@@ -100,7 +100,7 @@ public class CommentDetailVO implements Serializable {
         if(Objects.isNull(updateTime)){
             return ;
         }
-        this.updateTime = DateUtil.yyyyMMdd.format(updateTime);
+        this.updateTime = DateUtil.yyyyMMddHHmmss.format(updateTime);
     }
 
     public Integer getStatus() {

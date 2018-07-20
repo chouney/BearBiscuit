@@ -6,6 +6,10 @@ package com.xkr.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -112,6 +116,15 @@ public class DateUtil {
 
     public static String getCurrentDay() {
         return daySDF.format(new Date());
+    }
+
+    public static long getTodayRemainSecond(){
+        return LocalDate.now().plusDays(1).atStartOfDay().
+                minus(
+                        LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond(),
+                        ChronoUnit.SECONDS
+                ).toInstant(ZoneOffset.UTC).
+                getEpochSecond();
     }
 
     /**

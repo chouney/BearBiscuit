@@ -99,6 +99,12 @@ public class XkrUserAgent {
         ));
     }
 
+    public Integer getUserTotalCountByStatues(List<UserStatusEnum> userStatusEnums){
+        return xkrUserMapper.getTotalUser(ImmutableMap.of(
+                "statuses",userStatusEnums.stream().map(UserStatusEnum::getCode).collect(Collectors.toList())
+        ));
+    }
+
     public XkrUser getUserById(Long userId){
         if(Objects.isNull(userId)){
             return null;

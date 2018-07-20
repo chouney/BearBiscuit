@@ -145,7 +145,7 @@ public class XkrClassAgent {
         xkrClass.setId(classId);
         xkrClass.setClassName(className);
         xkrClass.setStatus((byte)CLASS_STATUS_NORMAL);
-        XkrClass parentClass = xkrClassMapper.selectByPrimaryKey(parendClassId);
+        XkrClass parentClass = xkrClassMapper.getClassById(parendClassId);
         if(Objects.isNull(parentClass)){
             xkrClass.setPath(ROOT_CLASS_ID+"-"+classId);
             xkrClass.setParentClassId(Long.valueOf(ROOT_CLASS_ID));

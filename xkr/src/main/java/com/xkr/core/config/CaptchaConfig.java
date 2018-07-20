@@ -1,6 +1,7 @@
 package com.xkr.core.config;
 
 import com.google.code.kaptcha.servlet.KaptchaServlet;
+import com.xkr.core.CaptchaServlet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -51,7 +52,7 @@ public class CaptchaConfig {
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean() throws ServletException {
-        ServletRegistrationBean servlet = new ServletRegistrationBean(new KaptchaServlet(), "/images/xkr_captcha.jpg");
+        ServletRegistrationBean servlet = new ServletRegistrationBean(new CaptchaServlet(), "/images/xkr_captcha.jpg");
 //        servlet.addInitParameter("kaptcha.border", "no"/*kborder*/);//无边框
 //        servlet.addInitParameter("kaptcha.textproducer.font.color", fcolor);
 //        servlet.addInitParameter("kaptcha.textproducer.font.size", fsize);

@@ -2,7 +2,9 @@ package com.xkr.web.controller.admin;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.domain.dto.ResponseDTO;
@@ -59,6 +61,8 @@ public class AccountController {
             @RequestParam(name = "accountName") String accountName,
             @NotBlank
             @RequestParam(name = "accountToken") String accountToken,
+            @Captcha(CaptchaEnum.LOGIN_TYPE)
+            @RequestParam("captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
@@ -103,6 +107,7 @@ public class AccountController {
 
     /**
      * 获取管理员列表
+     *
      * @param pageNum
      * @param size
      * @return
@@ -113,9 +118,9 @@ public class AccountController {
             @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         try {
-            ListAdminAccountDTO listAdminAccountDTO = adminService.getListAdminAccountDTO(pageNum,size);
+            ListAdminAccountDTO listAdminAccountDTO = adminService.getListAdminAccountDTO(pageNum, size);
 
-            if(!ErrorStatus.OK.equals(listAdminAccountDTO.getStatus())){
+            if (!ErrorStatus.OK.equals(listAdminAccountDTO.getStatus())) {
                 return new BasicResult(listAdminAccountDTO.getStatus());
             }
 
@@ -125,7 +130,7 @@ public class AccountController {
 
             return new BasicResult<>(listAdminAccountVO);
         } catch (Exception e) {
-            logger.error("后台获取管理员列表异常 ,pageNum:{},size:{}", pageNum,size, e);
+            logger.error("后台获取管理员列表异常 ,pageNum:{},size:{}", pageNum, size, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }
@@ -241,6 +246,7 @@ public class AccountController {
 
     /**
      * 管理员删除
+     *
      * @param adminAccountIds
      * @return
      */

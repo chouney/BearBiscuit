@@ -20,6 +20,7 @@ public class UserVO implements Serializable {
      * "userId":"会员id"
      * "userName":"会员名",
      * "email":"邮箱",
+     * "wealth":"财富值",
      * "createTime":"注册时间",
      * "status":"会员状态"
      */
@@ -31,6 +32,8 @@ public class UserVO implements Serializable {
     private String email;
 
     private String createTime;
+
+    private Long wealth;
 
     private Integer status;
 
@@ -69,12 +72,19 @@ public class UserVO implements Serializable {
         this.createTime = DateUtil.yyyyMMdd.format(createTime);
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public Long getWealth() {
+        return wealth;
     }
 
+    public void setWealth(Long wealth) {
+        this.wealth = wealth;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 }

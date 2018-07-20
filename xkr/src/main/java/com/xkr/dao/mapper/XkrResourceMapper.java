@@ -23,4 +23,6 @@ public interface XkrResourceMapper extends CustomerMapper<XkrResource> {
     List<XkrResource> getResourceByUserId(Map<String,Object> params);
 
     List<XkrResource> getResourceByIds(Map<String,Object> params);
+
+    Integer getTotalResource(Map<String,Object> params);
 }

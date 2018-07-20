@@ -1,6 +1,7 @@
 package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.valid.Captcha;
@@ -149,7 +150,7 @@ public class UserController {
             @NotBlank
             @RequestParam(name = "userToken")
                     String userToken,
-            @Captcha
+            @Captcha(CaptchaEnum.LOGIN_TYPE)
             @RequestParam(name = "captcha")
                     String captcha,
             @RequestParam(name = "isRemember", required = false, defaultValue = "false")
@@ -242,7 +243,7 @@ public class UserController {
             @RequestParam(name = "userId") String userId,
             @NotBlank
             @RequestParam(name = "userToken") String userToken,
-            @Captcha
+            @Captcha(CaptchaEnum.UPDATE_PASS_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
@@ -291,5 +292,6 @@ public class UserController {
         userVO.setStatus(userDTO.getStatus());
         userVO.setUserId(userDTO.getUserId());
         userVO.setUserName(userDTO.getUserName());
+        userVO.setWealth(userDTO.getWealth());
     }
 }

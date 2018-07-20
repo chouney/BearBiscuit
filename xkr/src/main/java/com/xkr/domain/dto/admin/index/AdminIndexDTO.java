@@ -1,4 +1,4 @@
-package com.xkr.domain.dto.admin;
+package com.xkr.domain.dto.admin.index;
 
 import com.xkr.domain.dto.BaseDTO;
 
@@ -30,15 +30,11 @@ public class AdminIndexDTO extends BaseDTO implements Serializable{
 
     private Date lastLoginDate;
 
-    private Integer loginCount;
+    private UserAccountDTO userAccountDTO;
 
-    private Integer regCount;
+    private ResourceAccountDTO designAccountDTO;
 
-    private Integer uploadCount;
-
-    private Integer downloadCount;
-
-    private Integer userTotalCount;
+    private ResourceAccountDTO resoureAccountDTO;
 
     public String getRoleName() {
         return roleName;
@@ -64,43 +60,27 @@ public class AdminIndexDTO extends BaseDTO implements Serializable{
         this.lastLoginDate = lastLoginDate;
     }
 
-    public Integer getLoginCount() {
-        return loginCount;
+    public UserAccountDTO getUserAccountDTO() {
+        return userAccountDTO;
     }
 
-    public void setLoginCount(Integer loginCount) {
-        this.loginCount = loginCount;
+    public void setUserAccountDTO(UserAccountDTO userAccountDTO) {
+        this.userAccountDTO = userAccountDTO;
     }
 
-    public Integer getRegCount() {
-        return regCount;
+    public ResourceAccountDTO getDesignAccountDTO() {
+        return designAccountDTO;
     }
 
-    public void setRegCount(Integer regCount) {
-        this.regCount = regCount;
+    public void setDesignAccountDTO(ResourceAccountDTO designAccountDTO) {
+        this.designAccountDTO = designAccountDTO;
     }
 
-    public Integer getUploadCount() {
-        return uploadCount;
+    public ResourceAccountDTO getResoureAccountDTO() {
+        return resoureAccountDTO;
     }
 
-    public void setUploadCount(Integer uploadCount) {
-        this.uploadCount = uploadCount;
-    }
-
-    public Integer getDownloadCount() {
-        return downloadCount;
-    }
-
-    public void setDownloadCount(Integer downloadCount) {
-        this.downloadCount = downloadCount;
-    }
-
-    public Integer getUserTotalCount() {
-        return userTotalCount;
-    }
-
-    public void setUserTotalCount(Integer userTotalCount) {
-        this.userTotalCount = userTotalCount;
+    public void setResoureAccountDTO(ResourceAccountDTO resoureAccountDTO) {
+        this.resoureAccountDTO = resoureAccountDTO;
     }
 }

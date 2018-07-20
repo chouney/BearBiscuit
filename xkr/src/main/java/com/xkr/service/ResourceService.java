@@ -225,8 +225,15 @@ public class ResourceService {
 
         //生成下载token
         try {
-            //增加下载数
-            adminIndexRedisService.incDownLoadCount();
+            XkrClass xkrClass = xkrClassAgent.getClassById(resource.getClassId());
+            if(Objects.nonNull(xkrClass)){
+                String[] paths = xkrClass.getPath().split("-");
+                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID ;
+
+                //增加下载数
+                adminIndexRedisService.incDownLoadCount(classType);
+            }
+
 
             JSONObject ext = JSON.parseObject(resource.getExt());
             String fileName = ext.getString(ResourceService.EXT_FILE_NAME_KEY);
@@ -276,7 +283,12 @@ public class ResourceService {
                     userId, compressMd5, fileInfoDTO.getSize(), fileName);
             if (Objects.nonNull(resource)) {
 
-                adminIndexRedisService.incrUploadCount();
+                String[] paths = xkrClass.getPath().split("-");
+                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID ;
+
+                //上传数+1
+                adminIndexRedisService.incrUploadCount(classType);
+
                 //上传者可免费下载
                 xkrResourceUserAgent.saveNewPayRecord(userId, resource.getId());
 
@@ -456,11 +468,10 @@ public class ResourceService {
      * @param orderType
      * @param pageNum
      * @param size
-     * @param needSearch
      * @return
      */
     public ListResourceDTO getResourcesByClassId(Long rootClassId, int orderType,
-                                                 int pageNum, int size, boolean needSearch) {
+                                                 int pageNum, int size) {
         ListResourceDTO result = new ListResourceDTO();
         if (Objects.isNull(rootClassId)) {
             result.setStatus(ErrorStatus.PARAM_ERROR);
@@ -471,9 +482,10 @@ public class ResourceService {
             return result;
         }
 
-        if (needSearch) {
+        try {
             buildResourceByClassIdsOnSearch(result, classList, orderType, pageNum, size);
-        } else {
+        }catch (Exception e){
+            logger.error("ResourceService getResourcesByClassId buildResourceByClassIdsOnSearch failed searchEngine error,use offline",e);
             buildResourceByClassIdsOnOffline(result, classList, orderType, pageNum, size);
         }
         return result;

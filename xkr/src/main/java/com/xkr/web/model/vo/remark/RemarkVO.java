@@ -44,7 +44,7 @@ public class RemarkVO implements Serializable{
         if(Objects.isNull(submitDate)){
             return;
         }
-        this.submitDate = DateUtil.yyyyMMdd.format(submitDate);
+        this.submitDate = DateUtil.yyyyMMddHHmmss.format(submitDate);
     }
 
     public Long getRemarkId() {

@@ -15,6 +15,7 @@ public class UserDTO implements Serializable {
      * "userId":"会员id"
      * "userName":"会员名",
      * "email":"邮箱",
+     * "wealth":"财富值",
      * "createTime":"注册时间",
      * "status":"会员状态"
      */
@@ -23,6 +24,8 @@ public class UserDTO implements Serializable {
     private String userName;
 
     private String email;
+
+    private Long wealth;
 
     private Date createTime;
 
@@ -60,12 +63,19 @@ public class UserDTO implements Serializable {
         this.createTime = createTime;
     }
 
-    public int getStatus() {
-        return status;
+    public Long getWealth() {
+        return wealth;
     }
 
-    public void setStatus(int status) {
+    public void setWealth(Long wealth) {
+        this.wealth = wealth;
+    }
+
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
 }

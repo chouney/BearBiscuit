@@ -1,11 +1,9 @@
 package com.xkr.web.controller.admin;
 
 import com.xkr.common.ErrorStatus;
-import com.xkr.domain.dto.admin.AdminIndexDTO;
 import com.xkr.domain.dto.admin.permission.ListPermissionDTO;
 import com.xkr.service.AdminService;
 import com.xkr.web.model.BasicResult;
-import com.xkr.web.model.vo.admin.AdminIndexVO;
 import com.xkr.web.model.vo.admin.permission.ListPermissionVO;
 import com.xkr.web.model.vo.admin.permission.PermissionVO;
 import org.slf4j.Logger;

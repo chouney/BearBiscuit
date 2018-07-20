@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -212,6 +213,19 @@ public class XkrResourceAgent {
 
     }
 
+    public Integer getResourceTotal(){
+        return xkrResourceMapper.getTotalResource(ImmutableMap.of("statuses",ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList())));
+    }
+
+    public Integer getResourceTotal(List<ResourceStatusEnum> resourceStatusEnums,Integer classId){
+        if(Objects.isNull(classId) || CollectionUtils.isEmpty(resourceStatusEnums)){
+            return null;
+        }
+        return xkrResourceMapper.getTotalResource(ImmutableMap.of(
+                "statuses",ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()),
+                "classIds", ImmutableList.of(classId))
+        );
+    }
 
     public List<XkrResource> getResourceListByClassIds(List<Long> classIds,List<Integer> statuses) {
         if (CollectionUtils.isEmpty(classIds)) {

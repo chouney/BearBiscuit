@@ -9,7 +9,9 @@ public class Const {
 
     public static final String SESSION_LOGIN_TOKEN_KEY = "SESSION_LOGIN_TOKEN_KEY";
 
-    public static final String CAPTCHA_SESSION_KEY = "KAPTCHA_SESSION_KEY";
+    public static final String CAPTCHA_SESSION_KEY_BASE = "KAPTCHA_SESSION_KEY_";
+
+    public static final String CAPTCHA_SESSION_DATE_BASE = "KAPTCHA_SESSION_DATE_";
 
     public static final String SESSION_COOKIE_NAME = "XKRSID";
 

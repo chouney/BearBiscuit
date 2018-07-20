@@ -1,5 +1,6 @@
 package com.xkr.common.annotation.valid;
 
+import com.xkr.common.CaptchaEnum;
 import com.xkr.web.handler.handler.CaptchaValidator;
 
 import javax.validation.Constraint;
@@ -20,11 +21,11 @@ import java.lang.annotation.Target;
         validatedBy = {CaptchaValidator.class}
 )
 public @interface Captcha {
-    String message() default "验证码未通过";
+    String message() default "验证码过期或者未通过";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    int value() default 0;
+    CaptchaEnum value();
 }

@@ -2,6 +2,7 @@ package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
@@ -72,7 +73,7 @@ public class ResourceController {
         }
         ListResourceVO resourceVOs = new ListResourceVO();
         try {
-            ListResourceDTO resourceDTOs = resourceService.getResourcesByClassId(Long.valueOf(classId), orderType, pageNum, size, true);
+            ListResourceDTO resourceDTOs = resourceService.getResourcesByClassId(Long.valueOf(classId), orderType, pageNum, size);
 
             if(!ErrorStatus.OK.equals(resourceDTOs.getStatus())){
                 return new BasicResult<>(resourceDTOs.getStatus());
@@ -263,7 +264,7 @@ public class ResourceController {
             @RequestParam(name = "compressMd5") String compressMd5,
             @NotBlank
             @RequestParam(name = "fileName") String fileName,
-            @Captcha
+            @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if(result.hasErrors()){

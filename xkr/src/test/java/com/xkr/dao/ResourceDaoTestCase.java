@@ -93,7 +93,7 @@ public class ResourceDaoTestCase extends BaseDaoTest {
     }
 
     @Test
-    public void testZBatchDeleteStatus(){
+    public void testZABatchDeleteStatus(){
         Map<String,Object> param = Maps.newHashMap();
         param.put("statuses", ImmutableList.of(4));
         param.put("ids", ImmutableList.of(1,2));
@@ -103,6 +103,13 @@ public class ResourceDaoTestCase extends BaseDaoTest {
         param.put("statuses", ImmutableList.of(1,2,3,4,-1));
         param.put("ids", ImmutableList.of(1,2));
         Assert.assertEquals(0,mapper.getResourceByIds(param).size());
+    }
+
+    @Test
+    public void testZBGetTotalResource(){
+        Map<String,Object> param = Maps.newHashMap();
+        param.put("statuses", ImmutableList.of(4));
+        Assert.assertEquals(2,mapper.getTotalResource(param).intValue());
     }
 
 

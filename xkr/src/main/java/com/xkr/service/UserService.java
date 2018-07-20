@@ -344,9 +344,10 @@ public class UserService {
     private void buildUserDTO(UserDTO userDTO, XkrUser user) {
         userDTO.setCreateTime(user.getCreateTime());
         userDTO.setEmail(user.getEmail());
-        userDTO.setStatus(user.getStatus());
+        userDTO.setStatus(Integer.valueOf(user.getStatus()));
         userDTO.setUserId(user.getId());
         userDTO.setUserName(user.getUserName());
+        userDTO.setWealth(user.getWealth());
     }
 
 }

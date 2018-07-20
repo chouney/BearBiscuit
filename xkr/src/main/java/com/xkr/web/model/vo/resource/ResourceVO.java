@@ -180,6 +180,6 @@ public class ResourceVO implements Serializable{
         if(Objects.isNull(updateTime)){
             return;
         }
-        this.updateTime = DateUtil.yyyyMMdd.format(updateTime);
+        this.updateTime = DateUtil.yyyyMMddHHmmss.format(updateTime);
     }
 }
