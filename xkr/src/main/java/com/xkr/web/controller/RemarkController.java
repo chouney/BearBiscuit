@@ -2,6 +2,7 @@ package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.domain.dto.ResponseDTO;
@@ -51,7 +52,7 @@ public class RemarkController {
             @RequestParam(name = "qq") String qq,
             @NotBlank
             @RequestParam(name = "phone") String phone,
-            @Captcha
+            @Captcha(CaptchaEnum.REMARK_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {

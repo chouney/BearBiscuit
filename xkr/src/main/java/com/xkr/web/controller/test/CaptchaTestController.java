@@ -1,5 +1,6 @@
 package com.xkr.web.controller.test;
 
+import com.xkr.common.CaptchaEnum;
 import com.xkr.service.api.CaptchaService;
 import com.xkr.web.model.BasicResult;
 import org.slf4j.Logger;
@@ -31,8 +32,9 @@ public class CaptchaTestController {
      */
     @RequestMapping(value = "/captcha", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public BasicResult index4(@RequestParam(name = "captcha") String captcha) {
-        return new BasicResult(captchaService.checkCaptcha(captcha));
+    public BasicResult index4(@RequestParam(name = "captcha") String captcha,
+                              @RequestParam(name = "type") Integer type) {
+        return new BasicResult(captchaService.checkCaptcha(captcha, CaptchaEnum.getByCode(type)));
     }
 
 

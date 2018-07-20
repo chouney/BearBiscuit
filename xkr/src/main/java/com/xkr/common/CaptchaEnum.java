@@ -10,6 +10,7 @@ public enum CaptchaEnum {
     LOGIN_TYPE(1,"登录类型"),
     UPDATE_PASS_TYPE(2,"更新密码类型"),
     UPLOAD_RES_TYPE(3,"上传资源类型"),
+    REMARK_TYPE(4,"提交留言类型"),
 //    REG_TYPE(4,"注册"),
 
 
