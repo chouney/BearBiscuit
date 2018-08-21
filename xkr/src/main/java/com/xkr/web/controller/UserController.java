@@ -2,6 +2,7 @@ package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.CaptchaEnum;
+import com.xkr.common.Const;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.valid.Captcha;
@@ -18,6 +19,7 @@ import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author chriszhang
@@ -59,11 +65,15 @@ public class UserController {
     @MethodValidate
     public BasicResult<JSONObject> regUser(
             @NotBlank
+            @Length(min = 6,max = 15,message = "用户名长度需在{min}和{max}之间")
             @RequestParam(name = "userName") String userName,
             @NotBlank
+            @Length(min = 6,max = 15,message = "密码长度需在{min}和{max}之间")
             @RequestParam(name = "userToken") String userToken,
             @Email
             @RequestParam(name = "email") String email,
+            @Captcha(CaptchaEnum.REG_TYPE)
+            @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
@@ -107,6 +117,14 @@ public class UserController {
             if (args.length < 3) {
                 return new BasicResult<>(ErrorStatus.PARAM_ERROR);
             }
+            LocalDateTime dateTime = LocalDateTime.parse(args[0]);
+            LocalDateTime now = LocalDateTime.now();
+
+            //如果会话过期
+            if(dateTime.plus(Const.VALIDATE_SESSION_EXPIRE, ChronoUnit.MINUTES).isBefore(now)){
+                return new BasicResult<>(ErrorStatus.USER_EMAIL_VALIDATE_SESSION_EXPIRED);
+            }
+
             //用户id
             Long userId = Long.valueOf(args[1]);
             //验证类型1为注册验证,2为修改密码验证
@@ -210,6 +228,8 @@ public class UserController {
     public BasicResult<JSONObject> preUpdate(
             @Email
             @RequestParam(name = "email") String email,
+            @Captcha(CaptchaEnum.UPDATE_PASS_TYPE)
+            @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
@@ -231,7 +251,6 @@ public class UserController {
      * 修改密码操作
      * @param userId
      * @param userToken
-     * @param captcha
      * @param result
      * @return
      */
@@ -243,8 +262,6 @@ public class UserController {
             @RequestParam(name = "userId") String userId,
             @NotBlank
             @RequestParam(name = "userToken") String userToken,
-            @Captcha(CaptchaEnum.UPDATE_PASS_TYPE)
-            @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
@@ -294,4 +311,5 @@ public class UserController {
         userVO.setUserName(userDTO.getUserName());
         userVO.setWealth(userDTO.getWealth());
     }
+
 }

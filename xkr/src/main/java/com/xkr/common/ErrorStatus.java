@@ -27,6 +27,7 @@ public enum ErrorStatus {
     //用户
     USER_NAME_ALREADY_EXIST(11401,"用户名已注册"),
     USER_EMAIL_ALREADY_EXIST(11402,"邮箱已注册"),
+    USER_EMAIL_VALIDATE_SESSION_EXPIRED(11403,"验证会话已过期"),
     USER_NOT_EXIST(11410,"用户不存在"),
     USER_ALREADY_FREEZED(11411,"用户已冻结"),
     USER_ALREADY_ACTIVE(11412,"用户已激活"),

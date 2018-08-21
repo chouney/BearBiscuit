@@ -25,4 +25,7 @@ public class Const {
 
     public static final int USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD = 2;
 
+    //邮箱验证时间长度(分钟)
+    public static final int VALIDATE_SESSION_EXPIRE = 60;
+
 }

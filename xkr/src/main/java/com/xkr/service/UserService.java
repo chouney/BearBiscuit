@@ -72,6 +72,7 @@ public class UserService {
 
     /**
      * 后台用户搜索
+     *
      * @param userLogin
      * @param createDate
      * @param status
@@ -91,7 +92,7 @@ public class UserService {
         size = size <= 0 ? 10 : size;
 
         SearchResultListDTO<UserIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
-                UserIndexDTO.class, userLogin,null,
+                UserIndexDTO.class, userLogin, null,
                 ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
                 null, null, offset, size
         );
@@ -105,32 +106,33 @@ public class UserService {
 
         List<XkrLoginToken> loginTokens = xkrLoginTokenAgent.getUserLoginRecordByIds(userIds);
 
-        buildListUserDetailDTO(result,users,loginTokens,searchResultListDTO);
+        buildListUserDetailDTO(result, users, loginTokens, searchResultListDTO);
 
         return result;
     }
 
     /**
      * 批量操作用户状态
+     *
      * @param userIds
      * @param status
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.USER,optEnum = OptEnum.UPDATE)
-    public ResponseDTO<Boolean> batchUpdateUserStatus(List<Long> userIds,UserStatusEnum status){
-        if(CollectionUtils.isEmpty(userIds) || Objects.isNull(status)){
+    @OptLog(moduleEnum = OptLogModuleEnum.USER, optEnum = OptEnum.UPDATE)
+    public ResponseDTO<Boolean> batchUpdateUserStatus(List<Long> userIds, UserStatusEnum status) {
+        if (CollectionUtils.isEmpty(userIds) || Objects.isNull(status)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-        Boolean success = xkrUserAgent.batchUpdateUserByIds(userIds,status);
+        Boolean success = xkrUserAgent.batchUpdateUserByIds(userIds, status);
         return new ResponseDTO<>(success);
     }
 
-    private void buildListUserDetailDTO(ListUserDetailDTO result,List<XkrUser> users,List<XkrLoginToken> loginTokens,SearchResultListDTO<UserIndexDTO> searchResultListDTO){
+    private void buildListUserDetailDTO(ListUserDetailDTO result, List<XkrUser> users, List<XkrLoginToken> loginTokens, SearchResultListDTO<UserIndexDTO> searchResultListDTO) {
         searchResultListDTO.getSearchResultDTO().forEach(userIndexDTO -> {
             XkrUser user = users.stream().filter(user1 -> userIndexDTO.getUserId().equals(user1.getId())).findAny().orElseThrow(RuntimeException::new);
             XkrLoginToken loginToken = loginTokens.stream().filter(loginToken1 -> userIndexDTO.getUserId().equals(loginToken1.getUserId())).findAny().orElse(null);
             UserDetailDTO userDetailDTO = new UserDetailDTO();
-            buildUserDetailDTO(userDetailDTO,user,loginToken);
+            buildUserDetailDTO(userDetailDTO, user, loginToken);
             result.getUserList().add(userDetailDTO);
         });
     }
@@ -194,9 +196,10 @@ public class UserService {
 
     /**
      * 登出
+     *
      * @return
      */
-    public ResponseDTO<Boolean> userLogout(){
+    public ResponseDTO<Boolean> userLogout() {
         SecurityUtils.getSubject().logout();
         return new ResponseDTO<>(true);
     }
@@ -234,7 +237,7 @@ public class UserService {
 
             adminIndexRedisService.incrRegCount();
 
-            mailApiService.sendRegValidCaptcha(newUser.getEmail(),newUser.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
+            mailApiService.sendRegValidCaptcha(newUser.getEmail(), newUser.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
                     String.valueOf(newUser.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_REG)));
             return new ResponseDTO<>(newUser.getId());
         } catch (MessagingException e) {
@@ -253,10 +256,23 @@ public class UserService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         try {
-            //暂无过期限制
-            if (type == Const.USER_ACCOUNT_VERIFY_TYPE_REG && xkrUserAgent.verifyUserAccountByUserId(userId)) {
-                return new ResponseDTO<>(userId);
+            XkrUser user = xkrUserAgent.getUserById(userId);
+            if (Objects.isNull(user)) {
+                return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
+            }
+            //如果是注册验证
+            if (type == Const.USER_ACCOUNT_VERIFY_TYPE_REG) {
+                if (UserStatusEnum.USER_STATUS_NORMAL.getCode() != user.getStatus()) {
+                    return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
+                }
+                if (UserStatusEnum.USER_STATUS_FREEZED.getCode() == user.getStatus()) {
+                    return new ResponseDTO<>(ErrorStatus.USER_ALREADY_FREEZED);
+                }
+                if (xkrUserAgent.verifyUserAccountByUserId(userId)) {
+                    return new ResponseDTO<>(userId);
+                }
             } else if (type == Const.USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD) {
+                //修改密码验证
                 //渲染密码页面
                 return new ResponseDTO<>(userId);
             }
@@ -283,14 +299,15 @@ public class UserService {
             if (Objects.isNull(user)) {
                 return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
             }
+            // 冻结是否能够更改密码
             if (UserStatusEnum.USER_STATUS_FREEZED.getCode() == user.getStatus()) {
                 return new ResponseDTO<>(ErrorStatus.USER_ALREADY_FREEZED);
             }
-            if (UserStatusEnum.USER_STATUS_NORMAL.getCode() == user.getStatus()) {
-                return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
-            }
+//            if (UserStatusEnum.USER_STATUS_NORMAL.getCode() == user.getStatus()) {
+//                return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
+//            }
             //发送邮箱验证
-            mailApiService.sendPasswordUpdateValidCaptcha(user.getEmail(),user.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
+            mailApiService.sendPasswordUpdateValidCaptcha(user.getEmail(), user.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
                     String.valueOf(user.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD)));
             return new ResponseDTO<>(true);
         } catch (MessagingException e) {
@@ -314,9 +331,9 @@ public class UserService {
         if (Objects.isNull(user)) {
             return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
         }
-//        if(XkrUserAgent.USER_STATUS_FREEZED == user.getStatus()){
-//            return new ResponseDTO<>(ErrorStatus.USER_ALREADY_FREEZED);
-//        }
+        if(UserStatusEnum.USER_STATUS_FREEZED.getCode() == user.getStatus()){
+            return new ResponseDTO<>(ErrorStatus.USER_ALREADY_FREEZED);
+        }
         return new ResponseDTO<>(xkrUserAgent.updateUserTokenByUser(user, userToken));
     }
 

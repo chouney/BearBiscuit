@@ -8,20 +8,25 @@ import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
+import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.resource.ListResourceDTO;
 import com.xkr.domain.dto.resource.ListResourceFolderDTO;
 import com.xkr.domain.dto.resource.ResourceDetailDTO;
 import com.xkr.domain.dto.resource.ResourceFolderDTO;
+import com.xkr.domain.entity.XkrClass;
 import com.xkr.domain.entity.XkrUser;
+import com.xkr.service.ClassService;
 import com.xkr.service.ResourceService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.resource.*;
 import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
+import org.chris.redbud.validator.result.ValidError;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -46,6 +52,9 @@ public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
+
+    @Autowired
+    private XkrClassAgent xkrClassAgent;
 
     /**
      * 根据分类获取资源
@@ -253,6 +262,7 @@ public class ResourceController {
     @MethodValidate
     public BasicResult<JSONObject> resourceUpload(
             @NotBlank
+            @Length(max = 50,message = "标题长度大于25")
             @RequestParam(name = "resTitle") String resTitle,
             @NotNull
             @RequestParam(name = "resCost") Integer resCost,
@@ -272,6 +282,15 @@ public class ResourceController {
         }
         JSONObject output = new JSONObject();
         try {
+
+            XkrClass xkrClass = xkrClassAgent.getClassById(Long.valueOf(classId));
+            if(Objects.isNull(xkrClass)){
+                result = new ValidResult();
+                result.getErrors().add(new ValidError("","分类参数异常",classId));
+                return new BasicResult<>(result);
+            }
+            //todo 资源根据分类进行内容长度限制
+
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
             ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,fileName);
