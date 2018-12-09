@@ -9,6 +9,7 @@ import com.xkr.exception.RegUserException;
 import com.xkr.service.AdminService;
 import com.xkr.service.UserService;
 import com.xkr.service.api.CaptchaService;
+import com.xkr.util.EncodeUtil;
 import com.xkr.web.model.BasicResult;
 import main.java.com.UpYun;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -65,17 +66,17 @@ public class CaptchaTestController {
                                   @RequestParam(name = "email",required = false) String email,
                                   @RequestParam(name = "userToken") String userToken,
                                   @RequestParam(name = "userType") String type) throws RegUserException {
-        if(LoginEnum.CUSTOMER.equals(type)){
-            userService.createUserAccount(userName,email,UpYun.md5(userToken));
-        }else if(LoginEnum.ADMIN.equals(type)){
-            adminService.saveNewAdminAccount(userName,UpYun.md5(userToken),email,1);
+        if(LoginEnum.CUSTOMER.getType().equals(type)){
+            userService.createUserAccount(userName,email,EncodeUtil.md5(userToken));
+        }else if(LoginEnum.ADMIN.getType().equals(type)){
+            adminService.saveNewAdminAccount(userName,EncodeUtil.md5(userToken),email,1);
         }
         return new BasicResult(ErrorStatus.OK);
     }
 
-    public static void main(String[] args){
-        System.out.println(UpYun.md5("admin"));
-    }
+//    public static void main(String[] args){
+//        System.out.println(EncodeUtil.md5("21232f297a57a5a743894a0e4a801fc3"));
+//    }
 
 
 }

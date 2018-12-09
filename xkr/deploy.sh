@@ -11,12 +11,12 @@ BASE_DIR=/home/admin
 CODE_DIR=$BASE_DIR/www-logic/$PROJECT_NAME
 cd $CODE_DIR
 mvn clean install -Dmaven.test.skip=true
-java_opt="--spring.profiles.active=${profile} -Xms256M -Xmx256M -Xmn64M -XX:ErrorFile=${CODE_DIR}/logs/jvm-error-pid.log  -XX:HeapDumpPath=${CODE_DIR}/logs/java_pid.hprof XX:-HeapDumpOnOutOfMemoryError"
+java_opt="-Xms256M -Xmx256M -Xmn64M -XX:ErrorFile=${CODE_DIR}/logs/jvm-error-pid.log  -XX:HeapDumpPath=${CODE_DIR}/logs/java_pid.hprof -XX:+HeapDumpOnOutOfMemoryError"
 if [ $profile != pro ] ; then
-    java_opt=${java_opt}" -Xdebug -Xrunjdwp,transport=dt_socket,server=y,address=8301,suspend=n,onthrow=java.io.IOException,launch=/sbin/echo"
+    java_opt=${java_opt}" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8301"
 fi
-echo ${JAVA_HOME}/bin/java -d64 -jar ${CODE_DIR}/target/xkr.jar $java_opt
-nohup ${JAVA_HOME}/bin/java -jar ${CODE_DIR}/target/xkr.jar $java_opt > /dev/null &
+echo ${JAVA_HOME}/bin/java -d64 $java_opt -jar ${CODE_DIR}/target/xkr.jar --spring.profiles.active=${profile}
+nohup ${JAVA_HOME}/bin/java -d64 $java_opt -jar ${CODE_DIR}/target/xkr.jar --spring.profiles.active=${profile} > /dev/null &
 
 #check app
 APP_NAME=xkr.jar
