@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -32,8 +33,11 @@ public class CaptchaValidator implements ConstraintValidator<Captcha, String> {
         }
         Session session = SecurityUtils.getSubject().getSession();
         String captcha = (String)session.getAttribute(Const.CAPTCHA_SESSION_KEY_BASE+checkType.getCode());
-        Date date = (Date)session.getAttribute(Const.CAPTCHA_SESSION_KEY_BASE+checkType.getCode());
-        if(text.equals(captcha) && date.after(new Date())){
+        Object date = session.getAttribute(Const.CAPTCHA_SESSION_DATE_BASE+checkType.getCode());
+        if(Objects.isNull(date)){
+           return false;
+        }
+        if(text.equals(captcha) && ((Date)date).after(new Date())){
             session.setAttribute(Const.CAPTCHA_SESSION_KEY_BASE+checkType.getCode(),null);
             return true;
         }
