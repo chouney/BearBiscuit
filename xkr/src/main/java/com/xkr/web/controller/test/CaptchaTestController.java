@@ -10,6 +10,9 @@ import com.xkr.service.AdminService;
 import com.xkr.service.UserService;
 import com.xkr.service.api.CaptchaService;
 import com.xkr.web.model.BasicResult;
+import main.java.com.UpYun;
+import org.apache.commons.codec.digest.Md5Crypt;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import sun.misc.BASE64Encoder;
 
 /**
  * @author chriszhang
@@ -62,11 +66,15 @@ public class CaptchaTestController {
                                   @RequestParam(name = "userToken") String userToken,
                                   @RequestParam(name = "userType") String type) throws RegUserException {
         if(LoginEnum.CUSTOMER.equals(type)){
-            userService.createUserAccount(userName,email,userToken);
+            userService.createUserAccount(userName,email,UpYun.md5(userToken));
         }else if(LoginEnum.ADMIN.equals(type)){
-            adminService.saveNewAdminAccount(userName,userToken,email,1);
+            adminService.saveNewAdminAccount(userName,UpYun.md5(userToken),email,1);
         }
         return new BasicResult(ErrorStatus.OK);
+    }
+
+    public static void main(String[] args){
+        System.out.println(UpYun.md5("admin"));
     }
 
 

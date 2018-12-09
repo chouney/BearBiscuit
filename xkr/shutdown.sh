@@ -2,13 +2,13 @@
 APP_NAME=xkr.jar
 
 tpid=`ps -ef|grep $APP_NAME|grep -v grep|grep -v kill|awk '{print $2}'`
-if [ ${tpid} ]; then
+if [ ${tpid} -gt 0 ]; then
     echo 'Stop Process...'
     kill -15 $tpid
 fi
 sleep 5
 tpid=`ps -ef|grep $APP_NAME|grep -v grep|grep -v kill|awk '{print $2}'`
-if [ ${tpid} ]; then
+if [ ${tpid} -gt 0 ]; then
     echo 'Kill Process!'
     kill -9 $tpid
 else

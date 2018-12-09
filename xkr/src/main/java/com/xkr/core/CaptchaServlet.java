@@ -6,7 +6,10 @@ import com.google.code.kaptcha.util.Config;
 import com.xkr.common.CaptchaEnum;
 import com.xkr.common.Const;
 import com.xkr.common.ErrorStatus;
+import com.xkr.util.DateUtil;
 import com.xkr.web.model.BasicResult;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -73,6 +76,10 @@ public class CaptchaServlet extends HttpServlet implements Servlet {
             resp.addHeader("Cache-Control", "post-check=0, pre-check=0");
             resp.setHeader("Pragma", "no-cache");
             resp.setContentType("image/jpeg");
+            String param = req.getParameter(CHECK_TYPE_KEY_PARAM);
+            if(StringUtils.isEmpty(param)){
+                throw new IllegalArgumentException("request param error");
+            }
             CaptchaEnum captchaEnum = CaptchaEnum.getByCode(Integer.valueOf(req.getParameter(CHECK_TYPE_KEY_PARAM)));
             if(Objects.isNull(captchaEnum)){
                 throw new IllegalArgumentException("request param error");
@@ -80,7 +87,7 @@ public class CaptchaServlet extends HttpServlet implements Servlet {
             String capText = this.kaptchaProducer.createText();
             Session session = SecurityUtils.getSubject().getSession();
             session.setAttribute(this.sessionKeyValue+captchaEnum.getCode(), capText);
-            session.setAttribute(this.sessionKeyDateValue+captchaEnum.getCode(), new Date());
+            session.setAttribute(this.sessionKeyDateValue+captchaEnum.getCode(), DateUtils.addSeconds(new Date(),60));
             BufferedImage bi = this.kaptchaProducer.createImage(capText);
             ServletOutputStream out = resp.getOutputStream();
             ImageIO.write(bi, "jpg", out);

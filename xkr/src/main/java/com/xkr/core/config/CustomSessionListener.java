@@ -1,6 +1,7 @@
 package com.xkr.core.config;
 
 
+import com.alibaba.fastjson.JSON;
 import com.xkr.core.redis.RedisConfiguration;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
@@ -29,14 +30,14 @@ public class CustomSessionListener implements SessionListener {
      */
     @Override
     public void onStart(Session session) {
-        logger.info("onStart:{}", session.getId());
+        logger.debug("onStart:{}", JSON.toJSONString(session));
     }
     /**
      * 一个回话的生命周期结束
      */
     @Override
     public void onStop(Session session) {
-        logger.info("onStop:{}", session.getId());
+        logger.debug("onStop:{}", JSON.toJSONString(session));
     }
 
     @Override
