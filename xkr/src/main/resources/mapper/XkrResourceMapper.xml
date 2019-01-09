@@ -106,14 +106,15 @@
     <select id="getTotalResource" parameterType="java.util.Map" resultType="java.lang.Integer">
         SELECT count(1)
         FROM xkr_resource
+        where 1=1
         <if test="classIds!=null">
-            WHERE class_id in
+            AND class_id in
             <foreach collection="classIds" item="id" separator="," open="(" close=")">
                 #{id}
             </foreach>
         </if>
         <if test="statuses!=null">
-            WHERE status in
+            AND status in
             <foreach collection="statuses" item="status" separator="," open="(" close=")">
                 #{status}
             </foreach>

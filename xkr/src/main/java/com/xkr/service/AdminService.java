@@ -436,6 +436,7 @@ public class AdminService {
 
         XkrAdminRole role = xkrAdminRoleAgent.getAdminRoleById(roleId);
         if (Objects.isNull(role)) {
+            logger.error("AdminService buildAdminIndexDTO 未找到管理员角色,roleId:{}",roleId);
             indexDTO.setStatus(ErrorStatus.ERROR);
             return;
         }

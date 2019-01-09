@@ -6,19 +6,24 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.hengyi.dzfilter.utils.TextUtils;
 import com.xkr.common.ErrorStatus;
-import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
 import com.xkr.service.api.SearchApiService;
+import com.xkr.web.controller.CommonController;
+import com.xkr.web.controller.ResourceController;
 import com.xkr.web.model.BasicResult;
 import main.java.com.upyun.UpException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.chris.redbud.validator.result.ValidResult;
+import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,6 +42,23 @@ public class IndexTestController {
 
     @Autowired
     private SearchApiService searchApiService;
+
+    @Autowired
+    private CommonController commonController;
+
+    @Autowired
+    private ResourceController resourceController;
+
+
+    @RequestMapping(value = "/uploadDemo", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult uploadDemo(@RequestParam(name = "file")
+                                          MultipartFile reqFile,
+                                  @RequestParam(name = "type",required =false, defaultValue = "1" ) Integer type) throws URISyntaxException, IOException, UpException {
+        commonController.fileUpload(reqFile,type,new ValidResult());
+        return new BasicResult(ErrorStatus.OK);
+//        resourceController.resourceUpload()
+    }
 
     @RequestMapping(value = "/saveIndex", method = {RequestMethod.GET})
     @ResponseBody
@@ -77,8 +99,8 @@ public class IndexTestController {
     @ResponseBody
     public BasicResult index3(String keyword) throws URISyntaxException, IOException, UpException {
         SearchResultListDTO hits = searchApiService.searchByKeyWordInField(UserIndexDTO.class,
-                keyword, ImmutableMap.of("userName",1F,"email",1F),null,new ImmutablePair<>(null,new Date()),"createTime",null,
-                ImmutableSet.of("userName","email","userId"),0,10);
+                keyword, ImmutableMap.of("userName", 1F, "email", 1F), null, new ImmutablePair<>(null, new Date()), "createTime", null,
+                ImmutableSet.of("userName", "email", "userId"), 0, 10);
         ImmutableMap result = ImmutableMap.of("searchHit", hits);
         return new BasicResult<>(result);
     }
@@ -95,21 +117,21 @@ public class IndexTestController {
     @RequestMapping(value = "/bulkUpdateIndexStatus", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult<Boolean> TestBulkUpdateIndexStatus(Integer status) throws URISyntaxException, IOException, UpException {
-        return new BasicResult<>(searchApiService.bulkUpdateIndexStatus("user", ImmutableList.of(5125121L, 412412123L),status));
+        return new BasicResult<>(searchApiService.bulkUpdateIndexStatus("user", ImmutableList.of(5125121L, 412412123L), status));
     }
 
     @RequestMapping(value = "/getAndBuildIndexDTOByIndexId", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult<String> TestGetAndBuildIndexDTOByIndexId(Integer docId) throws URISyntaxException, IOException, UpException {
         UserIndexDTO userIndexDTO = new UserIndexDTO();
-        searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(docId));
+        searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO, String.valueOf(docId));
         return new BasicResult<>(JSON.toJSONString(userIndexDTO));
     }
 
     @RequestMapping(value = "/searchByFilterField", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<String> TestSearchByFilterField(Integer status,Integer offset,Integer size) throws URISyntaxException, IOException, UpException {
-        SearchResultListDTO searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status",status),null,null,null,offset,size);
+    public BasicResult<String> TestSearchByFilterField(Integer status, Integer offset, Integer size) throws URISyntaxException, IOException, UpException {
+        SearchResultListDTO searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class, ImmutableMap.of("status", status), null, null, null, offset, size);
         return new BasicResult<>(JSON.toJSONString(searchResultListDTO));
     }
 

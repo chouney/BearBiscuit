@@ -2,6 +2,8 @@ package com.xkr.util;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -34,6 +36,14 @@ public class EncodeUtil {
     public static String md5(Object obj){
         return new Md5Hash(obj).toString();
     }
+
+    public static String shaEnc(Object source){
+        return new SimpleHash("sha-1",source).toHex();
+    }
+
+//    public static void main(String[] args){
+//        System.out.println(new SimpleHash("sha-1","admin").toHex());
+//    }
 
     /**
      * 生成邮箱验证码
