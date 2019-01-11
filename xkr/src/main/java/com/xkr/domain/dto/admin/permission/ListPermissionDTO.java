@@ -2,7 +2,6 @@ package com.xkr.domain.dto.admin.permission;
 
 import com.google.common.collect.Lists;
 import com.xkr.domain.dto.BaseDTO;
-import com.xkr.domain.dto.admin.role.AdminRoleDTO;
 
 import java.io.Serializable;
 import java.util.List;
