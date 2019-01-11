@@ -19,6 +19,7 @@ import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,8 +182,8 @@ public class AccountController {
             @RequestParam(name = "accountName") String accountName,
             @NotBlank
             @RequestParam(name = "accountToken") String accountToken,
-            @IsNumberic
-            @RequestParam(name = "roleId") String roleId,
+            @NotEmpty
+            @RequestParam(name = "permissionIds[]") String[] permissionIds,
             @Email
             @RequestParam(name = "email") String email,
             ValidResult result) {
@@ -191,7 +192,7 @@ public class AccountController {
         }
         try {
 
-            ResponseDTO<Long> responseDTO = adminService.saveNewAdminAccount(accountName, accountToken, email, Integer.valueOf(roleId));
+            ResponseDTO<Long> responseDTO = adminService.saveNewAdminAccount(accountName, accountToken, email, permissionIds);
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult<>(responseDTO.getStatus());
@@ -201,7 +202,7 @@ public class AccountController {
 
             return new BasicResult<>(jsonObject);
         } catch (Exception e) {
-            logger.error("后台添加管理员异常,accountName:{},accountToken:{},roleId:{},email:{}", accountName, accountToken, roleId, email, e);
+            logger.error("后台添加管理员异常,accountName:{},accountToken:{},permissionIds:{},email:{}", accountName, accountToken, Arrays.toString(permissionIds), email, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }
@@ -221,8 +222,8 @@ public class AccountController {
             @RequestParam(name = "accountName") String accountName,
             @NotBlank
             @RequestParam(name = "accountToken") String accountToken,
-            @IsNumberic
-            @RequestParam(name = "roleId") String roleId,
+            @NotEmpty
+            @RequestParam(name = "permissionIds[]") String[] permissionIds,
             @Email
             @RequestParam(name = "email") String email,
             ValidResult result) {
@@ -231,7 +232,7 @@ public class AccountController {
         }
         try {
 
-            ResponseDTO<Boolean> responseDTO = adminService.updateAdminAccountById(Long.valueOf(adminAccountId), accountName, accountToken, email, Integer.valueOf(roleId));
+            ResponseDTO<Boolean> responseDTO = adminService.updateAdminAccountById(Long.valueOf(adminAccountId), accountName, accountToken, email, permissionIds);
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult<>(responseDTO.getStatus());
@@ -239,7 +240,7 @@ public class AccountController {
 
             return new BasicResult<>(responseDTO.getData());
         } catch (Exception e) {
-            logger.error("后台管理员更新异常 , adminAccountId:{},accountName:{},accountToken:{},roleId:{},email:{}", adminAccountId, accountName, accountToken, roleId, email, e);
+            logger.error("后台管理员更新异常 , adminAccountId:{},accountName:{},accountToken:{},permissionIds:{},email:{}", adminAccountId, accountName, accountToken, Arrays.toString(permissionIds), email, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }
@@ -274,7 +275,7 @@ public class AccountController {
         adminAccountDetailVO.setAccountName(adminAccountDetailDTO.getAccountName());
         adminAccountDetailVO.setAdminAccountId(adminAccountDetailDTO.getAdminAccountId());
         adminAccountDetailVO.setEmail(adminAccountDetailDTO.getEmail());
-        adminAccountDetailVO.setRoleId(adminAccountDetailDTO.getRoleId());
+        adminAccountDetailVO.setPermissionIds(adminAccountDetailDTO.getPermissionIds());
     }
 
     private void buildListAdminAccountVO(ListAdminAccountVO listAdminAccountVO, ListAdminAccountDTO listAdminAccountDTO) {

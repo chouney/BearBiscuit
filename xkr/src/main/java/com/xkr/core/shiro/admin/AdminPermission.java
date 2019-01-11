@@ -9,9 +9,9 @@ import org.apache.shiro.authz.Permission;
  */
 public class AdminPermission implements Permission {
 
-    private Integer permissionId;
+    private String permissionId;
 
-    public AdminPermission(Integer permissionId) {
+    public AdminPermission(String permissionId) {
         this.permissionId = permissionId;
     }
 

@@ -2,6 +2,7 @@ package com.xkr.web.controller.admin;
 
 import com.alibaba.fastjson.JSON;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.comment.CommentDTO;
@@ -20,6 +21,7 @@ import com.xkr.web.model.vo.comment.ListCommentDetailVO;
 import com.xkr.web.model.vo.resource.ListResourceVO;
 import com.xkr.web.model.vo.resource.ResourceVO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
@@ -58,6 +60,7 @@ public class AdminCommentController {
      * 评论搜索
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.COMMENT_PERM)
     @RequestMapping(value = "/search", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult<ListCommentDetailVO> searchCommentByKeyWord(
@@ -93,6 +96,7 @@ public class AdminCommentController {
      * @param result
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.COMMENT_PERM)
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
     @MethodValidate
@@ -128,6 +132,7 @@ public class AdminCommentController {
      * @param result
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.COMMENT_PERM)
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
@@ -159,6 +164,7 @@ public class AdminCommentController {
      * @param result
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.COMMENT_PERM)
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate

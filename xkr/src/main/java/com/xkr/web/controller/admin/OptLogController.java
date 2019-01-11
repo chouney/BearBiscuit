@@ -2,6 +2,7 @@ package com.xkr.web.controller.admin;
 
 import com.alibaba.fastjson.JSON;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.clazz.ClassMenuDTO;
@@ -12,6 +13,7 @@ import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.clazz.ClassMenuVO;
 import com.xkr.web.model.vo.optlog.ListOptLogVO;
 import com.xkr.web.model.vo.optlog.OptLogVO;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
@@ -42,6 +44,7 @@ public class OptLogController {
     @Autowired
     private OptLogService optLogService;
 
+    @RequiresPermissions(value = {PermissionEnum.Constant.LOG_PERM})
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     @MethodValidate
@@ -71,6 +74,7 @@ public class OptLogController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    @RequiresPermissions(value = {PermissionEnum.Constant.LOG_PERM})
     @RequestMapping(value = "/del", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchDelateOptLog(

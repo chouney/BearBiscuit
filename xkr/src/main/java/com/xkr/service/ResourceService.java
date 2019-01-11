@@ -14,10 +14,7 @@ import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.dao.cache.AdminIndexRedisService;
-import com.xkr.domain.XkrClassAgent;
-import com.xkr.domain.XkrResourceAgent;
-import com.xkr.domain.XkrResourceUserAgent;
-import com.xkr.domain.XkrUserAgent;
+import com.xkr.domain.*;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.file.FileInfoDTO;
@@ -30,15 +27,12 @@ import com.xkr.domain.entity.*;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
-import main.java.com.UpYun;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,6 +61,9 @@ public class ResourceService {
 
     @Autowired
     private XkrResourceAgent xkrResourceAgent;
+
+    @Autowired
+    private XkrAdminRecycleAgent xkrAdminRecycleAgent;
 
     @Autowired
     private XkrResourceUserAgent xkrResourceUserAgent;
@@ -109,7 +106,7 @@ public class ResourceService {
      * ------------------- 管理员服务 ----------------------
      */
     /**
-     * 管理员搜索
+     * 资源搜索
      *
      * @param keyword
      * @param startDate
@@ -174,6 +171,112 @@ public class ResourceService {
         return new ResponseDTO<>(success);
     }
 
+
+    /**
+     * 批量删除资源
+     *
+     * @param resourceIds
+     * @return
+     */
+    @OptLog(moduleEnum = OptLogModuleEnum.RESOURCE, optEnum = OptEnum.DELETE)
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseDTO<Boolean> batchDeleteResource(List<Long> resourceIds) {
+        if (CollectionUtils.isEmpty(resourceIds)) {
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
+
+        Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_DELETED);
+
+        if (success) {
+            //给用户发送消息
+            Map<Long, String> userContentMapper = Maps.newHashMap();
+            resources.forEach(resource -> {
+                XkrClass xkrClass = xkrClassAgent.getClassById(resource.getClassId());
+                XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
+                xkrAdminRecycleAgent.saveNewResourceRecycle(resource.getId(),resource.getTitle(),
+                        xkrClass.getClassName(),user.getUserName(),adminAccount.getAccountName());
+                userContentMapper.put(resource.getUserId(),
+                        String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_DELETED.getDesc()));
+            });
+            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+        }
+        return new ResponseDTO<>(success);
+    }
+
+    /**
+     * 获取回收站资源
+     * @param pageNum
+     * @param size
+     * @return
+     */
+    public ListResourceRecycleDTO getRecycleResourceList(int pageNum,int size) {
+        ListResourceRecycleDTO listResourceRecycleDTO = new ListResourceRecycleDTO();
+        pageNum = pageNum < 1 ? 1 : pageNum;
+        size = size  < 1 ? 10 : size;
+        Page page = PageHelper.startPage(pageNum,size,"update_time desc");
+        List<XkrResourceRecycle> xkrResourceRecycles = xkrAdminRecycleAgent.getAllListByPage();
+        xkrResourceRecycles.forEach(xkrResourceRecycle -> {
+            ResourceRecycleDTO resourceRecycleDTO = new ResourceRecycleDTO();
+            buildResourceRecycleDTO(resourceRecycleDTO,xkrResourceRecycle);
+            listResourceRecycleDTO.getList().add(resourceRecycleDTO);
+        });
+        listResourceRecycleDTO.setTotalCount((int) page.getTotal());
+        return listResourceRecycleDTO;
+    }
+
+    /**
+     * 批量还原回收站资源
+     *
+     * @param resourceIds
+     * @return
+     */
+    @OptLog(moduleEnum = OptLogModuleEnum.RESOURCE, optEnum = OptEnum.RENEW)
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseDTO<Boolean> batchRenewRecycle(List<Long> resourceIds) {
+        if (CollectionUtils.isEmpty(resourceIds)) {
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
+
+        Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_NORMAL);
+        if (success) {
+            //给用户发送消息
+            Map<Long, String> userContentMapper = Maps.newHashMap();
+            resources.forEach(resource ->
+                    userContentMapper.put(resource.getUserId(),
+                            String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_NORMAL.getDesc())));
+            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+            //清除回收站资源
+            success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
+        }
+        return new ResponseDTO<>(success);
+    }
+
+    /**
+     * 批量清除回收站资源
+     *
+     * @param resourceIds
+     * @return
+     */
+    @OptLog(moduleEnum = OptLogModuleEnum.RESOURCE, optEnum = OptEnum.CLEAR)
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseDTO<Boolean> batchClearRecycle(List<Long> resourceIds) {
+        if (CollectionUtils.isEmpty(resourceIds)) {
+            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        //清除回收站资源
+        boolean success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
+        if(success){
+            //清除资源
+            success = xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
+        }
+        return new ResponseDTO<>(success);
+    }
+
+
     /**
      * ------------------- 用户服务 ----------------------
      */
@@ -226,9 +329,9 @@ public class ResourceService {
         //生成下载token
         try {
             XkrClass xkrClass = xkrClassAgent.getClassById(resource.getClassId());
-            if(Objects.nonNull(xkrClass)){
+            if (Objects.nonNull(xkrClass)) {
                 String[] paths = xkrClass.getPath().split("-");
-                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID ;
+                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID;
 
                 //增加下载数
                 adminIndexRedisService.incDownLoadCount(classType);
@@ -284,7 +387,7 @@ public class ResourceService {
             if (Objects.nonNull(resource)) {
 
                 String[] paths = xkrClass.getPath().split("-");
-                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID ;
+                Integer classType = paths.length > 1 ? Integer.valueOf(paths[1]) : XkrClassAgent.ROOT_CLASS_ID;
 
                 //上传数+1
                 adminIndexRedisService.incrUploadCount(classType);
@@ -324,7 +427,7 @@ public class ResourceService {
             return list;
         }
         String filePrefixName = fileName.split("\\.")[0];
-        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()),resource.getResourceUrl() ,  filePrefixName + "/" + resUri);
+        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), resource.getResourceUrl(), filePrefixName + "/" + resUri);
         return upLoadApiService.getDirInfo(dicPath);
     }
 
@@ -484,8 +587,8 @@ public class ResourceService {
 
         try {
             buildResourceByClassIdsOnSearch(result, classList, orderType, pageNum, size);
-        }catch (Exception e){
-            logger.error("ResourceService getResourcesByClassId buildResourceByClassIdsOnSearch failed searchEngine error,use offline",e);
+        } catch (Exception e) {
+            logger.error("ResourceService getResourcesByClassId buildResourceByClassIdsOnSearch failed searchEngine error,use offline", e);
             buildResourceByClassIdsOnOffline(result, classList, orderType, pageNum, size);
         }
         return result;
@@ -687,6 +790,15 @@ public class ResourceService {
 
     }
 
+    private void buildResourceRecycleDTO(ResourceRecycleDTO resourceRecycleDTO,XkrResourceRecycle xkrResourceRecycle){
+        resourceRecycleDTO.setClassName(xkrResourceRecycle.getClassName());
+        resourceRecycleDTO.setOptName(xkrResourceRecycle.getOptName());
+        resourceRecycleDTO.setResourceId(xkrResourceRecycle.getResourceId());
+        resourceRecycleDTO.setResourceTitle(xkrResourceRecycle.getResourceTitle());
+        resourceRecycleDTO.setUpdateTime(xkrResourceRecycle.getUpdateTime());
+        resourceRecycleDTO.setUserName(xkrResourceRecycle.getUserName());
+    }
+
     private void buildResourceDetailDTO(ResourceDetailDTO detailDTO, XkrResource resource) {
         detailDTO.setDetail(resource.getDetail());
         detailDTO.setCost(resource.getCost());
@@ -713,9 +825,7 @@ public class ResourceService {
         }
 
 
-
     }
-
 
 
 }

@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_resource_comment")
-public class XkrResourceComment {
+public class XkrResourceComment extends BaseEntity{
     /**
      * 评论id
      */

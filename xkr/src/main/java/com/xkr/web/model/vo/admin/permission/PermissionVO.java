@@ -16,15 +16,15 @@ public class PermissionVO implements Serializable{
      "permissionName":"XXX",//权限名称
      */
 
-    private Integer permissionId;
+    private String permissionId;
 
     private String permissionName;
 
-    public Integer getPermissionId() {
+    public String getPermissionId() {
         return permissionId;
     }
 
-    public void setPermissionId(Integer permissionId) {
+    public void setPermissionId(String permissionId) {
         this.permissionId = permissionId;
     }
 

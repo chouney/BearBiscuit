@@ -7,6 +7,8 @@ import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrAdminAccountMapper;
 import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.util.EncodeUtil;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.lucene.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +56,12 @@ public class XkrAdminAccountAgent {
         return xkrAdminAccountMapper.selectByAccountName(accountName);
     }
 
-    public List<XkrAdminAccount> getAdminAccountByRoleId(Integer roleId){
-        if(Objects.isNull(roleId)){
-            return Lists.newArrayList();
-        }
-        return xkrAdminAccountMapper.getAdminAccountByRoleId(roleId);
-    }
+//    public List<XkrAdminAccount> getAdminAccountByRoleId(Integer roleId){
+//        if(Objects.isNull(roleId)){
+//            return Lists.newArrayList();
+//        }
+//        return xkrAdminAccountMapper.getAdminAccountByRoleId(roleId);
+//    }
 
     public List<XkrAdminAccount> getListByIds(List<Long> ids){
         if(CollectionUtils.isEmpty(ids)){
@@ -73,9 +75,9 @@ public class XkrAdminAccountAgent {
     }
 
     public XkrAdminAccount saveNewAdminAccount(String accountName,
-                                    String accountToken,String email,Integer roleId){
+                                    String accountToken,String email,String permissionIds){
         if(StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || Objects.isNull(roleId)){
+                || StringUtils.isEmpty(email) || StringUtils.isEmpty(permissionIds)){
             return null;
         }
         XkrAdminAccount adminAccount = new XkrAdminAccount();
@@ -83,7 +85,7 @@ public class XkrAdminAccountAgent {
         adminAccount.setAccountName(accountName);
         adminAccount.setAccountToken(EncodeUtil.md5(accountToken));
         adminAccount.setEmail(email);
-        adminAccount.setRoleId(roleId);
+        adminAccount.setPermissionIds(permissionIds);
         adminAccount.setStatus((byte)STATUS_NORMAL);
         if(xkrAdminAccountMapper.insertSelective(adminAccount) == 1){
             return adminAccount;
@@ -92,14 +94,14 @@ public class XkrAdminAccountAgent {
     }
 
     public boolean updateAdminAccountById(Long adminAccountId,String accountName,
-                                          String accountToken,String email,Integer roleId){
+                                          String accountToken,String email,String permissionIds){
         if(Objects.isNull(adminAccountId)){
             return false;
         }
         Map<String,Object> param = Maps.newHashMap();
         param.put("id",adminAccountId);
         param.put("accountName",accountName);
-        param.put("roleId",roleId);
+        param.put("permissionIds",permissionIds);
         param.put("email",email);
         if(!StringUtils.isEmpty(accountToken)){
             param.put("accountToken",EncodeUtil.md5(accountToken));

@@ -6,11 +6,8 @@ package com.xkr.core.shiro.admin;
 
 import com.google.common.collect.ImmutableSet;
 import com.xkr.domain.XkrAdminAccountAgent;
-import com.xkr.domain.XkrAdminPermissionAgent;
-import com.xkr.domain.XkrAdminRoleAgent;
 import com.xkr.domain.entity.XkrAdminAccount;
-import com.xkr.domain.entity.XkrAdminRole;
-import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -22,10 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 后台身份校验核心类
@@ -38,12 +32,6 @@ public class AdminShiroRealm extends AuthorizingRealm {
 
     @Autowired
     private XkrAdminAccountAgent adminAccountAgent;
-
-    @Autowired
-    private XkrAdminRoleAgent adminRoleAgent;
-
-    @Autowired
-    private XkrAdminPermissionAgent adminPermissionAgent;
 
 
     @Override
@@ -112,13 +100,14 @@ public class AdminShiroRealm extends AuthorizingRealm {
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         XkrAdminAccount userInfo = (XkrAdminAccount) principals.getPrimaryPrincipal();
-        Set<String> roleIds = ImmutableSet.of(String.valueOf(userInfo.getRoleId()));
-
-        if (Collections.isEmpty(roleIds)) {
+        if(StringUtils.isEmpty(userInfo.getPermissionIds())){
             return authorizationInfo;
         }
 
-        authorizationInfo.setRoles(roleIds);
+        Set<String> permissionIds = ImmutableSet.copyOf(userInfo.getPermissionIds().split(";"));
+
+
+        authorizationInfo.setStringPermissions(permissionIds);
         return authorizationInfo;
     }
 

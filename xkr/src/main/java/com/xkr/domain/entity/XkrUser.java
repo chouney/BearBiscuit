@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_user")
-public class XkrUser implements Serializable{
+public class XkrUser extends BaseEntity implements Serializable{
 
     private static final long serialVersionUID = 4193514178172374190L;
     /**

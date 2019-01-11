@@ -69,7 +69,7 @@ public class CaptchaTestController {
         if(LoginEnum.CUSTOMER.getType().equals(type)){
             userService.createUserAccount(userName,email,EncodeUtil.md5(userToken));
         }else if(LoginEnum.ADMIN.getType().equals(type)){
-            adminService.saveNewAdminAccount(userName,EncodeUtil.md5(userToken),email,1);
+            adminService.saveNewAdminAccount(userName,EncodeUtil.md5(userToken),email,new String[]{"1"});
         }
         return new BasicResult(ErrorStatus.OK);
     }

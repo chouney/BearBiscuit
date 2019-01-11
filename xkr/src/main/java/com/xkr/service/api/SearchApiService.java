@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -111,6 +112,25 @@ public class SearchApiService {
                 request.add(updateRequest);
             });
 
+            BulkResponse responses = client.bulk(request);
+            return RestStatus.OK.equals(responses.status());
+        } catch (IOException e) {
+            // TODO: 2018/5/11 log
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean bulkDeleteIndexStatus(String module, List<Long> docIds) {
+        if (CollectionUtils.isEmpty(docIds)) {
+            return false;
+        }
+        BulkRequest request = new BulkRequest();
+        try {
+            docIds.forEach(docId -> {
+                DeleteRequest deleteRequest = new DeleteRequest(module, module, String.valueOf(docId));
+                request.add(deleteRequest);
+            });
             BulkResponse responses = client.bulk(request);
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {

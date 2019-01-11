@@ -10,7 +10,7 @@ public enum ErrorStatus {
     OK(200,"操作成功"),
     UNLOGIN_REDIRECT(302,"用户未登录"),
     PARAM_ERROR(400,"参数错误"),
-    UNAUTHORIZED(401,"未授权"),
+    UNAUTHORIZED(401,"未登录或者未授权操作"),
     BASIC_AUTH_ERROR(403,"认证异常了"),
     CSRF_TOEKN_ERROR(403,"认证异常"),
     NOT_FOUND(404,"资源未找到"),

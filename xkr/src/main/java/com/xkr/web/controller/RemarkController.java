@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.message.ListMessageDTO;
@@ -13,6 +14,7 @@ import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.message.ListMessageVO;
 import com.xkr.web.model.vo.message.MessageVO;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
@@ -42,9 +44,9 @@ public class RemarkController {
     @Autowired
     private RemarkService remarkService;
 
-    @RequestMapping(value = "/submit", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
+    @RequiresPermissions({PermissionEnum.Constant.REMARK_PERM})
     public BasicResult submitRemark(
             @NotBlank
             @RequestParam(name = "content") String content,

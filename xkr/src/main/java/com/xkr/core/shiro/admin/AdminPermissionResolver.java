@@ -13,6 +13,6 @@ public class AdminPermissionResolver implements PermissionResolver {
 
     @Override
     public Permission resolvePermission(String permissionId) {
-        return new AdminPermission(Integer.valueOf(permissionId));
+        return new AdminPermission(permissionId);
     }
 }

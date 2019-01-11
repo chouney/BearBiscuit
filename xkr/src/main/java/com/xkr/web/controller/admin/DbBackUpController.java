@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
@@ -15,6 +16,8 @@ import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.backup.BackUpVO;
 import com.xkr.web.model.vo.backup.ListBackUpVO;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
@@ -51,6 +54,7 @@ public class DbBackUpController {
      *
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult list() {
@@ -77,6 +81,7 @@ public class DbBackUpController {
      *
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/auto_detail", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult autoDetail() {
@@ -102,6 +107,7 @@ public class DbBackUpController {
      *
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/auto_opt", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
@@ -131,6 +137,7 @@ public class DbBackUpController {
      * @param backUpIds
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/del", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchDelDb(
@@ -155,6 +162,7 @@ public class DbBackUpController {
      * @param backUpId
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/restore", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
@@ -183,6 +191,7 @@ public class DbBackUpController {
      * 手动备份
      * @return
      */
+    @RequiresPermissions(value = {PermissionEnum.Constant.DATABASE_PERM})
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult backup() {

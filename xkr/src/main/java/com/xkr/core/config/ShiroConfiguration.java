@@ -112,11 +112,11 @@ public class ShiroConfiguration {
         return new IdGenerator();
     }
 
-    @Bean(name = "adminRolePermissionResolver")
-    public AdminRolePermissionResolver adminRolePermissionResolver() {
-        logger.debug("ShiroConfiguration.adminRolePermissionResolver()");
-        return new AdminRolePermissionResolver();
-    }
+//    @Bean(name = "adminRolePermissionResolver")
+//    public AdminRolePermissionResolver adminRolePermissionResolver() {
+//        logger.debug("ShiroConfiguration.adminRolePermissionResolver()");
+//        return new AdminRolePermissionResolver();
+//    }
 
     @Bean(name = "customSessionListener")
     public CustomSessionListener customSessionListener() {
@@ -173,7 +173,6 @@ public class ShiroConfiguration {
 
         ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer();
         authorizer.setRealms(shiroAuthorizerRealms);
-        authorizer.setRolePermissionResolver(adminRolePermissionResolver());
         authorizer.setPermissionResolver(new AdminPermissionResolver());
 
         LoginModularRealmAuthenticator loginModularRealmAuthenticator = new LoginModularRealmAuthenticator();

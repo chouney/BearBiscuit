@@ -30,7 +30,7 @@ public class PermissionController {
     private AdminService adminService;
 
     /**
-     * 管理员登出
+     * 权限列表
      *
      * @return
      */

@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_database_backup")
-public class XkrDatabaseBackup {
+public class XkrDatabaseBackup extends BaseEntity{
     /**
      * 数据库备份id
      */

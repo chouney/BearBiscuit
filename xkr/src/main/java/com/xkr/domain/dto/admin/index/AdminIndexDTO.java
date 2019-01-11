@@ -14,7 +14,6 @@ import java.util.List;
 public class AdminIndexDTO extends BaseDTO implements Serializable{
     private static final long serialVersionUID = 8334426097728001569L;
     /**
-     *  "roleName":"角色名称",
      "accountName":"用户名",
      "lastLoginDate":"YYYY-mm-dd HH:MM",
      "loginCount":412, //今日登录人数
@@ -23,8 +22,6 @@ public class AdminIndexDTO extends BaseDTO implements Serializable{
      "downloadCount":412, //今日下载人数
      "userTotalCount":412 //会员总人数
      */
-
-    private String roleName;
 
     private String accountName;
 
@@ -35,14 +32,6 @@ public class AdminIndexDTO extends BaseDTO implements Serializable{
     private ResourceAccountDTO designAccountDTO;
 
     private ResourceAccountDTO resoureAccountDTO;
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
 
     public String getAccountName() {
         return accountName;

@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_login_token")
-public class XkrLoginToken {
+public class XkrLoginToken extends BaseEntity{
     /**
      * 登录tokenId
      */

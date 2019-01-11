@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xkr.dao.mapper.XkrResourceRecycleMapper">
+    <resultMap id="BaseResultMap" type="com.xkr.domain.entity.XkrResourceRecycle">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+        <result column="resource_title" property="resourceTitle" jdbcType="VARCHAR"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="opt_name" property="optName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="ext" property="ext" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="resource_recycle_field">
+    resource_id,resource_title,class_name,user_name,opt_name,
+    create_time,update_time,ext,detail
+  </sql>
+
+    <delete id="batchDeleteResourceRecycleByIds" parameterType="java.util.List">
+        DELETE FROM xkr_resource_recycle WHERE resource_id IN
+        <foreach collection="resourceIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

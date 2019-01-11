@@ -2,6 +2,7 @@ package com.xkr.web.handler;
 
 import com.xkr.common.ErrorStatus;
 import com.xkr.web.model.BasicResult;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,4 +29,14 @@ public class XkrExceptionHandler {
     public BasicResult authorizationExceptionHandler(Exception e) {
         return new BasicResult(ErrorStatus.UNAUTHORIZED);
     }
+
+    /**
+     * 权限异常
+     */
+    @ExceptionHandler({AuthorizationException.class })
+    @ResponseBody
+    public BasicResult authorizationException(Exception e) {
+        return new BasicResult(ErrorStatus.UNAUTHORIZED);
+    }
+
 }

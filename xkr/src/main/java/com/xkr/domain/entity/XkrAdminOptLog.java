@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_admin_opt_log")
-public class XkrAdminOptLog {
+public class XkrAdminOptLog extends BaseEntity{
     /**
      * 评论id
      */

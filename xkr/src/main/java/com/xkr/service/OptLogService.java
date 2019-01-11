@@ -60,7 +60,7 @@ public class OptLogService {
         ListOptLogDTO result = new ListOptLogDTO();
         pageNum = pageNum < 1 ? 1 : pageNum;
         size = size  < 1 ? 10 : size;
-        Page page = PageHelper.startPage(pageNum,size,true);
+        Page page = PageHelper.startPage(pageNum,size,"update_time desc");
         List<XkrAdminOptLog> list = xkrAdminOptLogAgent.getAllList(adminAccountId);
         result.setTotalCount((int) page.getTotal());
 

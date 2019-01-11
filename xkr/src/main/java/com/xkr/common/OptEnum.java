@@ -11,6 +11,8 @@ public enum OptEnum {
     DELETE(2,"删除"),
     UPDATE(3,"修改"),
     QUERY(4,"查询"),
+    RENEW(5,"回收站还原"),
+    CLEAR(6,"回收站删除"),
 
 
     ;

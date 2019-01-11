@@ -41,9 +41,9 @@ public class EncodeUtil {
         return new SimpleHash("sha-1",source).toHex();
     }
 
-//    public static void main(String[] args){
-//        System.out.println(new SimpleHash("sha-1","admin").toHex());
-//    }
+    public static void main(String[] args){
+        System.out.println(new SimpleHash("md5","admin").toHex());
+    }
 
     /**
      * 生成邮箱验证码

@@ -78,7 +78,6 @@ public class AdminIndexController {
             buildResourceAccountVO(resourceAccountVO, adminIndexDTO.getResoureAccountDTO());
         }
         adminIndexVO.setLastLoginDate(adminIndexDTO.getLastLoginDate());
-        adminIndexVO.setRoleName(adminIndexDTO.getRoleName());
         adminIndexVO.setAccountName(adminIndexDTO.getAccountName());
 
         adminIndexVO.setUser(userAccountVO);

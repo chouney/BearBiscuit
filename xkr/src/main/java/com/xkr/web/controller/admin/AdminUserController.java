@@ -3,6 +3,7 @@ package com.xkr.web.controller.admin;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.PermissionEnum;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.user.ListUserDetailDTO;
 import com.xkr.domain.dto.user.UserDTO;
@@ -14,6 +15,7 @@ import com.xkr.web.model.vo.user.ListUserDetailVO;
 import com.xkr.web.model.vo.user.UserDetailVO;
 import com.xkr.web.model.vo.user.UserVO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
@@ -53,6 +55,7 @@ public class AdminUserController {
      *
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.USER_PERM)
     @RequestMapping(value = "/search", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult<ListUserDetailVO> getUserListBySearchWord(
@@ -90,6 +93,7 @@ public class AdminUserController {
      *
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.USER_PERM)
     @MethodValidate
     @RequestMapping(value = "/opt", method = {RequestMethod.POST})
     @ResponseBody

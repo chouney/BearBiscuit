@@ -10,12 +10,12 @@ import java.util.Map;
 @Service
 public interface XkrAdminAccountMapper extends CustomerMapper<XkrAdminAccount> {
 
-    /**
-     * 目前role_ids字段只存储单个角色id
-     * @param roleId
-     * @return
-     */
-    List<XkrAdminAccount> getAdminAccountByRoleId(Integer roleId);
+//    /**
+//     * 目前role_ids字段只存储单个角色id
+//     * @param roleId
+//     * @return
+//     */
+//    List<XkrAdminAccount> getAdminAccountByRoleId(Integer roleId);
 
     Integer updateAdminAccountById(Map<String,Object> params);
 

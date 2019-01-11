@@ -37,6 +37,19 @@ CREATE TABLE xkr_resource(
 	INDEX `idx_user_sta` (`user_id`,`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源表';
 
+DROP TABLE IF EXISTS `xkr_resource_recycle`;
+CREATE TABLE xkr_resource_recycle(
+	`resource_id` bigint(20) UNSIGNED NOT NULL COMMENT '资源id',
+	`resource_title`varchar(255) NOT NULL COMMENT '文件标题,80字内',
+	`class_name` varchar(64) NOT NULL COMMENT '分类名,长度限制20',
+	`user_name` varchar(64) NOT NULL COMMENT '用户名,长度限制20字内',
+	`opt_name` varchar(64) NOT NULL COMMENT '管理员名称',
+	`create_time` DATETIME COMMENT '创建时间',
+	`update_time` DATETIME COMMENT '更新时间',
+	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段，存储download_count，resource_url等',
+	PRIMARY KEY (`resource_id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源回收站表';
+
 DROP TABLE IF EXISTS `xkr_user`;
 CREATE TABLE xkr_user(
 	`id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
@@ -100,6 +113,9 @@ CREATE TABLE xkr_class(
 	PRIMARY KEY (`id`),
 	INDEX `idx_sta` (`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='栏目表';
+insert into xkr_class values('0','0','0','root','1',current_timestamp(),current_timestamp(),'{}');
+insert into xkr_class values('1','0','0-1','毕业设计','1',current_timestamp(),current_timestamp(),'{}');
+insert into xkr_class values('2','0','0-2','资源','1',current_timestamp(),current_timestamp(),'{}');
 
 DROP TABLE IF EXISTS `xkr_resource_comment`;
 CREATE TABLE xkr_resource_comment(
@@ -156,7 +172,7 @@ CREATE TABLE xkr_admin_account(
 	`account_name` varchar(64) NOT NULL COMMENT '管理员名称',
 	`account_token` varchar(255) NOT NULL COMMENT '管理员token',
 	`email` varchar(64) NOT NULL DEFAULT '' COMMENT '邮箱,长度限制64',
-	`role_id` int(10) NOT NULL COMMENT '账号角色id',
+	`permission_ids` varchar(255) NOT NULL COMMENT '权限id,以;分割',
 	`status` tinyint(4) NOT NULL COMMENT '账号状态',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -165,32 +181,7 @@ CREATE TABLE xkr_admin_account(
 	INDEX `idx_sta_up` (`status`,`update_time`),
 	INDEX `idx_name_sta` (`account_name`,`status`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理员表';
-
-DROP TABLE IF EXISTS `xkr_admin_role`;
-CREATE TABLE xkr_admin_role(
-	`id` int(10) NOT NULL AUTO_INCREMENT COMMENT '角色id',
-	`role_name` varchar(20) NOT NULL COMMENT '角色名称',
-	`permission_ids` varchar(255) NOT NULL COMMENT '权限id,以;分割',
-	`status` tinyint(4) NOT NULL COMMENT '角色状态',
-	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段',
-	PRIMARY KEY (`id`),
-	INDEX `idx_sta_up` (`status`,`update_time`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色表';
-
-
-DROP TABLE IF EXISTS `xkr_admin_permission`;
-CREATE TABLE xkr_admin_permission(
-	`id` int(10) NOT NULL AUTO_INCREMENT COMMENT '权限id',
-	`permission_name` varchar(20) NOT NULL COMMENT '权限名称',
-	`status` tinyint(4) NOT NULL COMMENT '权限状态',
-	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段',
-	PRIMARY KEY (`id`),
-	INDEX `idx_sta_up` (`status`,`update_time`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='权限表';
+insert into xkr_admin_account values('6476825075076045938','admin','c3284d0f94606de1fd2af172aba15bf3','administrator@sharecoder.cn','1;2;3;4;5;6;7;8;9;10','1',current_timestamp(),current_timestamp(),'{}');
 
 DROP TABLE IF EXISTS `xkr_pay_order`;
 CREATE TABLE xkr_pay_order(

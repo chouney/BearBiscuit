@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_about_remark")
-public class XkrAboutRemark {
+public class XkrAboutRemark extends BaseEntity{
     /**
      * 留言d
      */

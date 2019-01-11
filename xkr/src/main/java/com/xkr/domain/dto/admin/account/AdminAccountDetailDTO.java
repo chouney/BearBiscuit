@@ -18,7 +18,7 @@ public class AdminAccountDetailDTO extends BaseDTO implements Serializable{
      * adminAccountId":"12412431124",
      "accountName":"得得得",
      "email":"qweqwe@xx.c",
-     "roleId":"14214124124"
+     "permissionIds":"14214124124"
      */
 
     private Long adminAccountId;
@@ -27,7 +27,7 @@ public class AdminAccountDetailDTO extends BaseDTO implements Serializable{
 
     private String email;
 
-    private Integer roleId;
+    private String[] permissionIds;
 
     public Long getAdminAccountId() {
         return adminAccountId;
@@ -53,11 +53,11 @@ public class AdminAccountDetailDTO extends BaseDTO implements Serializable{
         this.email = email;
     }
 
-    public Integer getRoleId() {
-        return roleId;
+    public String[] getPermissionIds() {
+        return permissionIds;
     }
 
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
+    public void setPermissionIds(String[] permissionIds) {
+        this.permissionIds = permissionIds;
     }
 }

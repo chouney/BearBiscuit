@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_class")
-public class XkrClass {
+public class XkrClass extends BaseEntity{
     /**
      * 分类id
      */

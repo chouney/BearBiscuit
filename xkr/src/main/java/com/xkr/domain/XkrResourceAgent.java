@@ -114,14 +114,28 @@ public class XkrResourceAgent {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    public Boolean batchPhysicDeleteResourceByIds(List<Long> resourceIds){
+        if (CollectionUtils.isEmpty(resourceIds) ) {
+            return false;
+        }
+        logger.info("XkrResourceAgent batchPhysicDeleteResourceByIds params:{}",JSON.toJSONString(resourceIds));
+        boolean isSuccess = xkrResourceMapper.batchDeleteResourceByIds(resourceIds) == 1;
+        if(isSuccess){
+            if (!searchApiService.bulkDeleteIndexStatus("resource", resourceIds)) {
+                logger.error("XkrResourceAgent bulkDeleteIndexStatus failed ,resourceIds:{}", JSON.toJSONString(resourceIds));
+                throw new RuntimeException();
+            }
+        }
+        return isSuccess;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public Boolean batchUpdateResourceByIds(List<Long> resourceIds, ResourceStatusEnum status) {
         if (CollectionUtils.isEmpty(resourceIds) || Objects.isNull(status)) {
             return false;
         }
         boolean isSuccess = false;
-        if (ResourceStatusEnum.STATUS_PHYSICAL_DELETED.equals(status)) {
-            isSuccess = xkrResourceMapper.batchDeleteResourceByIds(resourceIds) == 1;
-        } else if (ResourceStatusEnum.TOUPDATE_STATUSED.contains(status)) {
+        if (ResourceStatusEnum.TOUPDATE_STATUSED.contains(status)) {
             isSuccess = xkrResourceMapper.batchUpdateResourceByIds(ImmutableMap.of(
                     "list", resourceIds, "status", status.getCode()
             )) > 0;

@@ -28,7 +28,7 @@ public class AdminAccountDetailVO implements Serializable{
 
     private String email;
 
-    private Integer roleId;
+    private String[] permissionIds;
 
     public Long getAdminAccountId() {
         return adminAccountId;
@@ -54,11 +54,12 @@ public class AdminAccountDetailVO implements Serializable{
         this.email = email;
     }
 
-    public Integer getRoleId() {
-        return roleId;
+    public String[] getPermissionIds() {
+        return permissionIds;
     }
 
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
+    public void setPermissionIds(String[] permissionIds) {
+        this.permissionIds = permissionIds;
     }
+
 }

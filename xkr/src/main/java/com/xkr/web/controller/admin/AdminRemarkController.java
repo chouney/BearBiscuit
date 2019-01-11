@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.LoginEnum;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.remark.ListRemarkDTO;
@@ -15,6 +16,7 @@ import com.xkr.web.model.vo.remark.ListRemarkVO;
 import com.xkr.web.model.vo.remark.RemarkDetailVO;
 import com.xkr.web.model.vo.remark.RemarkVO;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
@@ -46,6 +48,7 @@ public class AdminRemarkController {
     @Autowired
     private RemarkService remarkService;
 
+    @RequiresPermissions(PermissionEnum.Constant.REMARK_PERM)
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult getAllRemarkList(
@@ -70,6 +73,7 @@ public class AdminRemarkController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    @RequiresPermissions(PermissionEnum.Constant.REMARK_PERM)
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
     @MethodValidate
@@ -99,6 +103,7 @@ public class AdminRemarkController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    @RequiresPermissions(PermissionEnum.Constant.REMARK_PERM)
     @RequestMapping(value = "/del", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchDeleteRemarks(
@@ -120,6 +125,7 @@ public class AdminRemarkController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    @RequiresPermissions(PermissionEnum.Constant.REMARK_PERM)
     @RequestMapping(value = "/reply", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate

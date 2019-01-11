@@ -9,7 +9,7 @@
         <result column="account_name" property="accountName" jdbcType="VARCHAR"/>
         <result column="account_token" property="accountToken" jdbcType="VARCHAR"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
-        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="permission_ids" property="permissionIds" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="TINYINT"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -17,7 +17,7 @@
     </resultMap>
 
     <sql id="admin_fields">
-    id,account_name,account_token,email,role_id,status,create_time,update_time,ext
+    id,account_name,account_token,email,permission_ids,status,create_time,update_time,ext
   </sql>
 
     <update id="updateAdminAccountById" parameterType="java.util.Map">
@@ -32,8 +32,8 @@
             <if test="email!=null">
                 email = #{email} ,
             </if>
-            <if test="roleId!=null">
-                role_id = #{roleId} ,
+            <if test="permissionIds!=null">
+                permission_ids = #{permissionIds} ,
             </if>
         </trim>
         update_time = now()
@@ -79,11 +79,11 @@
         AND status = 1
     </select>
 
-    <select id="getAdminAccountByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        SELECT
-        <include refid="admin_fields"/>
-        FROM xkr_admin_account WHERE role_id = #{roleId}
-        AND status = 1
-    </select>
+    <!--<select id="getAdminAccountByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">-->
+        <!--SELECT-->
+        <!--<include refid="admin_fields"/>-->
+        <!--FROM xkr_admin_account WHERE role_id = #{roleId}-->
+        <!--AND status = 1-->
+    <!--</select>-->
 
 </mapper>

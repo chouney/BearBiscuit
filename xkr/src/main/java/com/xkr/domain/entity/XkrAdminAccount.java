@@ -33,10 +33,10 @@ public class XkrAdminAccount extends BaseEntity implements Serializable{
     private String email;
 
     /**
-     * 账号角色,以;分割
+     * 权限id,以;分割
      */
-    @Column(name = "role_id")
-    private Integer roleId;
+    @Column(name = "permission_ids")
+    private String permissionIds;
 
     /**
      * 账号状态
@@ -132,22 +132,12 @@ public class XkrAdminAccount extends BaseEntity implements Serializable{
         this.email = email;
     }
 
-    /**
-     * 获取账号角色,账号角色id
-     *
-     * @return role_id - 账号角色,账号角色id
-     */
-    public Integer getRoleId() {
-        return roleId;
+    public String getPermissionIds() {
+        return permissionIds;
     }
 
-    /**
-     * 设置账号角色,账号角色id
-     *
-     * @param roleId 账号角色,账号角色id
-     */
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
+    public void setPermissionIds(String permissionIds) {
+        this.permissionIds = permissionIds;
     }
 
     /**

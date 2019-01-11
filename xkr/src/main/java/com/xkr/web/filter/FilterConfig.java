@@ -76,8 +76,6 @@ public class FilterConfig {
         filterChainDefinitionMap.put("/api/res/detail", "anon");
         filterChainDefinitionMap.put("/api/res/res_list", "anon");
         filterChainDefinitionMap.put("/api/res/search_list", "anon");
-        filterChainDefinitionMap.put("/api/res/search_list", "anon");
-        filterChainDefinitionMap.put("/api/res/search_list", "anon");
 
         filterChainDefinitionMap.put("/api/cls/list", "anon");
 

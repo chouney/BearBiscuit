@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_resource_user")
-public class XkrResourceUser {
+public class XkrResourceUser extends BaseEntity{
     /**
      * id
      */

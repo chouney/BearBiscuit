@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_pay_order")
-public class XkrPayOrder {
+public class XkrPayOrder extends BaseEntity{
     /**
      * 账单id
      */
