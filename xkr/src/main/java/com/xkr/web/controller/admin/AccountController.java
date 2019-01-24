@@ -10,11 +10,14 @@ import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.admin.account.AdminAccountDetailDTO;
 import com.xkr.domain.dto.admin.account.ListAdminAccountDTO;
+import com.xkr.domain.entity.XkrAdminAccount;
 import com.xkr.service.AdminService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.admin.account.AdminAccountDetailVO;
 import com.xkr.web.model.vo.admin.account.AdminAccountVO;
 import com.xkr.web.model.vo.admin.account.ListAdminAccountVO;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
@@ -24,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -143,15 +148,20 @@ public class AccountController {
      */
     @RequestMapping(value = "/detail", method = {RequestMethod.GET})
     @ResponseBody
-    @MethodValidate
     public BasicResult getAccountDetail(
-            @IsNumberic
-            @RequestParam(name = "adminAccountId") String adminAccountId,
-            ValidResult result) {
-        if (result.hasErrors()) {
-            return new BasicResult(result);
-        }
+            @RequestParam(name = "adminAccountId",required = false) String adminAccountId) {
         try {
+            if(StringUtils.isEmpty(adminAccountId)){
+                //如果用户未登录则报参数异常
+                Object obj = SecurityUtils.getSubject().getPrincipal();
+                if(Objects.isNull(obj)){
+                    return new BasicResult(ErrorStatus.PARAM_ERROR);
+                }
+                XkrAdminAccount xkrAdminAccount = (XkrAdminAccount)obj;
+
+                //如果用户登录则默认去用户权限
+                adminAccountId = String.valueOf(xkrAdminAccount.getId());
+            }
             AdminAccountDetailDTO adminAccountDetailDTO = adminService.getAdminAccountDetailById(Long.valueOf(adminAccountId));
 
             if (!ErrorStatus.OK.equals(adminAccountDetailDTO.getStatus())) {
