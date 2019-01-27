@@ -169,6 +169,10 @@ public class AdminService {
 //        if(StringUtils.isEmpty(strPermissionIds)){
 //            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
 //        }
+        XkrAdminAccount xkrAdminAccount = xkrAdminAccountAgent.getAdminAccountByName(accountName);
+        if(Objects.nonNull(xkrAdminAccount)){
+            return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
+        }
         XkrAdminAccount newAccount = xkrAdminAccountAgent.saveNewAdminAccount(accountName, accountToken, email, strPermissionIds);
         if (Objects.isNull(newAccount)) {
             return new ResponseDTO<>(ErrorStatus.ERROR);
