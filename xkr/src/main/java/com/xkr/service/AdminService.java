@@ -159,8 +159,11 @@ public class AdminService {
     @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.INSERT)
     public ResponseDTO<Long> saveNewAdminAccount(String accountName, String accountToken, String email, String[] permissionIds) {
         if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || ArrayUtils.isEmpty(permissionIds)) {
+                || StringUtils.isEmpty(email) ) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        if(ArrayUtils.isEmpty(permissionIds)){
+            permissionIds = new String[]{};
         }
         String strPermissionIds = String.join(";",permissionIds);
         if(StringUtils.isEmpty(strPermissionIds)){
@@ -186,8 +189,11 @@ public class AdminService {
     @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> updateAdminAccountById(Long adminAccountId, String accountName, String accountToken, String email, String[] permissionIds) {
         if (Objects.isNull(adminAccountId) || StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || ArrayUtils.isEmpty(permissionIds)) {
+                || StringUtils.isEmpty(email)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
+        }
+        if(ArrayUtils.isEmpty(permissionIds)){
+            permissionIds = new String[]{};
         }
         String strPermissionIds = String.join(";",permissionIds);
         if(StringUtils.isEmpty(strPermissionIds)){
