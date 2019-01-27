@@ -219,12 +219,14 @@ public class UpLoadApiService {
         LocalDateTime date = LocalDateTime.now();
         String picPath = String.format(IMAGE_FILE_PATH_FORMAT, date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                 date.getHour(), date.getMinute(), date.getSecond(), md5FileName);
-        boolean isSuccess = imageYun.writeFile(picPath, imageFile, true);
-        if (!isSuccess) {
+        try {
+            imageYun.writeFile(picPath, imageFile, true);
+        } catch (Exception e){
             logger.info("云盘服务上传图片失败,回滚删除图片,md5FileName:{},imageFile:{}", md5FileName, imageFile.getName());
             deleteFile(picPath, false);
+            return false;
         }
-        return isSuccess;
+        return true;
     }
 
     /**
@@ -243,12 +245,14 @@ public class UpLoadApiService {
             throw new UpFileExistException("file already exist,filePath:"+filePath);
         }
         upYun.setContentMD5(md5FileName);
-        boolean isSuccess = upYun.writeFile(filePath, file, auto);
-        if (!isSuccess) {
+        try {
+            upYun.writeFile(filePath, file, auto);
+        }catch (Exception e){
             logger.info("云盘服务上传压缩文件失败,回滚删除压缩文件,userId:{},md5FileName:{},file:{}", userId, md5FileName, file.getName());
             deleteFile(filePath, false);
+            return false;
         }
-        return isSuccess;
+        return true;
     }
 
     /**
