@@ -77,7 +77,7 @@ public class XkrAdminAccountAgent {
     public XkrAdminAccount saveNewAdminAccount(String accountName,
                                     String accountToken,String email,String permissionIds){
         if(StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email) || StringUtils.isEmpty(permissionIds)){
+                || StringUtils.isEmpty(email)){
             return null;
         }
         XkrAdminAccount adminAccount = new XkrAdminAccount();
