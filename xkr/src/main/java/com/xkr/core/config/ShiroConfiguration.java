@@ -50,9 +50,6 @@ public class ShiroConfiguration {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("{shiro.remember.cookie.expire }")
-    private Integer rememberExpireTime;
-
     private final static String REMEMBER_COOKIE_ENCODE_KEY = EncodeUtil.encBase64("XKR_REM_COOKIE");
 
     /**
@@ -174,7 +171,7 @@ public class ShiroConfiguration {
         Cookie cookie = new SimpleCookie(Const.SESSION_REMEMBER_COOKIE_NAME);
         cookie.setDomain("xkr.com");
         //1 hour
-        cookie.setMaxAge(rememberExpireTime);
+        cookie.setMaxAge(Const.REMEMBER_COOKIE_EXPIRE);
         cookie.setHttpOnly(true);
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(cookie);

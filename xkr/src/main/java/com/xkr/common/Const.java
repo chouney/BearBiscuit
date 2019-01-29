@@ -30,4 +30,6 @@ public class Const {
     //邮箱验证时间长度(分钟)
     public static final int VALIDATE_SESSION_EXPIRE = 60;
 
+    public static final int REMEMBER_COOKIE_EXPIRE = 2592000;
+
 }
