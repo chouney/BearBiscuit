@@ -12,6 +12,7 @@ import com.xkr.core.shiro.LoginModularRealmAuthenticator;
 import com.xkr.core.shiro.user.UserShiroRealm;
 import com.xkr.core.shiro.admin.*;
 import com.xkr.core.shiro.user.UserCredentialsMatcher;
+import com.xkr.util.EncodeUtil;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
@@ -22,6 +23,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -47,6 +49,11 @@ import java.util.*;
 public class ShiroConfiguration {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Value("{shiro.remember.cookie.expire }")
+    private Integer rememberExpireTime;
+
+    private final static String REMEMBER_COOKIE_ENCODE_KEY = EncodeUtil.encBase64("XKR_REM_COOKIE");
 
     /**
      * 前台身份认证realm;
@@ -144,7 +151,7 @@ public class ShiroConfiguration {
         //是否开启 检测，默认开启
         sessionManager.setSessionValidationSchedulerEnabled(false);
         //创建会话Cookie
-        Cookie cookie = new SimpleCookie(Const.SESSION_COOKIE_NAME);
+        Cookie cookie = new SimpleCookie();
         cookie.setName("WEBID");
         cookie.setDomain("xkr.com");
         //1 hour
@@ -153,6 +160,29 @@ public class ShiroConfiguration {
         sessionManager.setSessionIdCookie(cookie);
         return sessionManager;
     }
+
+    /**
+     * 17   * cookie管理对象;
+     * 18   * rememberMeManager()方法是生成rememberMe管理器，而且要将这个rememberMe管理器设置到securityManager中
+     * 19   * @return
+     * 20
+     */
+    @Bean
+    public CookieRememberMeManager rememberMeManager() {
+        //System.out.println("ShiroConfiguration.rememberMeManager()");
+        //创建会话Cookie
+        Cookie cookie = new SimpleCookie(Const.SESSION_REMEMBER_COOKIE_NAME);
+        cookie.setDomain("xkr.com");
+        //1 hour
+        cookie.setMaxAge(rememberExpireTime);
+        cookie.setHttpOnly(true);
+        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+        cookieRememberMeManager.setCookie(cookie);
+        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
+        cookieRememberMeManager.setCipherKey(REMEMBER_COOKIE_ENCODE_KEY.getBytes());
+        return cookieRememberMeManager;
+    }
+
 
     /**
      * @return
@@ -184,6 +214,7 @@ public class ShiroConfiguration {
         //注入缓存管理器;
         securityManager.setCacheManager(redisCacheManager());
         securityManager.setSessionManager(defaultWebSessionManager());
+        securityManager.setRememberMeManager(rememberMeManager());
         return securityManager;
     }
 
@@ -201,8 +232,6 @@ public class ShiroConfiguration {
         authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
         return authorizationAttributeSourceAdvisor;
     }
-
-
 
 
     /**
@@ -262,7 +291,7 @@ public class ShiroConfiguration {
     }
 
     @Bean(name = "SecureRandomNumberGenerator")
-    public SecureRandomNumberGenerator getSecureRandomNumberGenerator(){
+    public SecureRandomNumberGenerator getSecureRandomNumberGenerator() {
         return new SecureRandomNumberGenerator();
     }
 }
