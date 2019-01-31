@@ -39,8 +39,8 @@ public class FilterConfig {
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         //增加自定义过滤
         Map<String, Filter> filters = new HashMap<>();
-        filters.put("adminLogin",new AdminLoginShiroFilter());
-        filters.put("userLogin",new UserLoginShiroFilter());
+        filters.put("adminLogin",getAdminLoginShiroFilter());
+        filters.put("userLogin",getUserLoginShiroFilter());
         shiroFilterFactoryBean.setFilters(filters);
         //拦截器.
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
@@ -65,6 +65,7 @@ public class FilterConfig {
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
         //可以未登录访问的链接
         filterChainDefinitionMap.put("/**/login", "anon");
+        // TODO: 2019/1/31 清除
         filterChainDefinitionMap.put("/test/**", "anon");
 
         filterChainDefinitionMap.put("/api/user/reg", "anon");
@@ -96,14 +97,14 @@ public class FilterConfig {
         return shiroFilterFactoryBean;
     }
 
-//    @Bean(name = "userLoginShiroFilter")
-//    public UserLoginShiroFilter getUserLoginShiroFilter(){
-//        return new UserLoginShiroFilter();
-//    }
-//
-//    @Bean(name = "adminLoginShiroFilter")
-//    public AdminLoginShiroFilter getAdminLoginShiroFilter(){
-//        return new AdminLoginShiroFilter();
-//    }
+    @Bean(name = "userLoginShiroFilter")
+    public UserLoginShiroFilter getUserLoginShiroFilter(){
+        return new UserLoginShiroFilter();
+    }
+
+    @Bean(name = "adminLoginShiroFilter")
+    public AdminLoginShiroFilter getAdminLoginShiroFilter(){
+        return new AdminLoginShiroFilter();
+    }
 
 }

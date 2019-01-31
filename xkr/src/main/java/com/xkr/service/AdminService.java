@@ -204,7 +204,7 @@ public class AdminService {
 //            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
 //        }
         XkrAdminAccount xkrAdminAccount = xkrAdminAccountAgent.getAdminAccountByName(accountName);
-        if(Objects.nonNull(xkrAdminAccount)){
+        if(Objects.nonNull(xkrAdminAccount) && !xkrAdminAccount.getId().equals(adminAccountId)){
             return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
         }
         return new ResponseDTO<>(xkrAdminAccountAgent.updateAdminAccountById(adminAccountId, accountName, accountToken, email, strPermissionIds));

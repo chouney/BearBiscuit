@@ -21,7 +21,9 @@ public enum PermissionEnum {
     DESIGN_PERM("7", "毕设管理"),
     DATABASE_PERM("8", "数据库"),
     PAY_PERM("9", "支付管理"),
-    LOG_PERM("10", "日志"),;
+    LOG_PERM("10", "日志"),
+    PERMISSION_PERM("11", "权限管理"),
+    ;
     private String permissionId;
     private String permissionName;
 
@@ -66,6 +68,7 @@ public enum PermissionEnum {
         public static final String DATABASE_PERM = "8";
         public static final String PAY_PERM = "9";
         public static final String LOG_PERM = "10";
+        public static final String PERMISSION_PERM = "11";
     }
 }
 

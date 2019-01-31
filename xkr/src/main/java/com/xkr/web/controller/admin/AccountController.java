@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.PermissionEnum;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.core.shiro.LoginAuthenticationToken;
@@ -17,10 +18,12 @@ import com.xkr.web.model.vo.admin.account.AdminAccountDetailVO;
 import com.xkr.web.model.vo.admin.account.AdminAccountVO;
 import com.xkr.web.model.vo.admin.account.ListAdminAccountVO;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -118,6 +121,7 @@ public class AccountController {
      * @param size
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.PERMISSION_PERM)
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult getAccountList(
@@ -184,6 +188,7 @@ public class AccountController {
      *
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.PERMISSION_PERM)
     @MethodValidate
     @RequestMapping(value = "/add", method = {RequestMethod.POST})
     @ResponseBody
@@ -221,6 +226,7 @@ public class AccountController {
      *
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.PERMISSION_PERM)
     @MethodValidate
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     @ResponseBody
@@ -231,7 +237,6 @@ public class AccountController {
             @RequestParam(name = "accountName") String accountName,
             @NotBlank
             @RequestParam(name = "accountToken") String accountToken,
-            @NotEmpty
             @RequestParam(name = "permissionIds[]") String[] permissionIds,
             @Email
             @RequestParam(name = "email") String email,
@@ -260,6 +265,7 @@ public class AccountController {
      * @param adminAccountIds
      * @return
      */
+    @RequiresPermissions(PermissionEnum.Constant.PERMISSION_PERM)
     @RequestMapping(value = "/del", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchDelAccount(
