@@ -31,7 +31,7 @@ public class FilterConfig {
      * 2、当设置多个过滤器时，全部验证通过，才视为通过
      * 3、部分过滤器可指定参数，如perms，roles
      */
-    @Bean(name = "shirFilter")
+    @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean shirFilter(DefaultWebSecurityManager securityManager) {
         LOGGER.debug("ShiroConfiguration.shirFilter()");
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();

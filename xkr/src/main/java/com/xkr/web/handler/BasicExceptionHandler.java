@@ -51,10 +51,11 @@ public class BasicExceptionHandler extends BasicErrorController {
                 "data", ImmutableMap.of(),
                 "ext", Collections.EMPTY_MAP
         );
-        LinkedMultiValueMap map = new LinkedMultiValueMap();
-        map.put("Access-Control-Allow-Origin", Lists.newArrayList("*"));
-
-        return new ResponseEntity<Map<String, Object>>(body,map ,status);
+//        LinkedMultiValueMap map = new LinkedMultiValueMap();
+//        map.put("Access-Control-Allow-Origin", Lists.newArrayList("*"));
+//        map.put("Content-Type", Lists.newArrayList("application/json;charset=UTF-8"));
+//
+        return new ResponseEntity<Map<String, Object>>(body ,status);
     }
 
 }

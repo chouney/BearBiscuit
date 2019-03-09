@@ -68,7 +68,7 @@ public class UserController {
             @Length(min = 6,max = 15,message = "用户名长度需在{min}和{max}之间")
             @RequestParam(name = "userName") String userName,
             @NotBlank
-            @Length(min = 6,max = 15,message = "密码长度需在{min}和{max}之间")
+//            @Length(min = 6,max = 15,message = "密码长度需在{min}和{max}之间")
             @RequestParam(name = "userToken") String userToken,
             @Email
             @RequestParam(name = "email") String email,

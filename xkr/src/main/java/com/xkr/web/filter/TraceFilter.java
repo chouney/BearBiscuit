@@ -7,6 +7,7 @@ package com.xkr.web.filter;
 import com.alibaba.fastjson.JSON;
 import com.xkr.util.IpUtil;
 import com.xkr.util.UuidUtil;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.shiro.web.servlet.AdviceFilter;
 import org.slf4j.Logger;
@@ -49,8 +50,11 @@ public class TraceFilter extends AdviceFilter {
     @Override
     protected void postHandle(ServletRequest request, ServletResponse response) throws Exception {
         //白名单控制跨域
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        httpServletResponse.setHeader("Access-Control-Allow-Origin","*");
+        ResponseFacade responseFacade = (ResponseFacade) response;
+        responseFacade.setCharacterEncoding("UTF-8");
+        responseFacade.setContentType("application/json");
+//        responseFacade.setHeader("Access-Control-Allow-Origin","*");
+//        System.out.println(JSON.toJSONString(responseFacade.getHeaderNames()));
     }
 
 }
