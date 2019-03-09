@@ -97,12 +97,12 @@ public class FilterConfig {
         return shiroFilterFactoryBean;
     }
 
-    @Bean(name = "userLoginShiroFilter")
+//    @Bean(name = "userLoginShiroFilter")
     public UserLoginShiroFilter getUserLoginShiroFilter(){
         return new UserLoginShiroFilter();
     }
 
-    @Bean(name = "adminLoginShiroFilter")
+//    @Bean(name = "adminLoginShiroFilter")
     public AdminLoginShiroFilter getAdminLoginShiroFilter(){
         return new AdminLoginShiroFilter();
     }

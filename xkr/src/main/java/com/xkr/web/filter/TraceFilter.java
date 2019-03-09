@@ -17,6 +17,7 @@ import org.springframework.core.annotation.Order;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * author xkr
@@ -43,6 +44,13 @@ public class TraceFilter extends AdviceFilter {
         MDC.put("traceId",traceId);
         logger.info("HttpRequst ip:{},uri:{},paramterMap:{}",ip,httpServletRequest.getRequestURI(),JSON.toJSONString(request.getParameterMap()));
         return true;
+    }
+
+    @Override
+    protected void postHandle(ServletRequest request, ServletResponse response) throws Exception {
+        //白名单控制跨域
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setHeader("Access-Control-Allow-Origin","*");
     }
 
 }

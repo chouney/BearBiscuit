@@ -1,6 +1,8 @@
 package com.xkr.web.handler;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.xkr.common.ErrorStatus;
 import org.springframework.boot.autoconfigure.web.BasicErrorController;
 import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
@@ -9,6 +11,8 @@ import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +51,10 @@ public class BasicExceptionHandler extends BasicErrorController {
                 "data", ImmutableMap.of(),
                 "ext", Collections.EMPTY_MAP
         );
-        return new ResponseEntity<>(body, status);
+        LinkedMultiValueMap map = new LinkedMultiValueMap();
+        map.put("Access-Control-Allow-Origin", Lists.newArrayList("*"));
+
+        return new ResponseEntity<Map<String, Object>>(body,map ,status);
     }
 
 }
