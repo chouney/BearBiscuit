@@ -47,14 +47,4 @@ public class TraceFilter extends AdviceFilter {
         return true;
     }
 
-    @Override
-    protected void postHandle(ServletRequest request, ServletResponse response) throws Exception {
-        //白名单控制跨域
-        ResponseFacade responseFacade = (ResponseFacade) response;
-        responseFacade.setCharacterEncoding("UTF-8");
-        responseFacade.setContentType("application/json");
-//        responseFacade.setHeader("Access-Control-Allow-Origin","*");
-//        System.out.println(JSON.toJSONString(responseFacade.getHeaderNames()));
-    }
-
 }
