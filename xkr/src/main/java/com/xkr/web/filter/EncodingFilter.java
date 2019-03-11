@@ -4,8 +4,15 @@
 
 package com.xkr.web.filter;
 
+import com.alibaba.fastjson.JSON;
+import com.xkr.util.IpUtil;
+import com.xkr.util.UuidUtil;
+import org.apache.catalina.connector.ResponseFacade;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.shiro.web.servlet.AdviceFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 
 import javax.servlet.*;
@@ -34,6 +41,7 @@ public class EncodingFilter implements Filter {
         httpServletResponse.setContentType("application/json");
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "http://144.202.124.199");
         httpServletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        httpServletResponse.setHeader("Access-Control-Max-Age", "3600");
         httpServletResponse.setHeader("Access-Control-Allow-Credentials", "true");
         chain.doFilter(request,response);
         //白名单控制跨域
