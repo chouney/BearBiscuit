@@ -24,7 +24,7 @@ tpid=`ps -ef|grep $APP_NAME|grep -v grep|grep -v kill|awk '{print $2}'`
 for (( i=1; i<100;i++))
     do
         echo 'RUNNING APP HealthCheck!'
-        if [ ${tpid} ]; then
+        if [ -n "${tpid}" ]; then
             echo 'App is running SUCCESS!!!!!!.'
             break
         else

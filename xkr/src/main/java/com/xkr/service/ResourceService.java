@@ -129,11 +129,13 @@ public class ResourceService {
         }
         int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
+        Map<String,Object> filterMap = Maps.newHashMap();
+        filterMap.put("type",resType);
+        filterMap.put("report",report);
+        filterMap.put("status",status.getCode());
         SearchResultListDTO<ResourceIndexDTO> resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
                 keyword, null,
-                ImmutableMap.of(
-                        "type", resType, "report", report, "status", status.getCode()
-                ), Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
+                filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
 
         List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
 

@@ -33,7 +33,8 @@ public class MailApiService {
         OhMyEmail.subject("sharecoder邮箱验证")
                 .from("sharecoder.cn")
                 .to(email)
-                .html("您好，您的账号<b>"+userName+"</b>已经注册成功，请您<a href=\""+frontDomain+"/front_pages/checkEmail.html?token=" + captcha + "\">点此链接</a>进行激活操作，没有激活的账号无法正常使用，此链接转发无效。")
+//                .html("您好，您的账号<b>"+userName+"</b>已经注册成功，请您<a href=\""+frontDomain+"/front_pages/checkEmail.html?token=" + captcha + "\">点此链接</a>进行激活操作，没有激活的账号无法正常使用，此链接转发无效。")
+                .html("您好，您的账号<b>"+userName+"</b>已经注册成功，请您点击链接"+frontDomain+"/front_pages/checkEmail.html?token=" + captcha + "进行激活操作，没有激活的账号无法正常使用，此链接转发无效。")
                 .send();
         return true;
     }
@@ -42,7 +43,8 @@ public class MailApiService {
         OhMyEmail.subject("sharecoder邮箱验证")
                 .from("sharecoder.cn")
                 .to(email)
-                .html("您好，您的账号<b>"+userName+"</b>正在进行修改密码操作，请您<a href=\"" + frontDomain + "/front_pages/checkEmail.html?token=" + captcha + "\">点此链接</a>进行密码修改操作，此链接转发无效。")
+//                .html("您好，您的账号<b>"+userName+"</b>正在进行修改密码操作，请您<a href=\"" + frontDomain + "/front_pages/checkEmail.html?token=" + captcha + "\">点此链接</a>进行密码修改操作，此链接转发无效。")
+                .html("您好，您的账号<b>"+userName+"</b>正在进行修改密码操作，请您点击链接" + frontDomain + "/front_pages/checkEmail.html?token=" + captcha + "进行密码修改操作，此链接转发无效。")
                 .send();
         return true;
     }

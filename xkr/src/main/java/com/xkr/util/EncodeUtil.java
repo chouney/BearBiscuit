@@ -41,6 +41,7 @@ public class EncodeUtil {
         return new SimpleHash("sha-1",source).toHex();
     }
 
+    //21232f297a57a5a743894a0e4a801fc3
     public static void main(String[] args){
         System.out.println(new SimpleHash("md5","admin").toHex());
     }

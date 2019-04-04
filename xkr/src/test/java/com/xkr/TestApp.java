@@ -37,10 +37,6 @@ public class TestApp extends TestCase {
 
 
     public static void main(String[] args) {
-        logger.debug("debug");
-        logger.info("info");
-        logger.warn("warn");
-        logger.error("error");
     }
 
 
