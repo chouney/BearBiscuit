@@ -45,8 +45,8 @@ public class OptLogService {
     private XkrAdminAccountAgent xkrAdminAccountAgent;
 
     @Async
-    public void saveOptLog(OptLogModuleEnum moduleEnum,String detail){
-        Subject subject = SecurityUtils.getSubject();
+    public void saveOptLog(Subject subject,OptLogModuleEnum moduleEnum,String detail){
+//        Subject subject = SecurityUtils.getSubject();
         XkrAdminAccount adminAccount = (XkrAdminAccount) subject.getPrincipal();
         if(Objects.isNull(adminAccount)){
             logger.error("OptLogService saveOptLog can not get adminAccount,param,moduleEnum:{},detail:{}", JSON.toJSONString(moduleEnum),detail);

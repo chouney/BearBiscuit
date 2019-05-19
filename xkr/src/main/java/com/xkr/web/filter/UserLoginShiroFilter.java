@@ -39,9 +39,9 @@ public class UserLoginShiroFilter extends AdviceFilter {
      */
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(request.getParameter("debug"))){
-            return true;
-        }
+//        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(request.getParameter("debug"))){
+//            return true;
+//        }
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         Subject principal = SecurityUtils.getSubject();
         Session session = principal.getSession();

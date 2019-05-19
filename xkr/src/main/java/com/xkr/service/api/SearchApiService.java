@@ -29,6 +29,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -46,6 +48,7 @@ import java.util.*;
  */
 @Service
 public class SearchApiService {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource(name = "esClient")
     private RestHighLevelClient client;
@@ -66,10 +69,10 @@ public class SearchApiService {
             } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
                 ArgUtil.assertNotEquals(response.getVersion(), 1L);
             }
+            logger.info("SearchApiService upsertIndex, response:{}",JSON.toJSONString(response));
             return true;
         } catch (final IOException e) {
-            // TODO: 2018/5/11 log
-            e.printStackTrace();
+            logger.error("SearchApiService upsertIndex failed, resourceIndexDTO:{}", JSON.toJSONString(baseIndexDTO));
         }
         return false;
     }
@@ -87,10 +90,10 @@ public class SearchApiService {
             });
 
             BulkResponse responses = client.bulk(request);
+            logger.info("SearchApiService bulkUpdateIndex, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            // TODO: 2018/5/11 log
-            e.printStackTrace();
+            logger.error("SearchApiService bulkUpdateIndex failed, updateMap:{}", JSON.toJSONString(updateMap));
         }
         return false;
     }
@@ -113,10 +116,10 @@ public class SearchApiService {
             });
 
             BulkResponse responses = client.bulk(request);
+            logger.info("SearchApiService bulkUpdateIndexStatus, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            // TODO: 2018/5/11 log
-            e.printStackTrace();
+            logger.error("SearchApiService bulkUpdateIndexStatus failed, docIds:{}", JSON.toJSONString(docIds));
         }
         return false;
     }
@@ -132,10 +135,10 @@ public class SearchApiService {
                 request.add(deleteRequest);
             });
             BulkResponse responses = client.bulk(request);
+            logger.info("SearchApiService bulkDeleteIndexStatus, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            // TODO: 2018/5/11 log
-            e.printStackTrace();
+            logger.error("SearchApiService bulkDeleteIndexStatus failed, docIds:{}", JSON.toJSONString(docIds));
         }
         return false;
     }
@@ -151,7 +154,7 @@ public class SearchApiService {
                 BeanUtils.populate(targetDTO, getResponse.getSourceAsMap());
             }
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error("SearchApiService getAndBuildIndexDTOByIndexId failed, targetDTO:{}", JSON.toJSONString(targetDTO));
         }
     }
 

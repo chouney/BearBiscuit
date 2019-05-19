@@ -181,7 +181,7 @@ CREATE TABLE xkr_admin_account(
 	INDEX `idx_sta_up` (`status`,`update_time`),
 	INDEX `idx_name_sta` (`account_name`,`status`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理员表';
-insert into xkr_admin_account values('6476825075076045938','admin','c3284d0f94606de1fd2af172aba15bf3','administrator@sharecoder.cn','1;2;3;4;5;6;7;8;9;10','1',current_timestamp(),current_timestamp(),'{}');
+insert into xkr_admin_account values('6476825075076045938','admin','c3284d0f94606de1fd2af172aba15bf3','administrator@sharecoder.cn','1;2;3;4;5;6;7;8;9;10;11','1',current_timestamp(),current_timestamp(),'{}');
 
 DROP TABLE IF EXISTS `xkr_pay_order`;
 CREATE TABLE xkr_pay_order(

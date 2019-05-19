@@ -34,9 +34,9 @@ public class ClassController {
 
     @RequestMapping(value = "/list",method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult getClassList(@RequestParam(name = "type") int type) {
+    public BasicResult getClassList(@RequestParam(name = "type") String type) {
         try {
-            ClassMenuDTO rootClass = classService.getAllChildClassByClassId((long) type);
+            ClassMenuDTO rootClass = classService.getAllChildClassByClassId(Long.valueOf(type));
             if(!ErrorStatus.OK.equals(rootClass.getStatus())){
                 return new BasicResult(ErrorStatus.ERROR);
             }

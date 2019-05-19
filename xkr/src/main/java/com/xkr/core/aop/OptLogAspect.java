@@ -5,6 +5,8 @@ import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.service.OptLogService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -51,7 +53,8 @@ public class OptLogAspect {
             OptLogModuleEnum moduleEnum = optLog.moduleEnum();
             OptEnum optEnum = optLog.optEnum();
             String detail = optEnum.getDesc()+ ",参数:"+ JSON.toJSONString(joinPoint.getArgs());
-            optLogService.saveOptLog(moduleEnum,detail);
+            Subject subject = SecurityUtils.getSubject();
+            optLogService.saveOptLog(subject,moduleEnum,detail);
         }
         return joinPoint.proceed(joinPoint.getArgs());
     }

@@ -24,6 +24,6 @@ public enum  LoginEnum {
 
     @Override
     public  String toString(){
-        return this.type.toString();
+        return this.type;
     }
 }

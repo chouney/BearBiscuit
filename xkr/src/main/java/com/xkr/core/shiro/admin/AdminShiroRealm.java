@@ -4,6 +4,7 @@
 
 package com.xkr.core.shiro.admin;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableSet;
 import com.xkr.domain.XkrAdminAccountAgent;
 import com.xkr.domain.entity.XkrAdminAccount;
@@ -108,6 +109,8 @@ public class AdminShiroRealm extends AuthorizingRealm {
 
 
         authorizationInfo.setStringPermissions(permissionIds);
+        logger.info("后台权限校验-->AdminShiroRealm.doGetAuthorizationInfo(),管理员用户权限为:{}", JSON.toJSONString(permissionIds));
+
         return authorizationInfo;
     }
 
