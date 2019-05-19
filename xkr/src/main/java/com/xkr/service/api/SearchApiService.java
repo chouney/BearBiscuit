@@ -72,7 +72,7 @@ public class SearchApiService {
             logger.info("SearchApiService upsertIndex, response:{}",JSON.toJSONString(response));
             return true;
         } catch (final IOException e) {
-            logger.error("SearchApiService upsertIndex failed, resourceIndexDTO:{}", JSON.toJSONString(baseIndexDTO));
+            logger.error("SearchApiService upsertIndex failed, resourceIndexDTO:{}", JSON.toJSONString(baseIndexDTO),e);
         }
         return false;
     }
@@ -93,7 +93,7 @@ public class SearchApiService {
             logger.info("SearchApiService bulkUpdateIndex, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            logger.error("SearchApiService bulkUpdateIndex failed, updateMap:{}", JSON.toJSONString(updateMap));
+            logger.error("SearchApiService bulkUpdateIndex failed, updateMap:{}", JSON.toJSONString(updateMap),e);
         }
         return false;
     }
@@ -119,7 +119,7 @@ public class SearchApiService {
             logger.info("SearchApiService bulkUpdateIndexStatus, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            logger.error("SearchApiService bulkUpdateIndexStatus failed, docIds:{}", JSON.toJSONString(docIds));
+            logger.error("SearchApiService bulkUpdateIndexStatus failed, docIds:{}", JSON.toJSONString(docIds),e);
         }
         return false;
     }
@@ -138,7 +138,7 @@ public class SearchApiService {
             logger.info("SearchApiService bulkDeleteIndexStatus, response:{}",JSON.toJSONString(responses));
             return RestStatus.OK.equals(responses.status());
         } catch (IOException e) {
-            logger.error("SearchApiService bulkDeleteIndexStatus failed, docIds:{}", JSON.toJSONString(docIds));
+            logger.error("SearchApiService bulkDeleteIndexStatus failed, docIds:{}", JSON.toJSONString(docIds),e);
         }
         return false;
     }
@@ -154,7 +154,7 @@ public class SearchApiService {
                 BeanUtils.populate(targetDTO, getResponse.getSourceAsMap());
             }
         } catch (IOException | IllegalAccessException | InvocationTargetException e) {
-            logger.error("SearchApiService getAndBuildIndexDTOByIndexId failed, targetDTO:{}", JSON.toJSONString(targetDTO));
+            logger.error("SearchApiService getAndBuildIndexDTOByIndexId failed, targetDTO:{}", JSON.toJSONString(targetDTO),e);
         }
     }
 
