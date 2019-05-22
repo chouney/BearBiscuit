@@ -224,6 +224,7 @@ public class SearchApiService {
             SearchResultListDTO<T> resultListDTO = new SearchResultListDTO<>();
 
             buildSearchResultListDTO(resultListDTO, resultIndexDTO,hits);
+            logger.debug("SearchApiService searchByFilterField 返回查询结果:{}",JSON.toJSONString(resultListDTO));
 
             return resultListDTO;
 
@@ -327,6 +328,7 @@ public class SearchApiService {
 
             buildSearchResultListDTO(resultListDTO, resultIndexDTO, hits);
 
+            logger.debug("SearchApiService searchByKeyWordInField 返回查询结果:{}",JSON.toJSONString(resultListDTO));
             return resultListDTO;
 
         } catch (final IOException e) {
