@@ -92,7 +92,7 @@ public class UserService {
         size = size <= 0 ? 10 : size;
 
         SearchResultListDTO<UserIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
-                UserIndexDTO.class, userLogin, null,
+                UserIndexDTO.class, userLogin, ImmutableMap.of("userName",1F,"email",0.5F),
                 ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
                 null, null, offset, size
         );

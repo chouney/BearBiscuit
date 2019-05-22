@@ -134,7 +134,7 @@ public class ResourceService {
         filterMap.put("report",report);
         filterMap.put("status",status.getCode());
         SearchResultListDTO<ResourceIndexDTO> resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
-                keyword, null,
+                keyword, ImmutableMap.of("title",0.5F,"content",1.5F,"userName",0.5F),
                 filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
 
         List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());

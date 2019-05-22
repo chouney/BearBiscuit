@@ -74,7 +74,7 @@ public class CommentService {
         size = size <= 0 ? 10 : size;
 
         SearchResultListDTO<CommentIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
-                CommentIndexDTO.class, keyword, null,
+                CommentIndexDTO.class, keyword, ImmutableMap.of("title",0.5F,"content",1.5F,"userName",0.5F),
                 ImmutableMap.of("status", status.getCode()), Pair.of(updateTime, null), "updateTime",
                 null, null, offset, size
         );
