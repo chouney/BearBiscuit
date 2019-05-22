@@ -6,17 +6,15 @@
  */
 package com.xkr.core.compress;
 
-import com.xkr.exception.UnArchiverException;
-import de.innosystec.unrar.Archive;
-import de.innosystec.unrar.exception.RarException;
-import de.innosystec.unrar.rarfile.FileHeader;
+import com.github.junrar.Junrar;
+import com.github.junrar.exception.RarException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author ben
@@ -40,37 +38,11 @@ public final class MyRar extends ArchiveProcessor {
 	public final void doUnArchiver(File srcfile, String destpath,
 			String password) throws IOException {
 		try {
-			Archive a = new Archive(srcfile, password, false);
-			if(!a.isPass()){
-				throw new UnArchiverException("UnRar file error!");
+			List<File> res = Junrar.extract(srcfile.getPath(),destpath);
+			if(CollectionUtils.isEmpty(res)){
+				throw new RuntimeException("unarchive error 解压缩");
 			}
-			FileHeader fh;
-			while ((fh = a.nextFileHeader()) != null) {
-				File f = new File(destpath + "/"
-						+ fh.getFileNameString().trim());
 
-				if (fh.isDirectory()) {
-					f.mkdirs();
-					continue;
-				}
-
-				/*
-				 * 父目录不存在则创建
-				 */
-				File parent = f.getParentFile();
-				if (!parent.exists()) {
-					parent.mkdirs();
-				}
-
-				FileOutputStream fos = new FileOutputStream(f);
-				BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-				a.extractFile(fh, bos);
-
-				bos.flush();
-				bos.close();
-			}
-			a.close();
 		} catch (RarException e) {
 			throw new RuntimeException("unarchive error",e);
 		}

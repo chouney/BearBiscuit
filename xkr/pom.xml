@@ -289,12 +289,18 @@
             <artifactId>gnu-crypto</artifactId>
             <version>2.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>local</groupId>
-            <artifactId>unrar</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>local</groupId>-->
+            <!--<artifactId>unrar</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
 
+        <!-- https://mvnrepository.com/artifact/com.github.junrar/junrar -->
+        <dependency>
+            <groupId>com.github.junrar</groupId>
+            <artifactId>junrar</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         <dependency>
             <groupId>local</groupId>
             <artifactId>validator</artifactId>
