@@ -38,6 +38,10 @@ public final class MyRar extends ArchiveProcessor {
 	public final void doUnArchiver(File srcfile, String destpath,
 			String password) throws IOException {
 		try {
+			File dest = new File(destpath);
+			if(!dest.exists()){
+				dest.mkdir();
+			}
 			List<File> res = Junrar.extract(srcfile.getPath(),destpath);
 			if(CollectionUtils.isEmpty(res)){
 				throw new RuntimeException("unarchive error 解压缩");
@@ -52,4 +56,5 @@ public final class MyRar extends ArchiveProcessor {
 	public final FileNameExtensionFilter getFileFilter() {
 		return filter;
 	}
+
 }
