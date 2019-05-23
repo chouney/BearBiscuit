@@ -133,10 +133,15 @@ public class ResourceService {
         filterMap.put("type",resType);
         filterMap.put("report",report);
         filterMap.put("status",status.getCode());
-        SearchResultListDTO<ResourceIndexDTO> resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
-                keyword, ImmutableMap.of("title",0.5F,"content",1.5F,"userName",0.5F),
-                filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
-
+        SearchResultListDTO<ResourceIndexDTO> resultListDTO = null;
+        if(StringUtils.isEmpty(keyword)){
+            resultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class,filterMap,Pair.of(startDate, endDate),
+                    "updateTime",null,offset,size);
+        } else {
+            resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
+                    keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
+                    filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
+        }
         List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
 
         List<XkrClass> xkrClasses = xkrClassAgent.getClassByIds(classIds);
@@ -454,6 +459,8 @@ public class ResourceService {
         currentMenuList.forEach(folderItemDTO -> {
             ResourceFolderDTO resourceFolderDTO = new ResourceFolderDTO();
             resourceFolderDTO.setName(folderItemDTO.getName());
+            resourceFolderDTO.setDate(folderItemDTO.getDate());
+            resourceFolderDTO.setSize(folderItemDTO.getSize());
             if (folderItemDTO.isFolder()) {
                 String uri = rootUri + folderItemDTO.getName();
                 resourceFolderDTO.setFileType("d");
@@ -473,6 +480,8 @@ public class ResourceService {
             subList.forEach(folderItemDTO -> {
                 ResourceFolderDTO subFolder = new ResourceFolderDTO();
                 subFolder.setName(folderItemDTO.getName());
+                subFolder.setDate(folderItemDTO.getDate());
+                subFolder.setSize(folderItemDTO.getSize());
                 if (folderItemDTO.isFolder()) {
                     String uri = currentUri + "/" + folderItemDTO.getName();
                     subFolder.setFileType("d");

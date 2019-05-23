@@ -13,6 +13,7 @@ import com.xkr.domain.XkrUserAgent;
 import com.xkr.domain.dto.*;
 import com.xkr.domain.dto.comment.*;
 import com.xkr.domain.dto.search.CommentIndexDTO;
+import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrResourceComment;
@@ -72,12 +73,17 @@ public class CommentService {
         }
         int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
-
-        SearchResultListDTO<CommentIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
-                CommentIndexDTO.class, keyword, ImmutableMap.of("title",0.5F,"content",1.5F,"userName",0.5F),
-                ImmutableMap.of("status", status.getCode()), Pair.of(updateTime, null), "updateTime",
-                null, null, offset, size
-        );
+        SearchResultListDTO<CommentIndexDTO> searchResultListDTO = null;
+        if(StringUtils.isEmpty(keyword)){
+            searchResultListDTO = searchApiService.searchByFilterField(CommentIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(updateTime, null),
+                    "updateTime",null,offset,size);
+        }else {
+            searchResultListDTO = searchApiService.searchByKeyWordInField(
+                    CommentIndexDTO.class, keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
+                    ImmutableMap.of("status", status.getCode()), Pair.of(updateTime, null), "updateTime",
+                    null, null, offset, size
+            );
+        }
 
         result.setTotalCount((int) searchResultListDTO.getTotalCount());
 

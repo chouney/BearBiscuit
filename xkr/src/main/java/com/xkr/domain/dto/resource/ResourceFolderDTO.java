@@ -3,6 +3,7 @@ package com.xkr.domain.dto.resource;
 import com.xkr.domain.dto.file.FolderItemDTO;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,6 +16,8 @@ public class ResourceFolderDTO implements Serializable{
     private static final long serialVersionUID = 3903968445097045087L;
     private String name;
 
+    private long size;
+    private Date date;
     private String fileType;
 
     private List<ResourceFolderDTO> subFolders;
@@ -37,6 +40,23 @@ public class ResourceFolderDTO implements Serializable{
 
     public List<ResourceFolderDTO> getSubFolders() {
         return subFolders;
+    }
+
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public void setSubFolders(List<ResourceFolderDTO> subFolders) {

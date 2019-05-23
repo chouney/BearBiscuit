@@ -48,7 +48,7 @@ public class UserLoginShiroFilter extends AdviceFilter {
         String loginType = (String)session.getAttribute(Const.SESSION_LOGIN_TYPE_KEY);
         if (!LoginEnum.CUSTOMER.getType().equals(loginType) || !principal.isAuthenticated()){
             httpServletResponse.setCharacterEncoding("UTF-8");
-            httpServletResponse.setContentType("application/json");
+//            httpServletResponse.setContentType("application/json");
             httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.UNLOGIN_REDIRECT)));
             return false;
         }

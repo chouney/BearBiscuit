@@ -1,7 +1,11 @@
 package com.xkr.web.model.vo.resource;
 
+import com.xkr.util.DateUtil;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -15,6 +19,8 @@ public class ResourceFolderVO implements Serializable{
     private String name;
 
     private String fileType;
+    private String size;
+    private String date;
 
     private List<ResourceFolderVO> subFolders;
 
@@ -36,6 +42,25 @@ public class ResourceFolderVO implements Serializable{
 
     public List<ResourceFolderVO> getSubFolders() {
         return subFolders;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = String.valueOf(size);
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        if(Objects.isNull(date)){
+            return;
+        }
+        this.date = DateUtil.yyyyMMddHHmmss.format(date);
     }
 
     public void setSubFolders(List<ResourceFolderVO> subFolders) {

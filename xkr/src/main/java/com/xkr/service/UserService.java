@@ -8,6 +8,7 @@ import com.xkr.dao.cache.AdminIndexRedisService;
 import com.xkr.domain.XkrLoginTokenAgent;
 import com.xkr.domain.XkrUserAgent;
 import com.xkr.domain.dto.ResponseDTO;
+import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
 import com.xkr.domain.dto.user.ListUserDetailDTO;
@@ -90,12 +91,17 @@ public class UserService {
         }
         int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
-
-        SearchResultListDTO<UserIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
-                UserIndexDTO.class, userLogin, ImmutableMap.of("userName",1F,"email",0.5F),
-                ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
-                null, null, offset, size
-        );
+        SearchResultListDTO<UserIndexDTO> searchResultListDTO = null;
+        if(StringUtils.isEmpty(userLogin)){
+            searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(createDate, null),
+                    "updateTime",null,offset,size);
+        } else {
+            searchResultListDTO = searchApiService.searchByKeyWordInField(
+                    UserIndexDTO.class, userLogin, ImmutableMap.of("userName", 1F, "email", 0.5F),
+                    ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
+                    null, null, offset, size
+            );
+        }
 
         result.setTotalCount((int) searchResultListDTO.getTotalCount());
 

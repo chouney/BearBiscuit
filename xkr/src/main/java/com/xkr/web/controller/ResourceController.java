@@ -386,6 +386,8 @@ public class ResourceController {
         if("d".equals(resourceFolderDTO.getFileType())){
             resourceFolderVO.setFileType("d");
             resourceFolderVO.setSubFolders(Lists.newArrayList());
+            resourceFolderVO.setDate(resourceFolderDTO.getDate());
+            resourceFolderVO.setSize(resourceFolderDTO.getSize());
             resourceFolderDTO.getSubFolders().forEach(resourceFolderDTO1 -> {
                 ResourceFolderVO subVO = new ResourceFolderVO();
                 buildResourceFolderVO(subVO,resourceFolderDTO1);
