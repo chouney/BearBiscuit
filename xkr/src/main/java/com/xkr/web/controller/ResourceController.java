@@ -383,11 +383,11 @@ public class ResourceController {
 
     private void buildResourceFolderVO(ResourceFolderVO resourceFolderVO, ResourceFolderDTO resourceFolderDTO){
         resourceFolderVO.setName(resourceFolderDTO.getName());
+        resourceFolderVO.setDate(resourceFolderDTO.getDate());
+        resourceFolderVO.setSize(resourceFolderDTO.getSize());
         if("d".equals(resourceFolderDTO.getFileType())){
             resourceFolderVO.setFileType("d");
             resourceFolderVO.setSubFolders(Lists.newArrayList());
-            resourceFolderVO.setDate(resourceFolderDTO.getDate());
-            resourceFolderVO.setSize(resourceFolderDTO.getSize());
             resourceFolderDTO.getSubFolders().forEach(resourceFolderDTO1 -> {
                 ResourceFolderVO subVO = new ResourceFolderVO();
                 buildResourceFolderVO(subVO,resourceFolderDTO1);
