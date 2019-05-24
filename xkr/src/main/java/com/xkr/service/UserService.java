@@ -268,7 +268,7 @@ public class UserService {
             }
             //如果是注册验证
             if (type == Const.USER_ACCOUNT_VERIFY_TYPE_REG) {
-                if (UserStatusEnum.USER_STATUS_NORMAL.getCode() != user.getStatus()) {
+                if (UserStatusEnum.USER_STATUS_NORMAL.getCode() == user.getStatus()) {
                     return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
                 }
                 if (UserStatusEnum.USER_STATUS_FREEZED.getCode() == user.getStatus()) {

@@ -426,6 +426,7 @@ public class ResourceController {
             resourceVO.setUpdateTime(resourceDTO.getUpdateTime());
             resourceVO.setUserId(resourceDTO.getUserId());
             resourceVO.setUserName(resourceDTO.getUserName());
+            resourceVO.setStatus(resourceDTO.getStatus());
             resourceVOs.getResList().add(resourceVO);
         });
         resourceVOs.setTotalCount(resourceDTOs.getTotalCount());
