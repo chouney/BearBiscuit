@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.valid.IsNumberic;
+import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.comment.ListCommentDTO;
 import com.xkr.domain.dto.message.ListMessageDTO;
@@ -82,6 +83,7 @@ public class CommentController {
     @RequestMapping(value = "/submit",method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
+    @UserCheck
     public BasicResult<JSONObject> submitUserComment(
             @IsNumberic
             @RequestParam(name = "resId") String resId,

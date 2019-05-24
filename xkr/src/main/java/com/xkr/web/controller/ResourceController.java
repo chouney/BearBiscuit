@@ -8,6 +8,7 @@ import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
+import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
@@ -260,6 +261,7 @@ public class ResourceController {
     @RequestMapping(value = "/res_upload", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
+    @UserCheck
     public BasicResult<JSONObject> resourceUpload(
             @NotBlank
             @Length(max = 50,message = "标题长度大于25")
@@ -318,6 +320,7 @@ public class ResourceController {
     @RequestMapping(value = "/res_download", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
+    @UserCheck
     public BasicResult<JSONObject> resourceDownLoad(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
@@ -355,6 +358,7 @@ public class ResourceController {
     @RequestMapping(value = "/report", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
+    @UserCheck
     public BasicResult<JSONObject> reportResource(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
