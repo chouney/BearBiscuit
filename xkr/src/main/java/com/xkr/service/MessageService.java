@@ -76,12 +76,14 @@ public class MessageService {
         } else {
             list = messageAgent.getAllToUserMessage(userId);
         }
-        list.forEach(xkrMessage -> {
-            MessageDTO dto = new MessageDTO();
-            dto.setDate(xkrMessage.getUpdateTime());
-            dto.setMsg(xkrMessage.getContent());
-            result.getMsgList().add(dto);
-        });
+        if(!CollectionUtils.isEmpty(list)) {
+            list.forEach(xkrMessage -> {
+                MessageDTO dto = new MessageDTO();
+                dto.setDate(xkrMessage.getUpdateTime());
+                dto.setMsg(xkrMessage.getContent());
+                result.getMsgList().add(dto);
+            });
+        }
 
         result.setTotalCount((int) page.getTotal());
 

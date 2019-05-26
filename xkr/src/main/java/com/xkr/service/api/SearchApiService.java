@@ -357,7 +357,7 @@ public class SearchApiService {
 
             }
         });
-        resultListDTO.setTotalCount(resultListDTO.getSearchResultDTO().size());
+        resultListDTO.setTotalCount(hits.getTotalHits());
 
     }
 }

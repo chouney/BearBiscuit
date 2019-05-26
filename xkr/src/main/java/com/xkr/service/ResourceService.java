@@ -41,6 +41,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -346,8 +348,8 @@ public class ResourceService {
 
 
             JSONObject ext = JSON.parseObject(resource.getExt());
-            String fileName = ext.getString(ResourceService.EXT_FILE_NAME_KEY);
-            String downloadUrl = String.format(UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
+            String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY),"utf-8");
+            String downloadUrl = String.format("/"+fileBucket+UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
@@ -356,6 +358,9 @@ public class ResourceService {
         } catch (UpException e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("ResourceService build response fileName failed", e);
+            throw new RuntimeException("generate download fileName failed", e);
         }
 
     }
