@@ -197,14 +197,16 @@ public class SearchApiService {
             //进行时间删选
             if (Objects.nonNull(rangeDate) && !StringUtils.isEmpty(dateKey)) {
 
-                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(dateKey);
-                if (Objects.nonNull(rangeDate.getLeft())) {
-                    rangeQueryBuilder.gte(rangeDate.getLeft().getTime());
+                if(Objects.nonNull(rangeDate.getLeft()) || Objects.nonNull(rangeDate.getRight())) {
+                    RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(dateKey);
+                    if (Objects.nonNull(rangeDate.getLeft())) {
+                        rangeQueryBuilder.gte(rangeDate.getLeft().getTime());
+                    }
+                    if (Objects.nonNull(rangeDate.getRight())) {
+                        rangeQueryBuilder.lte(rangeDate.getRight().getTime());
+                    }
+                    boolQueryBuilder.filter(rangeQueryBuilder);
                 }
-                if (Objects.nonNull(rangeDate.getRight())) {
-                    rangeQueryBuilder.lte(rangeDate.getRight().getTime());
-                }
-                boolQueryBuilder.filter(rangeQueryBuilder);
             }
 
             builder.query(boolQueryBuilder);

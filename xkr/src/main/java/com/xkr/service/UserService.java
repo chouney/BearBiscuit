@@ -94,7 +94,7 @@ public class UserService {
         SearchResultListDTO<UserIndexDTO> searchResultListDTO = null;
         if(StringUtils.isEmpty(userLogin)){
             searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(createDate, null),
-                    "updateTime",null,offset,size);
+                    "createTime",null,offset,size);
         } else {
             searchResultListDTO = searchApiService.searchByKeyWordInField(
                     UserIndexDTO.class, userLogin, ImmutableMap.of("userName", 1F, "email", 0.5F),

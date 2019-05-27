@@ -91,7 +91,8 @@ public class AdminResourceController {
                 return new BasicResult<>(ErrorStatus.PARAM_ERROR);
             }
 
-            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+//            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+            Date sDate = null;
             if (StringUtils.isNotEmpty(startDate)) {
                 sDate = DateUtil.stringToDate(startDate, "yyyy-MM-dd");
             }

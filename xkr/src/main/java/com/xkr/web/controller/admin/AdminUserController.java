@@ -66,7 +66,8 @@ public class AdminUserController {
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
 
         try {
-            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+//            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+            Date sDate = null;
             if (StringUtils.isNotEmpty(createDate)) {
                 sDate = DateUtil.stringToDate(createDate, "yyyy-MM-dd");
             }

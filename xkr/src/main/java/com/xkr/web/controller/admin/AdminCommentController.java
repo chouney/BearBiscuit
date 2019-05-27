@@ -72,7 +72,8 @@ public class AdminCommentController {
 
         ListCommentDetailVO commentDetailVO = new ListCommentDetailVO();
         try {
-            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+//            Date sDate = Date.from(LocalDateTime.now().minusWeeks(1).toInstant(ZoneOffset.UTC));
+            Date sDate = null;
             if(StringUtils.isNotEmpty(updateDate)){
                 sDate = DateUtil.stringToDate(updateDate,"yyyy-MM-dd");
             }
