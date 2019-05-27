@@ -76,9 +76,12 @@ public class AdminTestController {
                     String userAccount,
             @RequestParam(name = "userToken")
                     String userToken,
+            @RequestParam(name = "type")
+                    String type,
             HttpServletRequest request) {
         LoginAuthenticationToken token = new LoginAuthenticationToken(userAccount, userToken, false);
-        token.setLoginType(LoginEnum.ADMIN.toString());
+
+        token.setLoginType("1".equals(type) ? LoginEnum.CUSTOMER.toString() : LoginEnum.ADMIN.toString());
         //获取当前的Subject
         Subject currentUser = SecurityUtils.getSubject();
         try {
@@ -103,7 +106,7 @@ public class AdminTestController {
         //验证是否登录成功
         if (currentUser.isAuthenticated()) {
             Session session = SecurityUtils.getSubject().getSession();
-            session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, LoginEnum.ADMIN.toString());
+            session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, "1".equals(type) ? LoginEnum.CUSTOMER.toString() : LoginEnum.ADMIN.toString());
 
             logger.info("用户[" + userAccount + "]登录认证通过(这里可以进行一些认证通过后的一些系统参数初始化操作)");
             String ip = IpUtil.getIpAddr(request);
