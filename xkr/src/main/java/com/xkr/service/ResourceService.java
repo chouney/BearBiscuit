@@ -349,12 +349,12 @@ public class ResourceService {
 
             JSONObject ext = JSON.parseObject(resource.getExt());
             String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY),"utf-8");
-            String downloadUrl = String.format("/"+fileBucket+UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
+            String downloadUrl = String.format(UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
                     UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
-                    downloadUrl, date);
+                    "/"+fileBucket+downloadUrl, date);
         } catch (UpException e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);

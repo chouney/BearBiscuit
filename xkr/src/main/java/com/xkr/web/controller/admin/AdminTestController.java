@@ -141,12 +141,12 @@ public class AdminTestController {
     }
 
     public static void main(String[] args) throws UpException, UnsupportedEncodingException {
-        JSONObject ext = JSON.parseObject("{\"fileName\":\"二次测试3.zip\"}");
+        JSONObject ext = JSON.parseObject("{\"fileName\":\"java.zip\"}");
         String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY),"utf-8");
-        String downloadUrl = String.format(COMPRESS_FILE_PATH_FORMAT, "6536936932914499584", "7589ce0a327c731ffc33a82dfe966f31", fileName);
+        String downloadUrl = String.format(COMPRESS_FILE_PATH_FORMAT, "6539480863967547392", "bafbf73ce4d6118e6bd8814cf9f8aca2", fileName);
         String date = DateUtil.getGMTRFCUSDate();
 
         System.out.println(JSON.toJSONString(new FileDownloadResponseDTO(UpYunUtils.sign("GET", date, downloadUrl, "sharecoder", "zhangqixiang", UpYunUtils.md5("zhangqixiang"), null),
-                downloadUrl, date)));
+                "/sharecoder"+downloadUrl, date)));
     }
 }
