@@ -18,7 +18,7 @@
   </resultMap>
 
   <sql id="message_field" >
-    id,from_type_code,from_id,to_type_code,to_id,
+    id,from_type_code,from_id,to_type_code,to_id,create_time,update_time,
     content,status
   </sql>
 
