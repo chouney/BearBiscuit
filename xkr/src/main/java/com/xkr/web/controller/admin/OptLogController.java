@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,7 +59,8 @@ public class OptLogController {
             return new BasicResult(result);
         }
         try {
-            ListOptLogDTO listOptLogDTO = optLogService.getOptLogList(Long.valueOf(adminAccountId),pageNum,size);
+            Long adminId = StringUtils.isEmpty(adminAccountId) ? null : Long.valueOf(adminAccountId);
+            ListOptLogDTO listOptLogDTO = optLogService.getOptLogList(adminId,pageNum,size);
 
             if (!ErrorStatus.OK.equals(listOptLogDTO.getStatus())) {
                 return new BasicResult(ErrorStatus.ERROR);

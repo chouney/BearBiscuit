@@ -23,7 +23,9 @@
   <select id="getAllOptLogByAdminAccount"  parameterType="java.lang.Long" resultMap="BaseResultMap">
     SELECT <include refid="admin_opt_log"/>
     FROM xkr_admin_opt_log WHERE status = 1
-    AND admin_account_id = #{adminAccountId}
+    <if test="adminAccountId!=null">
+      AND admin_account_id = #{adminAccountId}
+    </if>
   </select>
 
   <update id="batchUpdateOptLogByIds" parameterType="java.util.Map">
