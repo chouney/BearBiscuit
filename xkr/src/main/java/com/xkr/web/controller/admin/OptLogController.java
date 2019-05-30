@@ -50,7 +50,7 @@ public class OptLogController {
     @MethodValidate
     public BasicResult getOptLogList(
             @IsNumberic
-            @RequestParam(name = "adminAccountId") String adminAccountId,
+            @RequestParam(name = "adminAccountId",required = false, defaultValue = "") String adminAccountId,
             @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
             ValidResult result) {
