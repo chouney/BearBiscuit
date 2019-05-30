@@ -170,12 +170,16 @@ public class ResourceService {
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, resourceStatusEnum);
         if (success) {
-            //给用户发送消息
-            Map<Long, String> userContentMapper = Maps.newHashMap();
-            resources.forEach(resource ->
-                    userContentMapper.put(resource.getUserId(),
-                            String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), resourceStatusEnum.getDesc())));
-            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+            try {
+                //给用户发送消息
+                Map<Long, String> userContentMapper = Maps.newHashMap();
+                resources.forEach(resource ->
+                        userContentMapper.put(resource.getUserId(),
+                                String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), resourceStatusEnum.getDesc())));
+                messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+            }catch (Exception e){
+                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            }
         }
         return new ResponseDTO<>(success);
     }
@@ -199,17 +203,21 @@ public class ResourceService {
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_DELETED);
 
         if (success) {
-            //给用户发送消息
-            Map<Long, String> userContentMapper = Maps.newHashMap();
-            resources.forEach(resource -> {
-                XkrClass xkrClass = xkrClassAgent.getClassById(resource.getClassId());
-                XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
-                xkrAdminRecycleAgent.saveNewResourceRecycle(resource.getId(),resource.getTitle(),
-                        xkrClass.getClassName(),user.getUserName(),adminAccount.getAccountName());
-                userContentMapper.put(resource.getUserId(),
-                        String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_DELETED.getDesc()));
-            });
-            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+            try {
+                //给用户发送消息
+                Map<Long, String> userContentMapper = Maps.newHashMap();
+                resources.forEach(resource -> {
+                    XkrClass xkrClass = xkrClassAgent.getClassById(resource.getClassId());
+                    XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
+                    xkrAdminRecycleAgent.saveNewResourceRecycle(resource.getId(), resource.getTitle(),
+                            xkrClass.getClassName(), user.getUserName(), adminAccount.getAccountName());
+                    userContentMapper.put(resource.getUserId(),
+                            String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_DELETED.getDesc()));
+                });
+                messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+            }catch (Exception e){
+                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            }
         }
         return new ResponseDTO<>(success);
     }
@@ -252,14 +260,19 @@ public class ResourceService {
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_NORMAL);
         if (success) {
-            //给用户发送消息
-            Map<Long, String> userContentMapper = Maps.newHashMap();
-            resources.forEach(resource ->
-                    userContentMapper.put(resource.getUserId(),
-                            String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_NORMAL.getDesc())));
-            messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
-            //清除回收站资源
-            success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
+            try {
+                //给用户发送消息
+
+                Map<Long, String> userContentMapper = Maps.newHashMap();
+                resources.forEach(resource ->
+                        userContentMapper.put(resource.getUserId(),
+                                String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_NORMAL.getDesc())));
+                messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
+                //清除回收站资源
+                success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
+            }catch (Exception e){
+                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            }
         }
         return new ResponseDTO<>(success);
     }
