@@ -22,7 +22,7 @@
 
     <delete id="batchDeleteResourceRecycleByIds" parameterType="java.util.List">
         DELETE FROM xkr_resource_recycle WHERE resource_id IN
-        <foreach collection="resourceIds" item="id" separator="," open="(" close=")">
+        <foreach collection="list" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
     </delete>

@@ -34,7 +34,7 @@ public class LogAspect {
     /**
      * 匹配所有带@MethodValidate
      */
-    @Pointcut(value = "execution(* com.xkr.web.controller..*.*(..))")
+    @Pointcut(value = "execution(* com.xkr.web.controller..*(..))")
     public void log() {
 
     }

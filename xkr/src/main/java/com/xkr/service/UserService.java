@@ -144,9 +144,11 @@ public class UserService {
     }
 
     private void buildUserDetailDTO(UserDetailDTO userDetailDTO, XkrUser user, XkrLoginToken loginToken) {
-        userDetailDTO.setClientIp(loginToken.getClientIp());
+        if(Objects.nonNull(loginToken)) {
+            userDetailDTO.setClientIp(loginToken.getClientIp());
+            userDetailDTO.setLastLoginDate(loginToken.getUpdateTime());
+        }
         userDetailDTO.setEmail(user.getEmail());
-        userDetailDTO.setLastLoginDate(loginToken.getUpdateTime());
         userDetailDTO.setStatus(Integer.valueOf(user.getStatus()));
         userDetailDTO.setTotalRecharge(user.getTotalRecharge());
         userDetailDTO.setUserId(user.getId());
