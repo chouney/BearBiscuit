@@ -46,6 +46,20 @@ public class XkrResourceUserAgent {
         return xkrResourceUserMapper.getResourceByUserId(params);
     }
 
+    public List<XkrResourceUser> getResourceByResAndUserId(Long userId, Long resourceId, int status) {
+        if (Objects.isNull(userId) || Objects.isNull(resourceId)) {
+            logger.error("XkrResourceUserAgent getResourceByResAndUserId empty userId or resourceId");
+            return Lists.newArrayList();
+        }
+        Map<String, Object> params = ImmutableMap.of(
+                "status", status,
+                "userId", userId,
+                "resourceId", resourceId
+        );
+        return xkrResourceUserMapper.getResourceByResAndUserId(params);
+    }
+
+
     public boolean saveNewPayRecord(Long userId, Long resourceId) {
         if (Objects.isNull(userId) || Objects.isNull(resourceId)) {
             logger.error("XkrResourceUserAgent saveNewPayRecord empty userId:{} , resourceId:{}",userId,resourceId);

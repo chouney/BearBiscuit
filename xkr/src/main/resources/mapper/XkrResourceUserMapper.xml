@@ -27,4 +27,14 @@
     </if>
   </select>
 
+  <select id="getResourceByResAndUserId" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="resource_user_field"/>
+    FROM xkr_resource_user WHERE user_id = #{userId}
+    AND resource_id = #resourceId#
+    <if test="status!=null">
+      AND status = #{status}
+    </if>
+  </select>
+
 </mapper>

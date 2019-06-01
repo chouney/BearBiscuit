@@ -5,6 +5,7 @@ import com.xkr.common.CaptchaEnum;
 import com.xkr.common.Const;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
+import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.core.shiro.LoginAuthenticationToken;
@@ -254,6 +255,7 @@ public class UserController {
      * @param result
      * @return
      */
+    @CSRFValid
     @MethodValidate
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody

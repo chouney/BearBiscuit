@@ -12,4 +12,6 @@ public interface XkrResourceUserMapper extends CustomerMapper<XkrResourceUser> {
 
     List<XkrResourceUser> getResourceByUserId(Map<String,Object> params);
 
+    List<XkrResourceUser> getResourceByResAndUserId(Map<String,Object> params);
+
 }

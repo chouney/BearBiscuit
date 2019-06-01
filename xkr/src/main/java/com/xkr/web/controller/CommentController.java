@@ -3,6 +3,7 @@ package com.xkr.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.domain.dto.ResponseDTO;
@@ -80,6 +81,7 @@ public class CommentController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    @CSRFValid
     @RequestMapping(value = "/submit",method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate

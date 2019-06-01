@@ -131,14 +131,14 @@ public class ResourceService {
         }
         int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
-        Map<String,Object> filterMap = Maps.newHashMap();
-        filterMap.put("type",resType);
-        filterMap.put("report",report);
-        filterMap.put("status",status.getCode());
+        Map<String, Object> filterMap = Maps.newHashMap();
+        filterMap.put("type", resType);
+        filterMap.put("report", report);
+        filterMap.put("status", status.getCode());
         SearchResultListDTO<ResourceIndexDTO> resultListDTO = null;
-        if(StringUtils.isEmpty(keyword)){
-            resultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class,filterMap,Pair.of(startDate, endDate),
-                    "updateTime",null,offset,size);
+        if (StringUtils.isEmpty(keyword)) {
+            resultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class, filterMap, Pair.of(startDate, endDate),
+                    "updateTime", null, offset, size);
         } else {
             resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
                     keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
@@ -177,8 +177,8 @@ public class ResourceService {
                         userContentMapper.put(resource.getUserId(),
                                 String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), resourceStatusEnum.getDesc())));
                 messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
-            }catch (Exception e){
-                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            } catch (Exception e) {
+                logger.error("发送消息异常,已忽略,resourceIds:{}", JSON.toJSONString(resourceIds), e);
             }
         }
         return new ResponseDTO<>(success);
@@ -215,8 +215,8 @@ public class ResourceService {
                             String.format(MessageService.RESOURCE_TEMPLATE, resource.getTitle(), ResourceStatusEnum.STATUS_DELETED.getDesc()));
                 });
                 messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
-            }catch (Exception e){
-                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            } catch (Exception e) {
+                logger.error("发送消息异常,已忽略,resourceIds:{}", JSON.toJSONString(resourceIds), e);
             }
         }
         return new ResponseDTO<>(success);
@@ -224,19 +224,20 @@ public class ResourceService {
 
     /**
      * 获取回收站资源
+     *
      * @param pageNum
      * @param size
      * @return
      */
-    public ListResourceRecycleDTO getRecycleResourceList(int pageNum,int size) {
+    public ListResourceRecycleDTO getRecycleResourceList(int pageNum, int size) {
         ListResourceRecycleDTO listResourceRecycleDTO = new ListResourceRecycleDTO();
         pageNum = pageNum < 1 ? 1 : pageNum;
-        size = size  < 1 ? 10 : size;
-        Page page = PageHelper.startPage(pageNum,size,"update_time desc");
+        size = size < 1 ? 10 : size;
+        Page page = PageHelper.startPage(pageNum, size, "update_time desc");
         List<XkrResourceRecycle> xkrResourceRecycles = xkrAdminRecycleAgent.getAllListByPage();
         xkrResourceRecycles.forEach(xkrResourceRecycle -> {
             ResourceRecycleDTO resourceRecycleDTO = new ResourceRecycleDTO();
-            buildResourceRecycleDTO(resourceRecycleDTO,xkrResourceRecycle);
+            buildResourceRecycleDTO(resourceRecycleDTO, xkrResourceRecycle);
             listResourceRecycleDTO.getList().add(resourceRecycleDTO);
         });
         listResourceRecycleDTO.setTotalCount((int) page.getTotal());
@@ -270,8 +271,8 @@ public class ResourceService {
                 messageService.batchSaveMessageToUser(LoginEnum.ADMIN, adminAccount.getId(), userContentMapper);
                 //清除回收站资源
                 success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
-            }catch (Exception e){
-                logger.error("发送消息异常,已忽略,resourceIds:{}",JSON.toJSONString(resourceIds),e);
+            } catch (Exception e) {
+                logger.error("发送消息异常,已忽略,resourceIds:{}", JSON.toJSONString(resourceIds), e);
             }
         }
         return new ResponseDTO<>(success);
@@ -291,7 +292,7 @@ public class ResourceService {
         }
         //清除回收站资源
         boolean success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
-        if(success){
+        if (success) {
             //清除资源
             success = xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
         }
@@ -361,13 +362,13 @@ public class ResourceService {
 
 
             JSONObject ext = JSON.parseObject(resource.getExt());
-            String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY),"utf-8");
+            String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY), "utf-8");
             String downloadUrl = String.format(UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
                     UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
-                    "/"+fileBucket+downloadUrl, date);
+                    "/" + fileBucket + downloadUrl, date);
         } catch (UpException e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);
@@ -673,8 +674,18 @@ public class ResourceService {
         return result;
     }
 
-    public boolean reportResource(Long resourceId) {
-        return xkrResourceAgent.reportIllegalResource(resourceId);
+    public ResponseDTO reportResource(Long resourceId) {
+        XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
+        //用户无权限
+        if (UserStatusEnum.USER_STATUS_NORMAL.getCode() != user.getStatus()) {
+            return new ResponseDTO<>(ErrorStatus.COMMENT_USER_NOT_PRILIVEGED);
+        }
+        //查询用户是否下载过该评论
+        List<XkrResourceUser> xkrResourceUsers = xkrResourceUserAgent.getResourceByResAndUserId(user.getId(), resourceId, XkrResourceUserAgent.STATUS_PAYED);
+        if (CollectionUtils.isEmpty(xkrResourceUsers)) {
+            return new ResponseDTO<>(ErrorStatus.COMMENT_USER_NOT_PRILIVEGED);
+        }
+        return xkrResourceAgent.reportIllegalResource(resourceId) ? new ResponseDTO() : new ResponseDTO(ErrorStatus.ERROR);
     }
 
 
@@ -819,7 +830,7 @@ public class ResourceService {
 
     }
 
-    private void buildResourceRecycleDTO(ResourceRecycleDTO resourceRecycleDTO,XkrResourceRecycle xkrResourceRecycle){
+    private void buildResourceRecycleDTO(ResourceRecycleDTO resourceRecycleDTO, XkrResourceRecycle xkrResourceRecycle) {
         resourceRecycleDTO.setClassName(xkrResourceRecycle.getClassName());
         resourceRecycleDTO.setOptName(xkrResourceRecycle.getOptName());
         resourceRecycleDTO.setResourceId(xkrResourceRecycle.getResourceId());

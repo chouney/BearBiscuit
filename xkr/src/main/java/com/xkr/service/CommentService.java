@@ -9,6 +9,7 @@ import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.domain.XkrResourceCommentAgent;
+import com.xkr.domain.XkrResourceUserAgent;
 import com.xkr.domain.XkrUserAgent;
 import com.xkr.domain.dto.*;
 import com.xkr.domain.dto.comment.*;
@@ -17,6 +18,7 @@ import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrResourceComment;
+import com.xkr.domain.entity.XkrResourceUser;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.SearchApiService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -43,6 +45,9 @@ public class CommentService {
 
     @Autowired
     private XkrResourceCommentAgent resourceCommentAgent;
+
+    @Autowired
+    private XkrResourceUserAgent resourceUserAgent;
 
     @Autowired
     private SearchApiService searchApiService;
@@ -215,6 +220,12 @@ public class CommentService {
         if (UserStatusEnum.USER_STATUS_NORMAL.getCode() != user.getStatus()) {
             return new ResponseDTO<>(ErrorStatus.COMMENT_USER_NOT_PRILIVEGED);
         }
+        //查询用户是否下载过该评论
+        List<XkrResourceUser> xkrResourceUsers = resourceUserAgent.getResourceByResAndUserId(user.getId(),resourceId,XkrResourceUserAgent.STATUS_PAYED);
+        if(CollectionUtils.isEmpty(xkrResourceUsers)){
+            return new ResponseDTO<>(ErrorStatus.COMMENT_USER_NOT_PRILIVEGED);
+        }
+
         ResponseDTO<XkrResourceComment> result = resourceCommentAgent.saveNewResourceComment(clientIp, user, resourceId, content);
         if (ErrorStatus.OK.equals(result.getStatus())) {
             return new ResponseDTO<>(result.getData().getId());

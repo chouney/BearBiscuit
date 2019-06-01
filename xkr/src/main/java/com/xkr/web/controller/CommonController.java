@@ -1,6 +1,7 @@
 package com.xkr.web.controller;
 
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.annotation.CSRFGen;
 import com.xkr.domain.dto.file.FileUploadResponseDTO;
 import com.xkr.exception.UpFileExistException;
 import com.xkr.service.api.UpLoadApiService;
@@ -41,6 +42,7 @@ public class CommonController {
     @Autowired
     private UpLoadApiService upLoadApiService;
 
+    @CSRFGen
     @RequestMapping(value = "/file_upload", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate

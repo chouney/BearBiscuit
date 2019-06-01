@@ -258,6 +258,7 @@ public class ResourceController {
      * @param result
      * @return
      */
+    @CSRFValid
     @RequestMapping(value = "/res_upload", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
@@ -367,8 +368,9 @@ public class ResourceController {
             return new BasicResult<>(result);
         }
         try {
-            Boolean isSuccess = resourceService.reportResource(Long.valueOf(resourceId));
-            if(isSuccess){
+
+            ResponseDTO responseDTO = resourceService.reportResource(Long.valueOf(resourceId));
+            if(ErrorStatus.OK.equals(responseDTO.getStatus())){
                 return new BasicResult<>(ErrorStatus.OK);
             }
         } catch (Exception e) {

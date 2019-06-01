@@ -47,7 +47,7 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                 return true;
             }
             try {
-                String date = httpServletRequest.getHeader("Date");
+                String date = httpServletRequest.getHeader("X-Date");
                 String uri = httpServletRequest.getRequestURI();
                 String signature = httpServletRequest.getHeader("Authorization");
                 if(StringUtils.isEmpty(signature)){
