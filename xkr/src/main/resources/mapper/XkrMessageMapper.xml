@@ -26,7 +26,7 @@
     insert into xkr_message(<include refid="message_field"/>)
     values
     <foreach collection="list" index="index" item="item"  separator="," >
-      (#{item.id}, #{item.fromTypeCode},#{item.fromId},#{item.toTypeCode},#{item.toId},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP()
+      (#{item.id}, #{item.fromTypeCode},#{item.fromId},#{item.toTypeCode},#{item.toId},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),
       #{item.content},#{item.status})
     </foreach>
   </insert>

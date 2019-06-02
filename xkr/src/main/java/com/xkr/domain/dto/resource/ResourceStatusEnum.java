@@ -41,10 +41,17 @@ public enum ResourceStatusEnum {
     );
 
     /**
-     * 带修改状态集合
+     * 待修改状态集合
      */
     public static List<ResourceStatusEnum> TOUPDATE_STATUSED = ImmutableList.of(
             STATUS_NORMAL, STATUS_FREEZED,STATUS_DELETED
+    );
+
+    /**
+     * 全状态集合
+     */
+    public static List<ResourceStatusEnum> ALL_STATUSED = ImmutableList.of(
+            STATUS_NORMAL, STATUS_FREEZED,STATUS_DELETED,STATUS_UNVERIFIED
     );
 
     public static ResourceStatusEnum getByCode(int code) {

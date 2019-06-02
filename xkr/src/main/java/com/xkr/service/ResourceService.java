@@ -166,7 +166,7 @@ public class ResourceService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds,ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, resourceStatusEnum);
         if (success) {
@@ -257,7 +257,7 @@ public class ResourceService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds);
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds,ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_NORMAL);
         if (success) {
