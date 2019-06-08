@@ -2,6 +2,7 @@ package com.xkr.web.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.hash.Hashing;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.web.model.BasicResult;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -61,8 +64,10 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                 String[] s = signature.split(":");
                 String secret = PROJECT_SCCURITY_MAP.get(s[0]);
 
+                String needValidate = Base64.encodeToString(
+                        Hashing.hmacSha256(secret.getBytes(Charset.forName("utf-8")))
+                                .hashBytes(String.join("&", uri, date).getBytes(Charset.forName("utf-8"))).toString().getBytes(Charset.forName("utf-8")));
 
-                String needValidate = Base64.encodeToString(HmacUtils.getHmacSha256(secret.getBytes()).doFinal(String.join("&", uri, date).getBytes()));
                 if (signature.equals(needValidate)) {
                     return true;
                 }
@@ -81,7 +86,13 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
     // TODO: 2018/5/7 待验证
 
 //    public static void main(String[] args){
-//        String needValidate = Base64.encodeToString(HmacUtils.getHmacSha256("a75db4ba27967da94d3ddc3c3675bb9e".getBytes()).doFinal(String.join("&", "/api/cls/list", "Sat").getBytes()));
+//        String secret = "a75db4ba27967da94d3ddc3c3675bb9e";
+//        String req = String.join("&", "/api/cls/list", "Sat,08 Jun 2019 13:20:43 GMT");
+//        System.out.println(req);
+//        System.out.println(secret);
+//        String needValidate = Base64.encodeToString(
+//                Hashing.hmacSha256(secret.getBytes(Charset.forName("utf-8")))
+//                        .hashBytes(req.getBytes(Charset.forName("utf-8"))).toString().getBytes(Charset.forName("utf-8")));
 //        System.out.println(needValidate);
 //    }
 }
