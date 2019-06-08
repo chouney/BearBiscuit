@@ -46,7 +46,6 @@ public class RemarkController {
 
     @ResponseBody
     @MethodValidate
-    @RequiresPermissions({PermissionEnum.Constant.REMARK_PERM})
     @RequestMapping("/submit")
     public BasicResult submitRemark(
             @NotBlank
