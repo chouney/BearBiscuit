@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.web.model.BasicResult;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.Sha1Hash;
@@ -60,7 +61,8 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                 String[] s = signature.split(":");
                 String secret = PROJECT_SCCURITY_MAP.get(s[0]);
 
-                String needValidate = Base64.encodeToString(new Sha1Hash(secret, String.join("&", uri, date)).getBytes());
+
+                String needValidate = Base64.encodeToString(HmacUtils.getHmacSha256(secret.getBytes()).doFinal(String.join("&", uri, date).getBytes()));
                 if (signature.equals(needValidate)) {
                     return true;
                 }
@@ -77,4 +79,9 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
     }
 
     // TODO: 2018/5/7 待验证
+
+//    public static void main(String[] args){
+//        String needValidate = Base64.encodeToString(HmacUtils.getHmacSha256("a75db4ba27967da94d3ddc3c3675bb9e".getBytes()).doFinal(String.join("&", "/api/cls/list", "Sat").getBytes()));
+//        System.out.println(needValidate);
+//    }
 }
