@@ -56,6 +56,12 @@ public class OptLogService {
         xkrAdminOptLogAgent.saveNewOptLog(adminAccount,moduleEnum,session.getHost(),detail);
     }
 
+    @Async
+    public void saveOptLogByAuto(OptLogModuleEnum moduleEnum,String detail){
+//        Subject subject = SecurityUtils.getSubject();
+        xkrAdminOptLogAgent.saveNewOptLog(999999L,moduleEnum,"127.0.0.1",detail);
+    }
+
     public ListOptLogDTO getOptLogList(Long adminAccountId,int pageNum,int size){
         ListOptLogDTO result = new ListOptLogDTO();
         pageNum = pageNum < 1 ? 1 : pageNum;

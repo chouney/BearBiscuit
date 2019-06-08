@@ -103,6 +103,7 @@ public class BaseRedisService {
             if (oldValue.equals(current)
                     && aquireLock(jedis, key, 10000L)) {
                 try {
+                    logger.debug("获取锁成功,key:{},oldValue:{},newValue:{}",key,oldValue,newValue);
                     jedis.set(key, newValue);
                     return true;
                 } catch (Exception e) {
@@ -132,12 +133,12 @@ public class BaseRedisService {
             return;
         }
         String lockKey = key + LOCK_KEY_POSTFIX;
-        String currentValueStr = jedis.get(lockKey); //redis里的时间
-        if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
-            //获取上一个锁到期时间，并设置现在的锁到期时间，
-            //只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
-            jedis.getSet(lockKey, "0");
-        }
+//        String currentValueStr = jedis.get(lockKey); //redis里的时间
+//        if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
+//            获取上一个锁到期时间，并设置现在的锁到期时间，
+//            只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
+        String oldValue = jedis.getSet(lockKey, "0");
+        logger.debug("释放锁成功,key:{},oldValue:{}",key,oldValue);
     }
 
     /**
@@ -153,18 +154,24 @@ public class BaseRedisService {
 
             String lockKey = key + LOCK_KEY_POSTFIX;
             if (jedis.setnx(lockKey, expiresStr) == 1) {
+                logger.debug("初次设置锁成功,lockKey:{},exprieTime:{}",lockKey,expiresStr);
+                //设置键失效时间
+                jedis.pexpire(lockKey,expireTime+1);
                 // lock acquired
                 return true;
             }
 
             String currentValueStr = jedis.get(lockKey); //redis里的时间
+            logger.debug("获取原有锁,lockKey:{},currentValueStr:{}",lockKey,currentValueStr);
             //判断是否为空，不为空的情况下，如果被其他线程设置了值，则第二个条件判断是过不去的
             if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
                 // lock is expired
                 //获取上一个锁到期时间，并设置现在的锁到期时间，
                 String oldValueStr = jedis.getSet(lockKey, expiresStr);
+                logger.debug("原有锁不为空,set新时间,lockKey:{},oldValueStr:{},expiresStr:{}",lockKey,oldValueStr,expiresStr);
                 //只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
                 if (oldValueStr != null && oldValueStr.equals(currentValueStr)) {
+                    logger.debug("抢占锁成功,lockKey:{},oldValueStr:{},currentValueStr:{}",lockKey,oldValueStr,currentValueStr);
                     //如过这个时候，多个线程恰好都到了这里，但是只有一个线程的设置值和当前值相同，他才有权利获取锁
                     // lock acquired
                     return true;

@@ -49,12 +49,15 @@ public class OptLogAspect {
         Method targetMethod = methodSignature.getMethod();
 
         OptLog optLog = targetMethod.getAnnotation(OptLog.class);
-        if(Objects.nonNull(optLog)){
+        if (Objects.nonNull(optLog)) {
             OptLogModuleEnum moduleEnum = optLog.moduleEnum();
             OptEnum optEnum = optLog.optEnum();
-            String detail = optEnum.getDesc()+ ",参数:"+ JSON.toJSONString(joinPoint.getArgs());
-            Subject subject = SecurityUtils.getSubject();
-            optLogService.saveOptLog(subject,moduleEnum,detail);
+            String detail = optEnum.getDesc() + ",参数:" + JSON.toJSONString(joinPoint.getArgs());
+            if (!OptEnum.SYSTEM.equals(optEnum)) {
+                Subject subject = SecurityUtils.getSubject();
+                optLogService.saveOptLog(subject, moduleEnum, detail);
+            }
+            optLogService.saveOptLogByAuto(moduleEnum,detail);
         }
         return joinPoint.proceed(joinPoint.getArgs());
     }

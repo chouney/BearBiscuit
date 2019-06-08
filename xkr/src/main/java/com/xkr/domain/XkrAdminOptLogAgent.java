@@ -52,6 +52,22 @@ public class XkrAdminOptLogAgent {
         return xkrAdminOptLogMapper.insertSelective(log) == 1;
     }
 
+    public boolean saveNewOptLog(Long systemId, OptLogModuleEnum logModuleEnum,
+                                 String clientIp,String detail){
+        if(Objects.isNull(systemId) || Objects.isNull(logModuleEnum) ||
+                StringUtils.isEmpty(clientIp) || StringUtils.isEmpty(detail)){
+            return false;
+        }
+        XkrAdminOptLog log = new XkrAdminOptLog();
+        log.setId(idGenerator.generateId());
+        log.setAdminAccountId(systemId);
+        log.setClientIp(clientIp);
+        log.setOptDetail(detail);
+        log.setOptModule((byte)logModuleEnum.getCode());
+        log.setStatus((byte)STATUS_NORMAL);
+        return xkrAdminOptLogMapper.insertSelective(log) == 1;
+    }
+
     public List<XkrAdminOptLog> getAllList(Long adminAccountId){
         return xkrAdminOptLogMapper.getAllOptLogByAdminAccount(adminAccountId);
     }

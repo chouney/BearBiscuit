@@ -13,6 +13,7 @@ public enum OptEnum {
     QUERY(4,"查询"),
     RENEW(5,"回收站还原"),
     CLEAR(6,"回收站删除"),
+    SYSTEM(7,"后台操作"),
 
 
     ;

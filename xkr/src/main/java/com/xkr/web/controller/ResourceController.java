@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -325,6 +326,7 @@ public class ResourceController {
     public BasicResult<JSONObject> resourceDownLoad(
             @IsNumberic
             @RequestParam(name = "resId") String resourceId,
+            HttpServletRequest request,
             ValidResult result) {
         if(result.hasErrors()){
             return new BasicResult<>(result);

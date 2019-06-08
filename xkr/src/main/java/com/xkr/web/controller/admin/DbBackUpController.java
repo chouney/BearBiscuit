@@ -199,7 +199,7 @@ public class DbBackUpController {
 
             XkrAdminAccount xkrAdminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> responseDTO = backUpService.backup(xkrAdminAccount.getId());
+            ResponseDTO<Long> responseDTO = backUpService.backupWithOpt(xkrAdminAccount.getId());
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult(responseDTO.getStatus());

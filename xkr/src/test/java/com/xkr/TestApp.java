@@ -31,6 +31,7 @@ public class TestApp extends TestCase {
 
     @Test
     public void testRedis(){
+
         redisTemplate.boundValueOps("xkr").set("df1111111111111");
         System.out.println(redisTemplate.opsForValue().get("xkr"));
     }

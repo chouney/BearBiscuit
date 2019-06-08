@@ -97,8 +97,37 @@ public class BackUpService {
      * @param adminAccountId
      * @return
      */
-    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.INSERT)
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.SYSTEM)
     public ResponseDTO<Long> backup(Long adminAccountId){
+        adminAccountId = Objects.isNull(adminAccountId) ? AUTO_BACKUP_ADMIN_ACCOUNT_ID : adminAccountId;
+        String backUpName = "dbbackup-" + DateUtil.getCurrentDate() + "-" + IdUtil.randomAlphanumeric(10);
+        String localFilePath = backUpApiService.getBackupPath() + backUpName;
+        String upyunFilePath = String.format(UpLoadApiService.getExtFilePathFormat(), backUpName);
+        Long id = xkrDatabaseBackUpAgent.saveNewBackUpDate(backUpName, localFilePath,
+                upyunFilePath, adminAccountId);
+        if (Objects.nonNull(id)) {
+            try {
+                localFilePath = backUpApiService.backup(localFilePath, null);
+                if (StringUtils.isEmpty(localFilePath)) {
+                    throw new BackUpException();
+                }
+                upyunFilePath = upLoadApiService.extFileUpload(upyunFilePath, new File(localFilePath));
+                if (StringUtils.isEmpty(upyunFilePath)) {
+                    throw new BackUpException();
+                }
+                return new ResponseDTO<>(id);
+            } catch (BackUpException | UpException | IOException e) {
+                logger.error("backup service save backup failed adminAccountId:{},error:{}", adminAccountId, e);
+            }
+            if (!xkrDatabaseBackUpAgent.batchDeleteBackUpByIds(ImmutableList.of(id))){
+                logger.error("冗余backup记录,backUpId:{}",id);
+            }
+        }
+        return new ResponseDTO<>(ErrorStatus.ERROR);
+    }
+
+    @OptLog(moduleEnum = OptLogModuleEnum.BACKUP,optEnum = OptEnum.INSERT)
+    public ResponseDTO<Long> backupWithOpt(Long adminAccountId){
         adminAccountId = Objects.isNull(adminAccountId) ? AUTO_BACKUP_ADMIN_ACCOUNT_ID : adminAccountId;
         String backUpName = "dbbackup-" + DateUtil.getCurrentDate() + "-" + IdUtil.randomAlphanumeric(10);
         String localFilePath = backUpApiService.getBackupPath() + backUpName;
