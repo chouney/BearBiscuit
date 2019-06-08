@@ -68,7 +68,8 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
                         Hashing.hmacSha256(secret.getBytes(Charset.forName("utf-8")))
                                 .hashBytes(String.join("&", uri, date).getBytes(Charset.forName("utf-8"))).toString().getBytes(Charset.forName("utf-8")));
 
-                if (signature.equals(needValidate)) {
+                if (s.length>1
+                        && s[1].equals(needValidate)) {
                     return true;
                 }
                 logger.info("Basic Auth认证未通过,uri:{}, date:{}", uri, date);
