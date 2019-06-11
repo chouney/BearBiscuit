@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -201,7 +202,8 @@ public class UpLoadApiService {
             return new FileUploadResponseDTO(compressMd5, uploadFile.getName());
         } else if (IMAGE_FILE_TYPE == fileType) {
             String imageMd5 = UpYun.md5(uploadFile);
-            if (uploadImageFile(imageMd5, uploadFile)) {
+            String picUri = uploadImageFile(imageMd5, uploadFile);
+            if (!StringUtils.isEmpty(picUri)) {
                 return new FileUploadResponseDTO(imageMd5);
             }
         }
@@ -218,7 +220,7 @@ public class UpLoadApiService {
      * @throws IOException
      * @throws UpException
      */
-    private boolean uploadImageFile(String md5FileName, File imageFile) throws IOException, UpException {
+    private String uploadImageFile(String md5FileName, File imageFile) throws IOException, UpException {
         LocalDateTime date = LocalDateTime.now();
         String picPath = String.format(IMAGE_FILE_PATH_FORMAT, date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                 date.getHour(), date.getMinute(), date.getSecond(), md5FileName);
@@ -227,9 +229,9 @@ public class UpLoadApiService {
         } catch (Exception e){
             logger.info("云盘服务上传图片失败,回滚删除图片,md5FileName:{},imageFile:{}", md5FileName, imageFile.getName());
             deleteFile(picPath, false);
-            return false;
+            return null;
         }
-        return true;
+        return picPath;
     }
 
     /**

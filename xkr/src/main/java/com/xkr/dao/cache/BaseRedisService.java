@@ -138,7 +138,7 @@ public class BaseRedisService {
 //            获取上一个锁到期时间，并设置现在的锁到期时间，
 //            只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
         String oldValue = jedis.getSet(lockKey, "0");
-        logger.debug("释放锁成功,key:{},oldValue:{}",key,oldValue);
+        logger.debug("释放锁成功,key:{},oldValue:{}",lockKey,oldValue);
     }
 
     /**
