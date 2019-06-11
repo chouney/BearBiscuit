@@ -127,6 +127,9 @@ public class UpLoadApiService {
         }
         try {
             List<UpYun.FolderItem> folderItems = upYun.readDir(dicPath);
+            if(CollectionUtils.isEmpty(folderItems)){
+                return Lists.newArrayList();
+            }
             return folderItems.stream().map(folderItem -> new FolderItemDTO(folderItem.name, "Folder".equals(folderItem.type),
                     folderItem.size, folderItem.date)).collect(Collectors.toList());
         } catch (IOException | UpException e) {

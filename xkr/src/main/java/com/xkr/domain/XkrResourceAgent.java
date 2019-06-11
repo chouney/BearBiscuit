@@ -157,8 +157,8 @@ public class XkrResourceAgent {
             return null;
         }
         //做敏感词过滤
-        title = TextUtils.filter(title);
-        detail = TextUtils.filter(detail);
+//        title = TextUtils.filter(title);
+//        detail = TextUtils.filter(detail);
         //获取资源分类：毕设或者资源
         Integer resType = Integer.valueOf(xkrClass.getPath().split("-")[1]);
         Long resourceId = idGenerator.generateId();
