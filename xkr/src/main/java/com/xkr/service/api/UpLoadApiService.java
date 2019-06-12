@@ -204,7 +204,7 @@ public class UpLoadApiService {
             String imageMd5 = UpYun.md5(uploadFile);
             String picUri = uploadImageFile(imageMd5, uploadFile);
             if (!StringUtils.isEmpty(picUri)) {
-                return new FileUploadResponseDTO(imageMd5);
+                return new FileUploadResponseDTO(picUri);
             }
         }
         return new FileUploadResponseDTO(ErrorStatus.ERROR);
