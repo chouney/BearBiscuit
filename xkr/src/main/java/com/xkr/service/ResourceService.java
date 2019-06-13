@@ -129,8 +129,8 @@ public class ResourceService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
+        int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
         Map<String, Object> filterMap = Maps.newHashMap();
         filterMap.put("type", resType);
         filterMap.put("report", report);
@@ -563,7 +563,8 @@ public class ResourceService {
 
         //排序的索引键值
         String sortKey = orderType == ORDER_BY_DOWNLOAD_COUNT ? "downloadCount" : "updateTime";
-        int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
+        size = size <= 0 ? 10 : size;
+        int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
 
         //搜索字段
         Map<String, Float> field = ImmutableMap.of(
@@ -693,7 +694,8 @@ public class ResourceService {
                                                  int pageNum, int size) {
         //排序的索引键值
         String sortKey = orderType == ORDER_BY_DOWNLOAD_COUNT ? "downloadCount" : "updateTime";
-        int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
+        size = size <= 0 ? 10 : size;
+        int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
 
         List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 

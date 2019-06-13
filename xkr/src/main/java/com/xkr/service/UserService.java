@@ -89,8 +89,8 @@ public class UserService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
+        int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
         SearchResultListDTO<UserIndexDTO> searchResultListDTO = null;
         if(StringUtils.isEmpty(userLogin)){
             searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(createDate, null),

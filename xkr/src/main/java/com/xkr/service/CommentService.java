@@ -76,8 +76,8 @@ public class CommentService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        int offset = pageNum - 1 < 0 ? 0 : pageNum - 1;
         size = size <= 0 ? 10 : size;
+        int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
         SearchResultListDTO<CommentIndexDTO> searchResultListDTO = null;
         if(StringUtils.isEmpty(keyword)){
             searchResultListDTO = searchApiService.searchByFilterField(CommentIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(updateTime, null),
