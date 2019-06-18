@@ -33,7 +33,7 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final static Map<String, String> PROJECT_SCCURITY_MAP = ImmutableMap.of(
-            "xkr", "a75db4ba27967da94d3ddc3c3675bb9e"
+            "xkr_sec", "45668d5e8dff0e2a62f9741d91bdff17"
     );
 
     @Value("${spring.profiles.active}")
@@ -41,7 +41,7 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug"))){
+        if(!"pro".equals(runEnv) && StringUtils.isNotEmpty(httpServletRequest.getParameter("debug_sec"))){
             return true;
         }
         if (o instanceof HandlerMethod) {
