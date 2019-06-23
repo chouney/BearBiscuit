@@ -216,3 +216,18 @@ CREATE TABLE xkr_database_backup(
 	PRIMARY KEY (`id`),
 	INDEX `idx_sta_up` (`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='数据库备份表';
+
+
+DROP TABLE IF EXISTS `xkr_data_analyze`;
+CREATE TABLE xkr_data_analyze(
+	`id` bigint(20) UNSIGNED NOT NULL COMMENT '数据分析id',
+	`title` varchar(255) NOT NULL COMMENT '标题',
+	`cal_count` int(10) UNSIGNED NOT NULL COMMENT '次数',
+	`cal_type` tinyint(4) NOT NULL COMMENT '统计状态',
+	`status` tinyint(4) NOT NULL COMMENT '状态',
+	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '',
+	PRIMARY KEY (`id`),
+	INDEX `idx_da_up` (`status`,`update_time`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='数据分析表';

@@ -138,18 +138,22 @@ public class ClassService {
         Map<Long, ClassMenuDTO> tmpMap = Maps.newHashMap();
         xkrClasses.forEach(xkrClass -> {
             ClassMenuDTO menuDTO = new ClassMenuDTO();
+            int totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED, xkrClass.getId().intValue());
             menuDTO.setClassId(xkrClass.getId());
             menuDTO.setClassName(xkrClass.getClassName());
+            menuDTO.setCount(totalCount);
             tmpMap.put(menuDTO.getClassId(), menuDTO);
         });
         xkrClasses.forEach(xkrClass -> {
             ClassMenuDTO parent = tmpMap.get(xkrClass.getParentClassId());
+            ClassMenuDTO current = tmpMap.get(xkrClass.getId());
             //如果为空,说明是根目录
             if (Objects.isNull(parent)) {
-                result.add(tmpMap.get(xkrClass.getId()));
+                result.add(current);
                 return;
             }
-            parent.getChild().add(tmpMap.get(xkrClass.getId()));
+            parent.setCount(parent.getCount()+current.getCount());
+            parent.getChild().add(current);
         });
     }
 }

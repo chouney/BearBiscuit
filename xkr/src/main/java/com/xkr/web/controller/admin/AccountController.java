@@ -237,7 +237,7 @@ public class AccountController {
             @RequestParam(name = "accountName") String accountName,
             @NotBlank
             @RequestParam(name = "accountToken") String accountToken,
-            @RequestParam(name = "permissionIds[]") String[] permissionIds,
+            @RequestParam(name = "permissionIds[]",required = false) String[] permissionIds,
             @Email
             @RequestParam(name = "email") String email,
             ValidResult result) {

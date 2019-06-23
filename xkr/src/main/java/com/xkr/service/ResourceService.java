@@ -387,17 +387,17 @@ public class ResourceService {
      * @param cost
      * @param classId
      * @param userId
-     * @param compressMd5
+     * @param cp
      * @return
      */
     public ResponseDTO<Long> saveNewResource(String title, String detail, Integer cost, Long classId, Long userId,
-                                             String compressMd5, String fileName) {
-        String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, compressMd5, fileName);
+                                             String cp, String up) {
+//        String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, cp, up);
         try {
-            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInfo(filePath);
+            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInfo(up);
             if (Objects.isNull(fileInfoDTO)) {
-                logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},filePath:{}",
-                        classId, userId, compressMd5, filePath);
+                logger.error("ResourceService saveNewResource failed : classId:{},userId:{},cp:{},up:{}",
+                        classId, userId, cp, up);
                 return new ResponseDTO<>(ErrorStatus.RESOURCE_NOT_FOUND);
             }
 
@@ -409,7 +409,7 @@ public class ResourceService {
             }
 
             XkrResource resource = xkrResourceAgent.saveNewResource(title, detail, cost, xkrClass,
-                    userId, compressMd5, fileInfoDTO.getSize(), fileName);
+                    userId, cp, fileInfoDTO.getSize(), up);
             if (Objects.nonNull(resource)) {
 
                 String[] paths = xkrClass.getPath().split("-");
@@ -426,8 +426,8 @@ public class ResourceService {
 
             }
         } catch (IOException | UpException e) {
-            logger.error("ResourceService saveNewResource failed : classId:{},userId:{},compressMd5:{},filePath:{}",
-                    classId, userId, compressMd5, filePath);
+            logger.error("ResourceService saveNewResource failed : classId:{},userId:{},cp:{},up:{}",
+                    classId, userId, cp, up);
         }
         return new ResponseDTO<>(ErrorStatus.ERROR);
 
@@ -447,14 +447,12 @@ public class ResourceService {
             logger.error("ResourceService getResourceMenuList resource info is null : resId:{},resUri:{}", "null", resUri);
             return list;
         }
-        String fileName = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
-        if (StringUtils.isEmpty(fileName)) {
+        String up = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
+        if (StringUtils.isEmpty(up)) {
             logger.error("ResourceService getResourceMenuList fileName is null : resource:{}", JSON.toJSONString(resource));
             return list;
         }
-        String filePrefixName = fileName.split("\\.")[0];
-        String dicPath = String.format(UpLoadApiService.getUncompressFilePathFormat(), String.valueOf(resource.getUserId()), resource.getResourceUrl(), filePrefixName + "/" + resUri);
-        return upLoadApiService.getDirInfo(dicPath);
+        return upLoadApiService.getDirInfo(up);
     }
 
     /**

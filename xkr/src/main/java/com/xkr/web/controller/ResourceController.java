@@ -19,6 +19,7 @@ import com.xkr.domain.dto.resource.ResourceFolderDTO;
 import com.xkr.domain.entity.XkrClass;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.ClassService;
+import com.xkr.service.DataAnalyzeService;
 import com.xkr.service.ResourceService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.resource.*;
@@ -54,6 +55,9 @@ public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
+
+    @Autowired
+    private DataAnalyzeService analyzeService;
 
     @Autowired
     private XkrClassAgent xkrClassAgent;
@@ -171,6 +175,9 @@ public class ResourceController {
                 return new BasicResult<>(resourceDTOs.getStatus());
             }
 
+            //数据统计
+            analyzeService.upsertData(keyWord);
+
             buildListResourceVO(resourceVOs, resourceDTOs);
 
             return new BasicResult<>(resourceVOs);
@@ -254,12 +261,11 @@ public class ResourceController {
      * @param resCost
      * @param classId
      * @param detail
-     * @param compressMd5
      * @param captcha
      * @param result
      * @return
      */
-    @CSRFValid
+//    @CSRFValid
     @RequestMapping(value = "/res_upload", method = {RequestMethod.POST})
     @ResponseBody
     @MethodValidate
@@ -275,9 +281,9 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "detail") String detail,
             @NotBlank
-            @RequestParam(name = "compressMd5") String compressMd5,
+            @RequestParam(name = "cp") String cp,
             @NotBlank
-            @RequestParam(name = "fileName") String fileName,
+            @RequestParam(name = "up") String up,
             @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
@@ -297,7 +303,7 @@ public class ResourceController {
 
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),compressMd5,fileName);
+            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),cp,up);
 
             if(!ErrorStatus.OK.equals(resId.getStatus())){
                 return new BasicResult<>(resId.getStatus());
@@ -307,7 +313,7 @@ public class ResourceController {
 
             return new BasicResult<>(output);
         } catch (Exception e) {
-            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},compressMd5:{}", resTitle,resCost,detail,classId,compressMd5, e);
+            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cp:{}", resTitle,resCost,detail,classId,cp, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }

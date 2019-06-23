@@ -19,6 +19,8 @@ public class ClassMenuDTO extends BaseDTO implements Serializable{
 
     private String className;
 
+    private Integer count;
+
     private List<ClassMenuDTO> child = Lists.newArrayList();
 
     public Long getClassId() {
@@ -44,4 +46,13 @@ public class ClassMenuDTO extends BaseDTO implements Serializable{
     public void setChild(List<ClassMenuDTO> child) {
         this.child = child;
     }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
 }
+

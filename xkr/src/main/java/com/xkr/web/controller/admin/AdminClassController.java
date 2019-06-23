@@ -126,6 +126,7 @@ public class AdminClassController {
     private void buildClassMenuVO(ClassMenuVO vo,ClassMenuDTO classMenuDTOs){
         vo.setClassId(classMenuDTOs.getClassId());
         vo.setClassName(classMenuDTOs.getClassName());
+        vo.setCount(classMenuDTOs.getCount());
         classMenuDTOs.getChild().forEach(classMenuDTO -> {
             ClassMenuVO menuVO = new ClassMenuVO();
             buildClassMenuVO(menuVO,classMenuDTO);

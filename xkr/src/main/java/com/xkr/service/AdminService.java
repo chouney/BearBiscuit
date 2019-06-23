@@ -196,10 +196,7 @@ public class AdminService {
                 || StringUtils.isEmpty(email)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-        if(ArrayUtils.isEmpty(permissionIds)){
-            permissionIds = new String[]{};
-        }
-        String strPermissionIds = String.join(";",permissionIds);
+
 //        if(StringUtils.isEmpty(strPermissionIds)){
 //            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
 //        }
@@ -207,6 +204,15 @@ public class AdminService {
         if(Objects.nonNull(xkrAdminAccount) && !xkrAdminAccount.getId().equals(adminAccountId)){
             return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
         }
+        String strPermissionIds ;
+
+        if(Objects.isNull(permissionIds)){
+            //如果没传permissionIds则获取当前权限id
+            strPermissionIds = xkrAdminAccount.getPermissionIds() == null ? "" : xkrAdminAccount.getPermissionIds();
+        } else {
+            strPermissionIds = String.join(";",permissionIds);
+        }
+
         return new ResponseDTO<>(xkrAdminAccountAgent.updateAdminAccountById(adminAccountId, accountName, accountToken, email, strPermissionIds));
     }
 

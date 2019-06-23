@@ -21,6 +21,8 @@ public class ClassMenuVO implements Serializable{
 
     private String className;
 
+    private int count;
+
     private List<ClassMenuVO> child = Lists.newArrayList();
 
     public Long getClassId() {
@@ -45,5 +47,13 @@ public class ClassMenuVO implements Serializable{
 
     public void setChild(List<ClassMenuVO> child) {
         this.child = child;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xkr.dao.mapper.XkrDataAnalyzeMapper" >
+  <resultMap id="BaseResultMap" type="com.xkr.domain.entity.XkrDataAnalyze" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="cal_count" property="calCount" jdbcType="INTEGER" />
+    <result column="cal_type" property="calType" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="ext" property="ext" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="data_analyze" >
+    id,title,cal_count,cal_type,status,create_time,update_time,ext
+  </sql>
+
+  <select id="selectByRange" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT <include refid="data_analyze"/>
+    FROM xkr_data_analyze WHERE 1=1
+    <if test="startTime!=null">
+      AND create_time <![CDATA[>=]]> #{startTime}
+    </if>
+    <if test="endTime!=null">
+      AND create_time <![CDATA[<=]]> #{endTime}
+    </if>
+    order by cal_count desc limit 50
+  </select>
+
+  <select id="selectByTitle" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT <include refid="data_analyze"/>
+    FROM xkr_data_analyze WHERE title = #{title}
+
+  </select>
+
+</mapper>
