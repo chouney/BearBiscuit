@@ -17,4 +17,7 @@ public interface XkrResourceCommentMapper extends CustomerMapper<XkrResourceComm
     Integer batchUpdateCommentByIds(Map<String,Object> params);
 
     List<XkrResourceComment> getCommentsByResourceId(Map<String, Object> params);
+
+    List<XkrResourceComment> searchByFilter(Map<String, Object> params);
+
 }

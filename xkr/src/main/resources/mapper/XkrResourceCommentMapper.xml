@@ -24,6 +24,12 @@
     create_time,update_time,ext,content
   </sql>
 
+  <sql id="resource_comment_field_t">
+    t.id as id,t.resource_id as resource_id,t.user_id as user_id,t.parent_comment_id as parent_comment_id,
+    t.root_comment_id as root_comment_id,t.client_ip as client_ip,t.status as status ,
+    t.create_time as create_time,t.update_time as update_time,t.ext as ext,t.content as content
+  </sql>
+
   <select id="getCommentsByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
     SELECT
     <include refid="resource_comment_field"/>
@@ -69,6 +75,28 @@
         #{status}
       </foreach>
     </if>
+  </select>
+
+  <select id="searchByFilter" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="resource_comment_field_t"/>
+    FROM xkr_resource_comment t
+    LEFT JOIN xkr_user t1
+    on t.user_id = t1.id WHERE 1=1
+    <if test="status!=null">
+      AND t.status = #{status}
+    </if>
+    <if test="updateDate!=null">
+      AND t.update_time > #{updateDate}
+    </if>
+    <if test="keyword!=null and keyword!=''">
+      AND t.content like  concat('%', #{keyWord},'%')
+    </if>
+    <if test="userName!=null and userName!=''">
+      AND (t1.user_name like  concat('%', #{userName},'%') or t1.email like concat('%', #{userName},'%'))
+      AND t1.status in ('1','2','3')
+    </if>
+
   </select>
 
 </mapper>

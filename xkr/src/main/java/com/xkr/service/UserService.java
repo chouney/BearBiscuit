@@ -1,10 +1,14 @@
 package com.xkr.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.SqlUtil;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.*;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.dao.cache.AdminIndexRedisService;
+import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.XkrLoginTokenAgent;
 import com.xkr.domain.XkrUserAgent;
 import com.xkr.domain.dto.ResponseDTO;
@@ -21,6 +25,7 @@ import com.xkr.exception.RegUserException;
 import com.xkr.service.api.MailApiService;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.util.EncodeUtil;
+import com.xkr.util.IdUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
@@ -42,6 +47,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.xkr.common.Const.VALIDATE_PREFIX;
 
 /**
  * @author chriszhang
@@ -67,6 +74,9 @@ public class UserService {
     @Autowired
     private AdminIndexRedisService adminIndexRedisService;
 
+    @Autowired
+    private BaseRedisService baseRedisService;
+
     /**
      * ------------------- 管理员服务 ----------------------
      */
@@ -91,28 +101,47 @@ public class UserService {
         }
         size = size <= 0 ? 10 : size;
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
-        SearchResultListDTO<UserIndexDTO> searchResultListDTO = null;
-        if(StringUtils.isEmpty(userLogin)){
-            searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(createDate, null),
-                    "createTime",null,offset,size);
-        } else {
-            searchResultListDTO = searchApiService.searchByKeyWordInField(
-                    UserIndexDTO.class, userLogin, ImmutableMap.of("userName", 1F, "email", 0.5F),
-                    ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
-                    null, null, offset, size
-            );
-        }
 
-        result.setTotalCount((int) searchResultListDTO.getTotalCount());
+        String sortKey = "update_time" ;
+        Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
 
-        List<Long> userIds = searchResultListDTO.getSearchResultDTO().stream().
-                map(UserIndexDTO::getUserId).collect(Collectors.toList());
+        List<XkrUser> xkrUsers = xkrUserAgent.searchByFilter(userLogin,createDate,status.getCode());
 
+        result.setTotalCount((int) page.getTotal());
+
+        SqlUtil.clearLocalPage();
+
+        List<Long> userIds = xkrUsers.stream().map(XkrUser::getId).collect(Collectors.toList());
         List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
 
         List<XkrLoginToken> loginTokens = xkrLoginTokenAgent.getUserLoginRecordByIds(userIds);
 
-        buildListUserDetailDTO(result, users, loginTokens, searchResultListDTO);
+        buildListUserDetailDTO(result,loginTokens,users);
+
+
+        /** es 搜索**/
+//        SearchResultListDTO<UserIndexDTO> searchResultListDTO = null;
+//        if(StringUtils.isEmpty(userLogin)){
+//            searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(createDate, null),
+//                    "createTime",null,offset,size);
+//        } else {
+//            searchResultListDTO = searchApiService.searchByKeyWordInField(
+//                    UserIndexDTO.class, userLogin, ImmutableMap.of("userName", 1F, "email", 0.5F),
+//                    ImmutableMap.of("status", status.getCode()), Pair.of(createDate, null), "createTime",
+//                    null, null, offset, size
+//            );
+//        }
+//
+//        result.setTotalCount((int) searchResultListDTO.getTotalCount());
+//
+//        List<Long> userIds = searchResultListDTO.getSearchResultDTO().stream().
+//                map(UserIndexDTO::getUserId).collect(Collectors.toList());
+//
+//        List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
+//
+//        List<XkrLoginToken> loginTokens = xkrLoginTokenAgent.getUserLoginRecordByIds(userIds);
+//
+//        buildListUserDetailDTO(result, users, loginTokens, searchResultListDTO);
 
         return result;
     }
@@ -137,6 +166,15 @@ public class UserService {
         searchResultListDTO.getSearchResultDTO().forEach(userIndexDTO -> {
             XkrUser user = users.stream().filter(user1 -> userIndexDTO.getUserId().equals(user1.getId())).findAny().orElseThrow(RuntimeException::new);
             XkrLoginToken loginToken = loginTokens.stream().filter(loginToken1 -> userIndexDTO.getUserId().equals(loginToken1.getUserId())).findAny().orElse(null);
+            UserDetailDTO userDetailDTO = new UserDetailDTO();
+            buildUserDetailDTO(userDetailDTO, user, loginToken);
+            result.getUserList().add(userDetailDTO);
+        });
+    }
+
+    private void buildListUserDetailDTO(ListUserDetailDTO result,List<XkrLoginToken> loginTokens, List<XkrUser> xkrUsers) {
+        xkrUsers.forEach(user -> {
+            XkrLoginToken loginToken = loginTokens.stream().filter(loginToken1 -> user.getId().equals(loginToken1.getUserId())).findAny().orElse(null);
             UserDetailDTO userDetailDTO = new UserDetailDTO();
             buildUserDetailDTO(userDetailDTO, user, loginToken);
             result.getUserList().add(userDetailDTO);
@@ -245,8 +283,11 @@ public class UserService {
 
             adminIndexRedisService.incrRegCount();
 
-            mailApiService.sendRegValidCaptcha(newUser.getEmail(), newUser.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
-                    String.valueOf(newUser.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_REG)));
+            String localTime = LocalDateTime.now().toString();
+            baseRedisService.set(VALIDATE_PREFIX+String.valueOf(newUser.getId()),localTime);
+
+            mailApiService.sendRegValidCaptcha(newUser.getEmail(), newUser.getUserName(), EncodeUtil.createEmailValidateString(localTime,
+                    String.valueOf(newUser.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_REG), IdUtil.uuid()));
             return new ResponseDTO<>(newUser.getId());
         } catch (MessagingException e) {
             logger.error("UserService sendCaptcha failed ,userEmail:{},userName:{},userToken:{}", email, userName, userToken, e);
@@ -264,6 +305,7 @@ public class UserService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         try {
+
             XkrUser user = xkrUserAgent.getUserById(userId);
             if (Objects.isNull(user)) {
                 return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
@@ -314,8 +356,11 @@ public class UserService {
 //            if (UserStatusEnum.USER_STATUS_NORMAL.getCode() == user.getStatus()) {
 //                return new ResponseDTO<>(ErrorStatus.USER_ALREADY_ACTIVE);
 //            }
+            //放到UserId缓存中
+            String localTime = LocalDateTime.now().toString();
+            baseRedisService.set(VALIDATE_PREFIX+String.valueOf(user.getId()),localTime);
             //发送邮箱验证
-            mailApiService.sendPasswordUpdateValidCaptcha(user.getEmail(), user.getUserName(), EncodeUtil.createEmailValidateString(LocalDateTime.now().toString(),
+            mailApiService.sendPasswordUpdateValidCaptcha(user.getEmail(), user.getUserName(), EncodeUtil.createEmailValidateString(localTime,
                     String.valueOf(user.getId()), String.valueOf(Const.USER_ACCOUNT_VERIFY_TYPE_UPDATE_PASSWORD)));
             return new ResponseDTO<>(true);
         } catch (MessagingException e) {

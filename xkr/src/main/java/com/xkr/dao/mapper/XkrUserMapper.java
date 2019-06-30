@@ -21,4 +21,6 @@ public interface XkrUserMapper extends CustomerMapper<XkrUser> {
     List<XkrUser> getUserByIds(Map<String,Object> params);
 
     XkrUser getUserById(Map<String,Object> params);
+
+    List<XkrUser> searchByFilter(Map<String,Object> params);
 }

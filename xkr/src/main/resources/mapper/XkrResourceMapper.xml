@@ -121,5 +121,26 @@
         </if>
     </select>
 
+    <select id="searchByFilter" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="resource_field"/>
+        FROM xkr_resource WHERE 1=1
+        <if test="status!=null">
+            AND status = #{status}
+        </if>
+        <if test="startDate!=null">
+            AND create_time >  #{startDate}
+        </if>
+        <if test="keyWord!=null and keyWord!=''">
+            AND (title like concat('%', #{keyWord},'%') OR detail like concat('%', #{keyWord},'%'))
+        </if>
+        <if test="report!=null">
+            AND report = #{report}
+        </if>
+        <if test="statuses!=null">
+            AND status #{status}
+        </if>
+    </select>
+
 
 </mapper>

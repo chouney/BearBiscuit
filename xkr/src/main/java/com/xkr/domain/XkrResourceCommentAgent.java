@@ -49,6 +49,15 @@ public class XkrResourceCommentAgent {
     @Autowired
     private IdGenerator idGenerator;
 
+    public List<XkrResourceComment> searchByFilter(String keyword,String userName, Date updateTime,
+                                                   int status){
+        Map<String,Object> params = Maps.newHashMap();
+        params.put("keyword",keyword);
+        params.put("userName",userName);
+        params.put("updateTime",updateTime);
+        params.put("status",status);
+        return xkrResourceCommentMapper.searchByFilter(params);
+    }
 
     public boolean batchUpdateCommentByIds(List<Long> commentIds, CommentStatusEnum status){
         if(CollectionUtils.isEmpty(commentIds) || Objects.isNull(status)){

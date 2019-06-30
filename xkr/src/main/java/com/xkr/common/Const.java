@@ -19,6 +19,8 @@ public class Const {
 
     public static final String SESSION_LOGIN_TYPE_KEY = "login_type";
 
+    public static final String VALIDATE_PREFIX = "validate_";
+
     public static final String CSRF_TOKEN_PREFIX = "csrf_";
 
     public static final String CSRF_TOKEN_PARAM = "token";

@@ -44,8 +44,7 @@ public class EncodeUtil {
 
     //21232f297a57a5a743894a0e4a801fc3
     public static void main(String[] args){
-        System.out.println(new SimpleHash("md5","21232f297a57a5a743894a0e4a801fc3").toHex());
-        System.out.println(md5("xkr_sec"));
+        System.out.println(md5("admin"));
     }
 
     /**

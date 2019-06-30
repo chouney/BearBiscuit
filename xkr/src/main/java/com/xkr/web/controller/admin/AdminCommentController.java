@@ -66,6 +66,7 @@ public class AdminCommentController {
     public BasicResult<ListCommentDetailVO> searchCommentByKeyWord(
             @RequestParam(name = "updateDate",required = false,defaultValue = "") String updateDate,
             @RequestParam(name = "keyWord",required = false,defaultValue = "") String keyWord,
+            @RequestParam(name = "userName",required = false,defaultValue = "") String userName,
             @RequestParam(name = "status",required = false,defaultValue = "1") Integer status,
             @RequestParam(name = "pageNum", required = false, defaultValue = "1") Integer pageNum,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size){
@@ -77,7 +78,7 @@ public class AdminCommentController {
             if(StringUtils.isNotEmpty(updateDate)){
                 sDate = DateUtil.stringToDate(updateDate,"yyyy-MM-dd");
             }
-            ListCommentDetailDTO listCommentDetailDTO = commentService.searchCommentByKeyWord(keyWord,sDate, CommentStatusEnum.getByCode(status),pageNum,size);
+            ListCommentDetailDTO listCommentDetailDTO = commentService.searchCommentByKeyWord(keyWord,userName,sDate, CommentStatusEnum.getByCode(status),pageNum,size);
 
             if(!ErrorStatus.OK.equals(listCommentDetailDTO.getStatus())){
                 return new BasicResult<>(listCommentDetailDTO.getStatus());

@@ -2,12 +2,14 @@ package com.xkr.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.SqlUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
+import com.xkr.domain.XkrResourceAgent;
 import com.xkr.domain.XkrResourceCommentAgent;
 import com.xkr.domain.XkrResourceUserAgent;
 import com.xkr.domain.XkrUserAgent;
@@ -17,6 +19,7 @@ import com.xkr.domain.dto.search.CommentIndexDTO;
 import com.xkr.domain.dto.search.ResourceIndexDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.user.UserStatusEnum;
+import com.xkr.domain.entity.XkrResource;
 import com.xkr.domain.entity.XkrResourceComment;
 import com.xkr.domain.entity.XkrResourceUser;
 import com.xkr.domain.entity.XkrUser;
@@ -50,6 +53,9 @@ public class CommentService {
     private XkrResourceUserAgent resourceUserAgent;
 
     @Autowired
+    private XkrResourceAgent xkrResourceAgent;
+
+    @Autowired
     private SearchApiService searchApiService;
 
     @Autowired
@@ -68,7 +74,7 @@ public class CommentService {
      * @param size
      * @return
      */
-    public ListCommentDetailDTO searchCommentByKeyWord(String keyword, Date updateTime,
+    public ListCommentDetailDTO searchCommentByKeyWord(String keyword,String userName, Date updateTime,
                                                     CommentStatusEnum status, int pageNum, int size) {
         ListCommentDetailDTO result = new ListCommentDetailDTO();
         if (StringUtils.isEmpty(keyword) && Objects.isNull(updateTime) &&
@@ -76,23 +82,42 @@ public class CommentService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        size = size <= 0 ? 10 : size;
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
-        SearchResultListDTO<CommentIndexDTO> searchResultListDTO = null;
-        if(StringUtils.isEmpty(keyword)){
-            searchResultListDTO = searchApiService.searchByFilterField(CommentIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(updateTime, null),
-                    "updateTime",null,offset,size);
-        }else {
-            searchResultListDTO = searchApiService.searchByKeyWordInField(
-                    CommentIndexDTO.class, keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
-                    ImmutableMap.of("status", status.getCode()), Pair.of(updateTime, null), "updateTime",
-                    null, null, offset, size
-            );
-        }
 
-        result.setTotalCount((int) searchResultListDTO.getTotalCount());
+        //走db查询逻辑
+        size = size <= 0 ? 10 : size;
+        String sortKey = "update_time" ;
+        Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
+        List<XkrResourceComment> resourceComments = resourceCommentAgent.searchByFilter(keyword,userName,updateTime,status.getCode());
 
-        buildListCommentDetailDTO(result, searchResultListDTO);
+        result.setTotalCount((int) page.getTotal());
+
+        SqlUtil.clearLocalPage();
+
+        List<Long> resIds = resourceComments.stream().map(XkrResourceComment::getResourceId).collect(Collectors.toList());
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resIds);
+
+        List<Long> userIds = resourceComments.stream().map(XkrResourceComment::getUserId).collect(Collectors.toList());
+        List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
+
+        buildListCommentDetailDTO(result,resourceComments,resources,users);
+
+        /** es 搜索逻辑**/
+//        SearchResultListDTO<CommentIndexDTO> searchResultListDTO = null;
+//        if(StringUtils.isEmpty(keyword) && StringUtils.isEmpty(userName)){
+//            searchResultListDTO = searchApiService.searchByFilterField(CommentIndexDTO.class,ImmutableMap.of("status", status.getCode()),Pair.of(updateTime, null),
+//                    "updateTime",null,offset,size);
+//        }else {
+//            searchResultListDTO = searchApiService.searchByKeyWordInField(
+//                    CommentIndexDTO.class, keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
+//                    ImmutableMap.of("status", status.getCode()), Pair.of(updateTime, null), "updateTime",
+//                    null, null, offset, size
+//            );
+//        }
+
+//        result.setTotalCount((int) searchResultListDTO.getTotalCount());
+//
+//        buildListCommentDetailDTO(result, searchResultListDTO);
 
         return result;
     }
@@ -160,6 +185,28 @@ public class CommentService {
             detailDTO.setTitle(commentIndexDTO.getTitle());
             detailDTO.setUpdateTime(commentIndexDTO.getUpdateTime());
             detailDTO.setUserName(commentIndexDTO.getUserName());
+            result.getList().add(detailDTO);
+        });
+    }
+
+    private void buildListCommentDetailDTO(ListCommentDetailDTO result, List<XkrResourceComment> resultListDTO,
+                                           List<XkrResource> xkrResources,List<XkrUser> xkrUsers) {
+        resultListDTO.forEach(commentIndexDTO -> {
+            CommentDetailDTO detailDTO = new CommentDetailDTO();
+            detailDTO.setClientIp(commentIndexDTO.getClientIp());
+            detailDTO.setCommentId(commentIndexDTO.getId());
+            detailDTO.setContent(commentIndexDTO.getContent());
+            detailDTO.setResourceId(commentIndexDTO.getResourceId());
+            detailDTO.setStatus((int)commentIndexDTO.getStatus());
+            XkrResource xkrResource = xkrResources.stream().filter(res -> commentIndexDTO.getResourceId().equals(res.getClassId())).findFirst().orElse(null);
+            if(Objects.nonNull(xkrResource)){
+                detailDTO.setTitle(xkrResource.getTitle());
+            }
+            detailDTO.setUpdateTime(commentIndexDTO.getUpdateTime());
+            XkrUser xkrUser = xkrUsers.stream().filter(user -> commentIndexDTO.getUserId().equals(user.getId())).findFirst().orElse(null);
+            if(Objects.nonNull(xkrUser)) {
+                detailDTO.setUserName(xkrUser.getUserName());
+            }
             result.getList().add(detailDTO);
         });
     }

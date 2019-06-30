@@ -9,6 +9,7 @@ import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.core.shiro.LoginAuthenticationToken;
+import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.user.UserDTO;
 import com.xkr.domain.entity.XkrUser;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +53,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BaseRedisService baseRedisService;
 
     /**
      * 用户注册
@@ -128,6 +133,15 @@ public class UserController {
 
             //用户id
             Long userId = Long.valueOf(args[1]);
+
+            //获取缓存日期
+            String cacheDate = baseRedisService.get(Const.VALIDATE_PREFIX+String.valueOf(userId));
+            if(StringUtils.isEmpty(cacheDate) || !cacheDate.equals(args[0])){
+                return new BasicResult<>(ErrorStatus.USER_EMAIL_VALIDATE_SESSION_EXPIRED);
+            }
+            //缓存置空
+            baseRedisService.set(Const.VALIDATE_PREFIX+String.valueOf(userId),"");
+
             //验证类型1为注册验证,2为修改密码验证
             Integer type = Integer.valueOf(args[2]);
 

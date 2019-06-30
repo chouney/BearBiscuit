@@ -197,6 +197,16 @@ public class XkrResourceAgent {
         return null;
     }
 
+    public List<XkrResource> searchByFilter(Date startDate,String keyWord,Integer status,Integer report) {
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("startDate",startDate);
+        map.put("keyWord",keyWord);
+        map.put("status",status);
+        map.put("report",report);
+        return xkrResourceMapper.searchByFilter(map);
+    }
+
+
     public XkrResource getResourceById(Long resId,List<Integer> statuses) {
         if (Objects.isNull(resId)) {
             return null;
@@ -223,6 +233,9 @@ public class XkrResourceAgent {
     }
 
     public List<XkrResource> getResourceListByIds(List<Long> resIds) {
+        if(CollectionUtils.isEmpty(resIds)){
+            return Lists.newArrayList();
+        }
         return getResourceListByIds(resIds,ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
     }

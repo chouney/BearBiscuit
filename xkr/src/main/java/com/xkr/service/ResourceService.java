@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.SqlUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -131,25 +132,40 @@ public class ResourceService {
         }
         size = size <= 0 ? 10 : size;
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
-        Map<String, Object> filterMap = Maps.newHashMap();
-        filterMap.put("type", resType);
-        filterMap.put("report", report);
-        filterMap.put("status", status.getCode());
-        SearchResultListDTO<ResourceIndexDTO> resultListDTO = null;
-        if (StringUtils.isEmpty(keyword)) {
-            resultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class, filterMap, Pair.of(startDate, endDate),
-                    "updateTime", null, offset, size);
-        } else {
-            resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
-                    keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
-                    filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
-        }
-        List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
 
-        List<XkrClass> xkrClasses = xkrClassAgent.getClassByIds(classIds);
+        List<XkrResource> resultList = null;
+        //排序的索引键值
+        String sortKey = "update_time" ;
+        Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
+        //全部走sql接口
+        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report);
 
-        buildListResourceDTO(result, xkrClasses, resultListDTO);
+        result.setTotalCount((int) page.getTotal());
 
+        SqlUtil.clearLocalPage();
+
+        buildResourceByFilterOnOffline(result,resultList);
+
+
+        /** ea search逻辑 **/
+//        Map<String, Object> filterMap = Maps.newHashMap();
+//        filterMap.put("type", resType);
+//        filterMap.put("report", report);
+//        filterMap.put("status", status.getCode());
+//        SearchResultListDTO<ResourceIndexDTO> resultListDTO = null;
+//        if (StringUtils.isEmpty(keyword)) {
+//            resultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class, filterMap, Pair.of(startDate, endDate),
+//                    "updateTime", null, offset, size);
+//        } else {
+//            resultListDTO = searchApiService.searchByKeyWordInField(ResourceIndexDTO.class,
+//                    keyword, ImmutableMap.of("title", 0.5F, "content", 1.5F, "userName", 0.5F),
+//                    filterMap, Pair.of(startDate, endDate), "updateTime", null, null, offset, size);
+//        }
+//        List<Long> classIds = resultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
+
+//        List<XkrClass> xkrClasses = xkrClassAgent.getClassByIds(classIds);
+
+//        buildListResourceDTO(result, xkrClasses, resultListDTO);
         return result;
     }
 
@@ -713,6 +729,35 @@ public class ResourceService {
         result.setTotalCount((int) searchResultListDTO.getTotalCount());
 
         buildListResourceDTO(result, classList, searchResultListDTO);
+    }
+
+    private void buildResourceByFilterOnOffline(ListResourceDTO resourceDTOList, List<XkrResource> xkrResources) {
+        if(CollectionUtils.isEmpty(xkrResources)){
+            return;
+        }
+
+
+        List<Long> classIds = xkrResources.stream().map(XkrResource::getClassId).collect(Collectors.toList());
+
+        //获取所有分配信息
+        List<XkrClass> classList = xkrClassAgent.getClassByIds(classIds);
+
+        //获取分类下所有资源
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(classIds, ImmutableList.of(
+                ResourceStatusEnum.STATUS_NORMAL.getCode()
+        ));
+
+
+
+
+        List<Long> userIds = resources.stream().map(XkrResource::getUserId).collect(Collectors.toList());
+
+        List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
+
+
+        buildListResourceDTO(resourceDTOList, resources, classList, users);
+
+
     }
 
     private void buildResourceByClassIdsOnOffline(ListResourceDTO result, List<XkrClass> classList, int orderType,

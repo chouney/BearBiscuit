@@ -59,6 +59,9 @@ public class MessageService {
 
     @Async
     public void batchSaveMessageToUser(LoginEnum fromUserType, long fromUserId, Map<Long,String> userIdsContentMapperList) {
+        if(CollectionUtils.isEmpty(userIdsContentMapperList)){
+            return;
+        }
         messageAgent.batchSaveToUserMessage(fromUserType, fromUserId, LoginEnum.CUSTOMER, userIdsContentMapperList);
     }
 

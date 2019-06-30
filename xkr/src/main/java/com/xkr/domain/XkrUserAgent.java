@@ -3,6 +3,7 @@ package com.xkr.domain;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrUserMapper;
 import com.xkr.domain.dto.search.UserIndexDTO;
@@ -41,6 +42,15 @@ public class XkrUserAgent {
 
     @Autowired
     private SearchApiService searchApiService;
+
+    public List<XkrUser> searchByFilter(String userLogin, Date createDate,
+                                        int status){
+        Map<String,Object> params = Maps.newHashMap();
+        params.put("userName",userLogin);
+        params.put("createDate",createDate);
+        params.put("status",status);
+        return xkrUserMapper.searchByFilter(params);
+    }
 
     public boolean batchUpdateUserByIds(List<Long> userIds,UserStatusEnum status){
         if(CollectionUtils.isEmpty(userIds) || Objects.isNull(status)){
