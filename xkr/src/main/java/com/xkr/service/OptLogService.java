@@ -122,6 +122,7 @@ public class OptLogService {
             OptLogModuleEnum moduleEnum = OptLogModuleEnum.getByCode(xkrAdminOptLog.getOptModule());
             optLogDTO.setOptModule(moduleEnum == null ? "unknown" : moduleEnum.getDesc());
             optLogDTO.setOptlogId(xkrAdminOptLog.getId());
+            listOptLogDTO.getList().add(optLogDTO);
         });
     }
 }
