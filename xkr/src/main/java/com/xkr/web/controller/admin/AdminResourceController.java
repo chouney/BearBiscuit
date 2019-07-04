@@ -12,6 +12,8 @@ import com.xkr.domain.dto.resource.ResourceStatusEnum;
 import com.xkr.service.ResourceService;
 import com.xkr.util.DateUtil;
 import com.xkr.web.model.BasicResult;
+import com.xkr.web.model.vo.admin.resource.AdminResourceVO;
+import com.xkr.web.model.vo.admin.resource.ListAdminResourceVO;
 import com.xkr.web.model.vo.resource.ListResourceRecycleVO;
 import com.xkr.web.model.vo.resource.ListResourceVO;
 import com.xkr.web.model.vo.resource.ResourceRecycleVO;
@@ -62,7 +64,7 @@ public class AdminResourceController {
     @RequiresPermissions(value = {PermissionEnum.Constant.RESOURCE_PERM, PermissionEnum.Constant.DESIGN_PERM}, logical = Logical.OR)
     @RequestMapping(value = "/search_list", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<ListResourceVO> getResourceListBySearchWord(
+    public BasicResult<ListAdminResourceVO> getResourceListBySearchWord(
             @RequestParam(name = "startDate", required = false, defaultValue = "") String startDate,
             @RequestParam(name = "keyWord", required = false, defaultValue = "") String keyWord,
             @RequestParam(name = "type") Integer type,
@@ -71,7 +73,7 @@ public class AdminResourceController {
             @RequestParam(name = "pageNum", required = false, defaultValue = "1") Integer pageNum,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
 
-        ListResourceVO resourceVOs = new ListResourceVO();
+        ListAdminResourceVO resourceVOs = new ListAdminResourceVO();
         try {
             //权限校验
             Subject subject = SecurityUtils.getSubject();
@@ -224,18 +226,15 @@ public class AdminResourceController {
     }
 
 
-    private void buildListResourceVO(ListResourceVO resourceVOs, ListResourceDTO resourceDTOs) {
+    private void buildListResourceVO(ListAdminResourceVO resourceVOs, ListResourceDTO resourceDTOs) {
         resourceDTOs.getResList().forEach(resourceDTO -> {
-            ResourceVO resourceVO = new ResourceVO();
+            AdminResourceVO resourceVO = new AdminResourceVO();
             resourceVO.setClassId(resourceDTO.getClassId());
             resourceVO.setClassName(resourceDTO.getClassName());
-            resourceVO.setContent(resourceDTO.getContent());
             resourceVO.setCost(resourceDTO.getCost());
             resourceVO.setDownloadCount(resourceDTO.getDownloadCount());
             resourceVO.setReport(resourceDTO.getReport());
             resourceVO.setResourceId(resourceDTO.getResourceId());
-            resourceVO.setRootClassId(resourceDTO.getRootClassId());
-            resourceVO.setRootClassName(resourceDTO.getRootClassName());
             resourceVO.setTitle(resourceDTO.getTitle());
             resourceVO.setUpdateTime(resourceDTO.getUpdateTime());
             resourceVO.setUserId(resourceDTO.getUserId());
