@@ -790,7 +790,7 @@ public class ResourceService {
             ResourceDTO resourceDTO = new ResourceDTO();
             XkrUser user = users.stream().filter(user1 -> xkrResource.getUserId().equals(user1.getId())).findFirst().orElse(null);
             XkrClass classBean = xkrClassList.stream().
-                    filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElseThrow(RuntimeException::new);
+                    filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElse(null);
             buildResourceDTO(resourceDTO, xkrResource, classBean, user);
             listResourceDTO.getResList().add(resourceDTO);
         });
@@ -800,7 +800,7 @@ public class ResourceService {
         list.forEach(xkrResource -> {
             ResourceDTO resourceDTO = new ResourceDTO();
             XkrClass classBean = xkrClassList.stream().
-                    filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElseThrow(RuntimeException::new);
+                    filter(xkrClass1 -> xkrClass1.getId().equals(xkrResource.getClassId())).findFirst().orElse(null);
 
             buildResourceDTO(resourceDTO, xkrResource, classBean, user);
 
@@ -819,12 +819,14 @@ public class ResourceService {
         searchResultListDTO.getSearchResultDTO().forEach(resourceIndexDTO -> {
             ResourceDTO resourceDTO = new ResourceDTO();
 
-            XkrClass xkrClass = xkrClassList.stream().filter(xkrClass1 -> resourceIndexDTO.getClassId().equals(xkrClass1.getId())).findAny().orElseThrow(RuntimeException::new);
+            XkrClass xkrClass = xkrClassList.stream().filter(xkrClass1 -> resourceIndexDTO.getClassId().equals(xkrClass1.getId())).findAny().orElse(null);
 
-            String[] paths = xkrClass.getPath().split("-");
-            XkrClass rootClass = paths.length > 1 ?
-                    xkrClassAgent.getClassById(Long.valueOf(paths[1])) : xkrClass;
-
+            XkrClass rootClass = null;
+            if(Objects.nonNull(xkrClass)) {
+                String[] paths = xkrClass.getPath().split("-");
+                rootClass = paths.length > 1 ?
+                        xkrClassAgent.getClassById(Long.valueOf(paths[1])) : xkrClass;
+            }
             buildResourceDTO(resourceDTO, resourceIndexDTO, xkrClass, rootClass);
 
             listResourceDTO.getResList().add(resourceDTO);
@@ -842,28 +844,40 @@ public class ResourceService {
         resourceDTO.setUpdateTime(resourceIndexDTO.getUpdateTime());
         resourceDTO.setUserId(resourceIndexDTO.getUserId());
         resourceDTO.setUserName(resourceIndexDTO.getUserName());
-        resourceDTO.setClassId(currentClass.getId());
-        resourceDTO.setClassName(currentClass.getClassName());
+        if(Objects.nonNull(currentClass)) {
+            resourceDTO.setClassId(currentClass.getId());
+            resourceDTO.setClassName(currentClass.getClassName());
+        }else{
+//            resourceDTO.setClassId(currentClass.getId());
+            resourceDTO.setClassName("分类不存在或被删除");
+        }
         resourceDTO.setRootClassId(rootClass.getId());
         resourceDTO.setRootClassName(rootClass.getClassName());
 
     }
 
     private void buildResourceDTO(ResourceDTO resourceDTO, XkrResource resource, XkrClass currentClass, XkrUser user) {
-        String[] paths = currentClass.getPath().split("-");
-        XkrClass rootClass = paths.length > 1 ?
-                xkrClassAgent.getClassById(Long.valueOf(paths[1])) : currentClass;
-        rootClass = Objects.isNull(rootClass) ? currentClass : rootClass;
+
         if (Objects.isNull(user)) {
             resourceDTO.setUserName("未知账号");
         } else {
             resourceDTO.setUserName(user.getUserName());
         }
+        if(Objects.nonNull(currentClass)) {
+            String[] paths = currentClass.getPath().split("-");
+            XkrClass rootClass = paths.length > 1 ?
+                    xkrClassAgent.getClassById(Long.valueOf(paths[1])) : currentClass;
+            rootClass = Objects.isNull(rootClass) ? currentClass : rootClass;
+            resourceDTO.setRootClassId(rootClass.getId());
+            resourceDTO.setRootClassName(rootClass.getClassName());
+            resourceDTO.setClassId(currentClass.getId());
+            resourceDTO.setClassName(currentClass.getClassName());
+        }else{
+            resourceDTO.setClassName("分类不存在或被删除");
+            resourceDTO.setRootClassName("分类不存在或被删除");
+
+        }
         resourceDTO.setUserId(resource.getUserId());
-        resourceDTO.setClassId(currentClass.getId());
-        resourceDTO.setClassName(currentClass.getClassName());
-        resourceDTO.setRootClassId(rootClass.getId());
-        resourceDTO.setRootClassName(rootClass.getClassName());
         resourceDTO.setResourceId(resource.getId());
         resourceDTO.setReport(Integer.valueOf(resource.getReport()));
         resourceDTO.setDownloadCount(resource.getDownloadCount());
