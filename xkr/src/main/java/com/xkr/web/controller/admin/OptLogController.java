@@ -50,8 +50,7 @@ public class OptLogController {
     @ResponseBody
     @MethodValidate
     public BasicResult getOptLogList(
-            @IsNumberic
-            @RequestParam(name = "adminAccountId",required = false, defaultValue = "") String adminAccountId,
+            @RequestParam(name = "accountName",required = false, defaultValue = "") String accountName,
             @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
             ValidResult result) {
@@ -59,8 +58,7 @@ public class OptLogController {
             return new BasicResult(result);
         }
         try {
-            Long adminId = StringUtils.isEmpty(adminAccountId) ? null : Long.valueOf(adminAccountId);
-            ListOptLogDTO listOptLogDTO = optLogService.getOptLogList(adminId,pageNum,size);
+            ListOptLogDTO listOptLogDTO = optLogService.getOptLogList(accountName,pageNum,size);
 
             if (!ErrorStatus.OK.equals(listOptLogDTO.getStatus())) {
                 return new BasicResult(ErrorStatus.ERROR);
@@ -71,7 +69,7 @@ public class OptLogController {
 
             return new BasicResult<>(listOptLogVO);
         } catch (Exception e) {
-            logger.error("OptLogController getOptLogList error ,adminAccountId:{},pageNum:{},size:{}", adminAccountId,pageNum,size, e);
+            logger.error("OptLogController getOptLogList error ,accountName:{},pageNum:{},size:{}", accountName,pageNum,size, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }

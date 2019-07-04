@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -62,11 +63,18 @@ public class OptLogService {
         xkrAdminOptLogAgent.saveNewOptLog(999999L,moduleEnum,"127.0.0.1",detail);
     }
 
-    public ListOptLogDTO getOptLogList(Long adminAccountId,int pageNum,int size){
+    public ListOptLogDTO getOptLogList(String accountName,int pageNum,int size){
         ListOptLogDTO result = new ListOptLogDTO();
         pageNum = pageNum < 1 ? 1 : pageNum;
         size = size  < 1 ? 10 : size;
         Page page = PageHelper.startPage(pageNum,size,"update_time desc");
+        Long adminAccountId = null;
+        if(!StringUtils.isEmpty(accountName)) {
+            XkrAdminAccount adminAccount = xkrAdminAccountAgent.getAdminAccountByName(accountName);
+            if(Objects.nonNull(adminAccount)){
+                adminAccountId = adminAccount.getId();
+            }
+        }
         List<XkrAdminOptLog> list = xkrAdminOptLogAgent.getAllList(adminAccountId);
         result.setTotalCount((int) page.getTotal());
 
