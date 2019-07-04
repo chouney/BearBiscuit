@@ -108,10 +108,14 @@ public class OptLogService {
 
     private void buildListOptLogDTO(ListOptLogDTO listOptLogDTO,List<XkrAdminAccount> adminAccounts,List<XkrAdminOptLog> list){
         list.forEach(xkrAdminOptLog -> {
-            XkrAdminAccount xkrAdminAccount = adminAccounts.stream().filter(xkrAdminAccount1 -> xkrAdminAccount1.getId().equals(xkrAdminOptLog.getAdminAccountId())).findAny().orElseThrow(RuntimeSqlException::new);
+            XkrAdminAccount xkrAdminAccount = adminAccounts.stream().filter(xkrAdminAccount1 -> xkrAdminAccount1.getId().equals(xkrAdminOptLog.getAdminAccountId())).findAny().orElse(null);
             OptLogDTO optLogDTO = new OptLogDTO();
-            optLogDTO.setAccountName(xkrAdminAccount.getAccountName());
-            optLogDTO.setAdminAccountId(xkrAdminAccount.getId());
+            if(Objects.nonNull(xkrAdminAccount)) {
+                optLogDTO.setAccountName(xkrAdminAccount.getAccountName());
+                optLogDTO.setAdminAccountId(xkrAdminAccount.getId());
+            }else{
+                optLogDTO.setAccountName("账号不存在或被删除");
+            }
             optLogDTO.setClientIp(xkrAdminOptLog.getClientIp());
             optLogDTO.setDate(xkrAdminOptLog.getUpdateTime());
             optLogDTO.setOptDetail(xkrAdminOptLog.getOptDetail());
