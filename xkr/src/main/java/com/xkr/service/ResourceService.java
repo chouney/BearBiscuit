@@ -137,8 +137,12 @@ public class ResourceService {
         //排序的索引键值
         String sortKey = "update_time" ;
         Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
+
+        List<XkrClass> classList = xkrClassAgent.getAllChildClassByClassId(Long.valueOf(resType));
+        List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
+
         //全部走sql接口
-        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report);
+        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report,classIds);
 
         result.setTotalCount((int) page.getTotal());
 

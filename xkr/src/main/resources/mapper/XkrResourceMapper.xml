@@ -140,6 +140,12 @@
         <if test="statuses!=null">
             AND status #{status}
         </if>
+        <if test="class_id!=null">
+            AND class_id in
+            <foreach collection="classIds" item="classId" separator="," open="(" close=")">
+                #{classId}
+            </foreach>
+        </if>
     </select>
 
 

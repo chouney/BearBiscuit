@@ -100,7 +100,7 @@ public class ClassService {
         XkrClass currentClass = optional.get();
         List<Long> ids = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(ids, ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(ids, ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
         List<Long> resourceId = resources.stream().map(XkrResource::getId).collect(Collectors.toList());
 
