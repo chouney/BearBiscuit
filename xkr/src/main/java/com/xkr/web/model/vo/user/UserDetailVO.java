@@ -43,6 +43,8 @@ public class UserDetailVO implements Serializable {
 
     private Integer status;
 
+    private Integer loginCount;
+
     public Long getUserId() {
         return userId;
     }
@@ -116,5 +118,17 @@ public class UserDetailVO implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public void setLastLoginDate(String lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
     }
 }

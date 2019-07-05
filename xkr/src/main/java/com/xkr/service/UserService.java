@@ -185,6 +185,7 @@ public class UserService {
         if(Objects.nonNull(loginToken)) {
             userDetailDTO.setClientIp(loginToken.getClientIp());
             userDetailDTO.setLastLoginDate(loginToken.getUpdateTime());
+            userDetailDTO.setLoginCount(loginToken.getLoginCount());
         }
         userDetailDTO.setEmail(user.getEmail());
         userDetailDTO.setStatus(Integer.valueOf(user.getStatus()));

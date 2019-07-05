@@ -198,7 +198,7 @@ public class CommentService {
             detailDTO.setContent(commentIndexDTO.getContent());
             detailDTO.setResourceId(commentIndexDTO.getResourceId());
             detailDTO.setStatus((int)commentIndexDTO.getStatus());
-            XkrResource xkrResource = xkrResources.stream().filter(res -> commentIndexDTO.getResourceId().equals(res.getClassId())).findFirst().orElse(null);
+            XkrResource xkrResource = xkrResources.stream().filter(res -> commentIndexDTO.getResourceId().equals(res.getId())).findFirst().orElse(null);
             if(Objects.nonNull(xkrResource)){
                 detailDTO.setTitle(xkrResource.getTitle());
             }

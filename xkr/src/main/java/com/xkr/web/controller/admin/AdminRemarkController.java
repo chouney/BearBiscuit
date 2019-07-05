@@ -56,7 +56,7 @@ public class AdminRemarkController {
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
         try {
 
-            ListRemarkDTO listRemarkDTO = remarkService.getAllRemarkDTO(pageNum,size);
+            ListRemarkDTO listRemarkDTO = remarkService.getAllRemarkDTO(pageNum, size);
 
             if (!ErrorStatus.OK.equals(listRemarkDTO.getStatus())) {
                 return new BasicResult(listRemarkDTO.getStatus());
@@ -64,11 +64,11 @@ public class AdminRemarkController {
 
             ListRemarkVO listRemarkVO = new ListRemarkVO();
 
-            buildListRemarkVO(listRemarkVO,listRemarkDTO);
+            buildListRemarkVO(listRemarkVO, listRemarkDTO);
 
             return new BasicResult<>(listRemarkVO);
         } catch (Exception e) {
-            logger.error("RemarkController getAllRemarkList error , pageNum:{},size:{}",pageNum,size, e);
+            logger.error("RemarkController getAllRemarkList error , pageNum:{},size:{}", pageNum, size, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }
@@ -79,9 +79,9 @@ public class AdminRemarkController {
     @MethodValidate
     public BasicResult getDetailRemark(
             @IsNumberic
-            @RequestParam(name = "remarkId") String  remarkId,
-            ValidResult result){
-        if(result.hasErrors()){
+            @RequestParam(name = "remarkId") String remarkId,
+            ValidResult result) {
+        if (result.hasErrors()) {
             return new BasicResult(result);
         }
         try {
@@ -94,11 +94,11 @@ public class AdminRemarkController {
 
             RemarkDetailVO remarkDetailVO = new RemarkDetailVO();
 
-            buildRemarkDetailVO(remarkDetailVO,responseDTO.getData());
+            buildRemarkDetailVO(remarkDetailVO, responseDTO.getData());
 
             return new BasicResult<>(remarkDetailVO);
         } catch (Exception e) {
-            logger.error("RemarkController getDetailRemark error , remarkId:{}",remarkId, e);
+            logger.error("RemarkController getDetailRemark error , remarkId:{}", remarkId, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }
@@ -107,7 +107,7 @@ public class AdminRemarkController {
     @RequestMapping(value = "/del", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult batchDeleteRemarks(
-            @RequestParam(name = "remarkIds[]") String[] remarkIds){
+            @RequestParam(name = "remarkIds[]") String[] remarkIds) {
         try {
 
             List<Long> ids = Arrays.stream(remarkIds).map(Long::valueOf).collect(Collectors.toList());
@@ -131,43 +131,45 @@ public class AdminRemarkController {
     @MethodValidate
     public BasicResult replyRemark(
             @IsNumberic
-            @RequestParam(name = "remarkId") String  remarkId,
+            @RequestParam(name = "remarkId") String remarkId,
             @NotBlank
-            @RequestParam(name = "content") String  content,
-            ValidResult result){
-        if(result.hasErrors()){
+            @RequestParam(name = "content") String content,
+            ValidResult result) {
+        if (result.hasErrors()) {
             return new BasicResult(result);
         }
         try {
             XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> responseDTO = remarkService.replyRemark(adminAccount.getId(), LoginEnum.ADMIN,content,Long.valueOf(remarkId));
+            ResponseDTO<Long> responseDTO = remarkService.replyRemark(adminAccount.getId(), LoginEnum.ADMIN, content, Long.valueOf(remarkId));
 
             if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
                 return new BasicResult(responseDTO.getStatus());
             }
 
             JSONObject output = new JSONObject();
-            output.put("remarkId",String.valueOf(responseDTO.getData()));
+            output.put("remarkId", String.valueOf(responseDTO.getData()));
 
             return new BasicResult<>(output);
         } catch (Exception e) {
-            logger.error("RemarkController replyRemark error , remarkId:{},content:{}",remarkId,content, e);
+            logger.error("RemarkController replyRemark error , remarkId:{},content:{}", remarkId, content, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }
 
-    private void buildRemarkDetailVO(RemarkDetailVO remarkDetailVO, RemarkDetailDTO remarkDetailDTO){
+    private void buildRemarkDetailVO(RemarkDetailVO remarkDetailVO, RemarkDetailDTO remarkDetailDTO) {
         remarkDetailVO.setContent(remarkDetailDTO.getContent());
         remarkDetailVO.setRemarkId(remarkDetailDTO.getRemarkId());
         remarkDetailVO.setSubmitDate(remarkDetailDTO.getSubmitDate());
-        if(Objects.nonNull(remarkDetailDTO.getpRemark())){
+        remarkDetailDTO.setPhone(remarkDetailDTO.getPhone());
+        remarkDetailDTO.setQq(remarkDetailDTO.getQq());
+        if (Objects.nonNull(remarkDetailDTO.getpRemark())) {
             remarkDetailVO.setpRemark(new RemarkDetailVO());
-            buildRemarkDetailVO(remarkDetailVO.getpRemark(),remarkDetailDTO.getpRemark());
+            buildRemarkDetailVO(remarkDetailVO.getpRemark(), remarkDetailDTO.getpRemark());
         }
     }
 
-    private void buildListRemarkVO(ListRemarkVO listRemarkVO,ListRemarkDTO listRemarkDTO){
+    private void buildListRemarkVO(ListRemarkVO listRemarkVO, ListRemarkDTO listRemarkDTO) {
         listRemarkDTO.getList().forEach(remarkDTO -> {
             RemarkVO remarkVO = new RemarkVO();
             remarkVO.setContent(remarkDTO.getContent());

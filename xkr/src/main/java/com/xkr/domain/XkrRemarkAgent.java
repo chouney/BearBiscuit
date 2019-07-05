@@ -62,10 +62,14 @@ public class XkrRemarkAgent {
         if(Objects.nonNull(parentRemarkId)){
             xkrAboutRemark.setParentRemarkId(parentRemarkId);
         }
-        if(StringUtils.isEmpty(qq) && StringUtils.isEmpty(phone)) {
-            JSONObject ext = new JSONObject();
+        JSONObject ext = new JSONObject();
+        if(!StringUtils.isEmpty(qq)) {
             ext.put("qq", qq);
+        }
+        if(!StringUtils.isEmpty(phone)){
             ext.put("phone", phone);
+        }
+        if(!ext.isEmpty()) {
             xkrAboutRemark.setExt(ext.toJSONString());
         }
 

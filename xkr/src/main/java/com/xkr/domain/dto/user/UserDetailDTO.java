@@ -40,6 +40,8 @@ public class UserDetailDTO implements Serializable {
 
     private Integer status;
 
+    private Integer loginCount;
+
     public Long getUserId() {
         return userId;
     }
@@ -110,5 +112,13 @@ public class UserDetailDTO implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
     }
 }

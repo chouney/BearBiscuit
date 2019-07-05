@@ -24,6 +24,10 @@ public class RemarkDetailVO implements Serializable{
 
     private String submitDate;
 
+    private String phone;
+
+    private String qq;
+
     private RemarkDetailVO pRemark;
 
     public String getSubmitDate() {
@@ -59,5 +63,25 @@ public class RemarkDetailVO implements Serializable{
 
     public void setpRemark(RemarkDetailVO pRemark) {
         this.pRemark = pRemark;
+    }
+
+    public void setSubmitDate(String submitDate) {
+        this.submitDate = submitDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
     }
 }

@@ -20,6 +20,10 @@ public class RemarkDetailDTO extends BaseDTO implements Serializable{
 
     private Date submitDate;
 
+    private String phone;
+
+    private String qq;
+
     private RemarkDetailDTO pRemark;
 
     public Long getRemarkId() {
@@ -52,5 +56,21 @@ public class RemarkDetailDTO extends BaseDTO implements Serializable{
 
     public void setSubmitDate(Date submitDate) {
         this.submitDate = submitDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
     }
 }

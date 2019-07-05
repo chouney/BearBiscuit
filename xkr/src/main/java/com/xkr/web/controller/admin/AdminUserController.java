@@ -135,6 +135,7 @@ public class AdminUserController {
             userDetailVO.setUserName(userDetailDTO.getUserName());
             userDetailVO.setUserToken(userDetailDTO.getUserToken());
             userDetailVO.setWealth(userDetailDTO.getWealth());
+            userDetailVO.setLoginCount(userDetailDTO.getLoginCount());
             userDetailVOs.getUserList().add(userDetailVO);
         });
         userDetailVOs.setTotalCount(listUserDetailDTO.getTotalCount());

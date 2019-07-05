@@ -742,20 +742,14 @@ public class ResourceService {
         //获取所有分配信息
         List<XkrClass> classList = xkrClassAgent.getClassByIds(classIds);
 
-        //获取分类下所有资源
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(classIds, ImmutableList.of(
-                ResourceStatusEnum.STATUS_NORMAL.getCode()
-        ));
 
 
-
-
-        List<Long> userIds = resources.stream().map(XkrResource::getUserId).collect(Collectors.toList());
+        List<Long> userIds = xkrResources.stream().map(XkrResource::getUserId).collect(Collectors.toList());
 
         List<XkrUser> users = xkrUserAgent.getUserByIds(userIds);
 
 
-        buildListResourceDTO(resourceDTOList, resources, classList, users);
+        buildListResourceDTO(resourceDTOList, xkrResources, classList, users);
 
 
     }

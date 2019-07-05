@@ -149,6 +149,11 @@ public class RemarkService {
         remarkDetailDTO.setContent(remark.getContent());
         remarkDetailDTO.setRemarkId(remark.getId());
         remarkDetailDTO.setSubmitDate(remark.getCreateTime());
+        JSONObject ext = JSON.parseObject(remark.getExt());
+        if(Objects.nonNull(ext)){
+            remarkDetailDTO.setPhone(ext.getString("phone"));
+            remarkDetailDTO.setQq(ext.getString("qq"));
+        }
         if(Objects.nonNull(remark.getParentRemarkId()) &&
                 remark.getParentRemarkId() != XkrRemarkAgent.DEFAULT_PARENT_REMARK_ID){
             XkrAboutRemark parentRemark = remarkAgent.getRemarkById(remark.getParentRemarkId());

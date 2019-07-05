@@ -44,8 +44,8 @@ CREATE TABLE xkr_resource_recycle(
 	`class_name` varchar(64) NOT NULL COMMENT '分类名,长度限制20',
 	`user_name` varchar(64) NOT NULL COMMENT '用户名,长度限制20字内',
 	`opt_name` varchar(64) NOT NULL COMMENT '管理员名称',
-	`create_time` DATETIME COMMENT '创建时间',
-	`update_time` DATETIME COMMENT '更新时间',
+	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段，存储download_count，resource_url等',
 	PRIMARY KEY (`resource_id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='资源回收站表';
