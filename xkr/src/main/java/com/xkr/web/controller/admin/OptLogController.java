@@ -103,6 +103,7 @@ public class OptLogController {
             optLogVO.setDate(optLogDTO.getDate());
             optLogVO.setOptlogId(optLogDTO.getOptlogId());
             optLogVO.setOptModule(optLogDTO.getOptModule());
+            optLogVO.setOptDetail(optLogDTO.getOptDetail());
             listOptLogVO.getList().add(optLogVO);
         });
         listOptLogVO.setTotalCount(listOptLogDTO.getTotalCount());

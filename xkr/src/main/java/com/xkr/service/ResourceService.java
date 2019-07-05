@@ -540,9 +540,8 @@ public class ResourceService {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
-        XkrResource xkrResource = xkrResourceAgent.getResourceById(resourceId, ImmutableList.of(
-                ResourceStatusEnum.STATUS_NORMAL.getCode()
-        ));
+        XkrResource xkrResource = xkrResourceAgent.getResourceById(resourceId,
+                ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
         if (Objects.isNull(xkrResource)) {
             result.setStatus(ErrorStatus.ERROR);
             return result;
