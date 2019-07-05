@@ -134,13 +134,14 @@ public class ResourceService {
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
 
         List<XkrResource> resultList = null;
-        //排序的索引键值
-        String sortKey = "update_time" ;
-        Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
+
 
         List<XkrClass> classList = xkrClassAgent.getAllChildClassByClassId(Long.valueOf(resType));
         List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 
+        //排序的索引键值
+        String sortKey = "update_time" ;
+        Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
         //全部走sql接口
         resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report,classIds);
 
@@ -363,6 +364,8 @@ public class ResourceService {
             if (!xkrResourceUserAgent.saveNewPayRecord(downloadUser.getId(), resourceId)) {
                 throw new RuntimeException("saveNew userRelationShip failed");
             }
+
+            //
 
             //3更新资源库以及索引的下载数
             xkrResourceAgent.updateDownloadCountById(resourceId);
