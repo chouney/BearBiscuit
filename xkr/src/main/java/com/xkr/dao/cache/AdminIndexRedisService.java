@@ -40,18 +40,18 @@ public class AdminIndexRedisService extends BaseRedisService{
 
     public void incrUploadCount(int classId){
         long remainDaySecond = DateUtil.getTodayRemainSecond();
-        if(XkrClassAgent.ROOT_DESIGN_CLASS_ID == classId) {
+        if(XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID == classId) {
             incrByCount(CACHE_DES_UPLOADCOUNT_KEY, 1L, (int) remainDaySecond);
-        }else if(XkrClassAgent.ROOT_RESOURCE_CLASS_ID == classId){
+        }else if(XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID == classId){
             incrByCount(CACHE_RES_UPLOADCOUNT_KEY, 1L, (int) remainDaySecond);
         }
     }
 
     public void incDownLoadCount(int classId){
         long remainDaySecond = DateUtil.getTodayRemainSecond();
-        if(XkrClassAgent.ROOT_DESIGN_CLASS_ID == classId) {
+        if(XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID == classId) {
             incrByCount(CACHE_DES_DOWNLOADCOUNT_KEY, 1L, (int) remainDaySecond);
-        }else if(XkrClassAgent.ROOT_RESOURCE_CLASS_ID == classId){
+        }else if(XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID == classId){
             incrByCount(CACHE_RES_DOWNLOADCOUNT_KEY, 1L, (int) remainDaySecond);
         }
     }
@@ -63,9 +63,9 @@ public class AdminIndexRedisService extends BaseRedisService{
 
     public Integer getUploadCount(int classId){
         String value = null;
-        if(XkrClassAgent.ROOT_DESIGN_CLASS_ID == classId) {
+        if(XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID == classId) {
             value = get(CACHE_DES_UPLOADCOUNT_KEY);
-        }else if(XkrClassAgent.ROOT_RESOURCE_CLASS_ID == classId){
+        }else if(XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID == classId){
             value = get(CACHE_RES_UPLOADCOUNT_KEY);
         }
         return value == null ? 0 : Integer.valueOf(value);
@@ -78,9 +78,9 @@ public class AdminIndexRedisService extends BaseRedisService{
 
     public Integer getDownLoadCount(int classId){
         String value = null;
-        if(XkrClassAgent.ROOT_DESIGN_CLASS_ID == classId) {
+        if(XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID == classId) {
             value = get(CACHE_DES_DOWNLOADCOUNT_KEY);
-        }else if(XkrClassAgent.ROOT_RESOURCE_CLASS_ID == classId){
+        }else if(XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID == classId){
             value = get(CACHE_RES_DOWNLOADCOUNT_KEY);
         }
         return value == null ? 0 : Integer.valueOf(value);

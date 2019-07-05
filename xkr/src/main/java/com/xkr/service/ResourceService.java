@@ -134,9 +134,12 @@ public class ResourceService {
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
 
         List<XkrResource> resultList = null;
+        Integer classType = XkrClassAgent.ROOT_DESIGN_CLASS_ID == resType ?
+                XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID :
+                XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID;
 
 
-        List<XkrClass> classList = xkrClassAgent.getAllChildClassByClassId(Long.valueOf(resType));
+        List<XkrClass> classList = xkrClassAgent.getAllChildClassByClassId(Long.valueOf(classType));
         List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 
         //排序的索引键值

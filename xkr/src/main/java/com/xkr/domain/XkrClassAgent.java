@@ -40,6 +40,9 @@ public class XkrClassAgent {
 
     public static final int ROOT_RESOURCE_CLASS_ID = 2;
 
+    public static final int ROOT_RESOURCE_ACTUAL_CLASS_ID = 200000000;
+    public static final int ROOT_DESIGN_ACTUAL_CLASS_ID = 100000000;
+
 
     public static final int CLASS_STATUS_NORMAL = 1;
 

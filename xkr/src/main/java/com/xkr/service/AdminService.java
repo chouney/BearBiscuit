@@ -431,9 +431,9 @@ public class AdminService {
 
         buildUserAccountDTO(userAccountDTO);
 
-        buildResourceAccountDTO(XkrClassAgent.ROOT_RESOURCE_CLASS_ID,resourceAccountDTO);
+        buildResourceAccountDTO(XkrClassAgent.ROOT_RESOURCE_ACTUAL_CLASS_ID,resourceAccountDTO);
 
-        buildResourceAccountDTO(XkrClassAgent.ROOT_DESIGN_CLASS_ID,designAccountDTO);
+        buildResourceAccountDTO(XkrClassAgent.ROOT_DESIGN_ACTUAL_CLASS_ID,designAccountDTO);
 
         indexDTO.setAccountName(adminAccount.getAccountName());
         indexDTO.setLastLoginDate(session.getLastAccessTime());
