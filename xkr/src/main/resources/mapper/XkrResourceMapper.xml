@@ -140,7 +140,7 @@
         <if test="statuses!=null">
             AND status #{status}
         </if>
-        <if test="class_id!=null">
+        <if test="classIds!=null and classIds.size()>0">
             AND class_id in
             <foreach collection="classIds" item="classId" separator="," open="(" close=")">
                 #{classId}
