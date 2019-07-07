@@ -192,10 +192,20 @@ public class AdminService {
      */
     @OptLog(moduleEnum = OptLogModuleEnum.ADMIN,optEnum = OptEnum.UPDATE)
     public ResponseDTO<Boolean> updateAdminAccountById(Long adminAccountId, String accountName, String accountToken, String email, String[] permissionIds) {
-        if (Objects.isNull(adminAccountId) || StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountToken)
-                || StringUtils.isEmpty(email)) {
+        if (Objects.isNull(adminAccountId)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
+
+        XkrAdminAccount oriAdminAccount = xkrAdminAccountAgent.getById(adminAccountId);
+        if(Objects.isNull(oriAdminAccount)){
+            return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
+        }
+        accountName = StringUtils.isEmpty(accountName) ?
+                oriAdminAccount.getAccountName() : accountName;
+        accountToken = StringUtils.isEmpty(accountToken) ?
+                oriAdminAccount.getAccountToken() : accountToken;
+        email = StringUtils.isEmpty(email) ?
+                oriAdminAccount.getEmail() : email;
 
 //        if(StringUtils.isEmpty(strPermissionIds)){
 //            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);

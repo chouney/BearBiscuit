@@ -1,5 +1,7 @@
 package com.xkr.web.model.vo.user;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.xkr.util.DateUtil;
 
 import java.io.Serializable;
@@ -25,6 +27,7 @@ public class UserDetailVO implements Serializable {
      * "status":1, //会员属性
      * "clientIp":"客户端ip地址"
      */
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long userId;
 
     private String userName;

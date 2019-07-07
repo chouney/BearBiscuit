@@ -233,13 +233,11 @@ public class AccountController {
     public BasicResult updateAdmin(
             @IsNumberic
             @RequestParam(name = "adminAccountId") String adminAccountId,
-            @NotBlank
-            @RequestParam(name = "accountName") String accountName,
-            @NotBlank
-            @RequestParam(name = "accountToken") String accountToken,
+            @RequestParam(name = "accountName",required = false,defaultValue = "") String accountName,
+            @RequestParam(name = "accountToken",required = false,defaultValue = "") String accountToken,
             @RequestParam(name = "permissionIds[]",required = false) String[] permissionIds,
             @Email
-            @RequestParam(name = "email") String email,
+            @RequestParam(name = "email",required = false,defaultValue = "") String email,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
