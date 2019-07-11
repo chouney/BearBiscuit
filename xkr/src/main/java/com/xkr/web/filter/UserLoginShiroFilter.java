@@ -61,15 +61,17 @@ public class UserLoginShiroFilter extends AdviceFilter {
             return false;
         }
         //检查是否有人登录该账号
-        XkrUser user = (XkrUser) principal.getPrincipal();
-        XkrLoginToken xkrLoginToken = xkrLoginTokenAgent.getUserLoginRecordById(user.getId());
-        if(Objects.nonNull(xkrLoginToken)){
-            String sessionId = xkrLoginToken.getLoginToken();
-            if(!session.getId().equals(sessionId)){
-                httpServletResponse.setCharacterEncoding("UTF-8");
+        if(Objects.nonNull(principal.getPrincipal())) {
+            XkrUser user = (XkrUser) principal.getPrincipal();
+            XkrLoginToken xkrLoginToken = xkrLoginTokenAgent.getUserLoginRecordById(user.getId());
+            if (Objects.nonNull(xkrLoginToken)) {
+                String sessionId = xkrLoginToken.getLoginToken();
+                if (!session.getId().equals(sessionId)) {
+                    httpServletResponse.setCharacterEncoding("UTF-8");
 //            httpServletResponse.setContentType("application/json");
-                httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.USER_LOGIN_NEW)));
-                return false;
+                    httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.USER_LOGIN_NEW)));
+                    return false;
+                }
             }
         }
         return true;

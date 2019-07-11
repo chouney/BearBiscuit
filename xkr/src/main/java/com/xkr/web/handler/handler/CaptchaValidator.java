@@ -39,6 +39,7 @@ public class CaptchaValidator implements ConstraintValidator<Captcha, String> {
         }
         if(text.equals(captcha) && ((Date)date).after(new Date())){
             session.setAttribute(Const.CAPTCHA_SESSION_KEY_BASE+checkType.getCode(),null);
+            session.setAttribute(Const.CAPTCHA_SESSION_DATE_BASE+checkType.getCode(),null);
             return true;
         }
         return false;
