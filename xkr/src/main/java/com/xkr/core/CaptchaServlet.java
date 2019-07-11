@@ -86,8 +86,8 @@ public class CaptchaServlet extends HttpServlet implements Servlet {
             }
             String capText = this.kaptchaProducer.createText();
             Session session = SecurityUtils.getSubject().getSession();
-            session.setAttribute(this.sessionKeyValue+"_"+session.getId()+"_"+captchaEnum.getCode(), capText);
-            session.setAttribute(this.sessionKeyDateValue+"_"+session.getId()+"_"+captchaEnum.getCode(), DateUtils.addSeconds(new Date(),60));
+            session.setAttribute(this.sessionKeyValue+captchaEnum.getCode(), capText);
+            session.setAttribute(this.sessionKeyDateValue+captchaEnum.getCode(), DateUtils.addSeconds(new Date(),60));
             BufferedImage bi = this.kaptchaProducer.createImage(capText);
             ServletOutputStream out = resp.getOutputStream();
             ImageIO.write(bi, "jpg", out);
@@ -97,12 +97,5 @@ public class CaptchaServlet extends HttpServlet implements Servlet {
             resp.setContentType("application/json");
             resp.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.ERROR)));
         }
-    }
-
-
-    public static void main(String[] args){
-        Date date = new Date();
-        System.out.println(date);
-        System.out.println(DateUtils.addSeconds(new Date(),60));
     }
 }

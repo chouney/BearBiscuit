@@ -62,7 +62,7 @@ public class AdminLoginShiroFilter extends AdviceFilter {
             return false;
         }
         //检查是否有人登录该账号
-        XkrAdminAccount user = (XkrAdminAccount) principal;
+        XkrAdminAccount user = (XkrAdminAccount) principal.getPrincipal();
         XkrLoginToken xkrLoginToken = xkrLoginTokenAgent.getUserLoginRecordById(user.getId());
         if(Objects.nonNull(xkrLoginToken)){
             String sessionId = xkrLoginToken.getLoginToken();

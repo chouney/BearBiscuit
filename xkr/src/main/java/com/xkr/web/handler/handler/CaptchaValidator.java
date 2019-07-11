@@ -32,8 +32,8 @@ public class CaptchaValidator implements ConstraintValidator<Captcha, String> {
             return false;
         }
         Session session = SecurityUtils.getSubject().getSession();
-        String captcha = (String)session.getAttribute(Const.CAPTCHA_SESSION_KEY_BASE+"_"+session.getId()+"_"+checkType.getCode());
-        Object date = session.getAttribute(Const.CAPTCHA_SESSION_DATE_BASE+"_"+session.getId()+"_"+checkType.getCode());
+        String captcha = (String)session.getAttribute(Const.CAPTCHA_SESSION_KEY_BASE+checkType.getCode());
+        Object date = session.getAttribute(Const.CAPTCHA_SESSION_DATE_BASE+checkType.getCode());
         if(Objects.isNull(date)){
            return false;
         }
