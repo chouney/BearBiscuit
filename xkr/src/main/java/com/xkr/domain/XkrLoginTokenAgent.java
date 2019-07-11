@@ -1,6 +1,7 @@
 package com.xkr.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.xkr.common.Const;
 import com.xkr.common.LoginEnum;
@@ -72,10 +73,8 @@ public class XkrLoginTokenAgent {
         if(Objects.isNull(userId)){
             return null;
         }
-        XkrLoginToken xkrLoginToken = new XkrLoginToken();
-        xkrLoginToken.setUserId(userId);
-        xkrLoginToken.setStatus((byte) 1);
-        return xkrLoginTokenMapper.selectOne(xkrLoginToken);
+        List<XkrLoginToken> userIds = getUserLoginRecordByIds(ImmutableList.of(userId));
+        return CollectionUtils.isEmpty(userIds) ? null : userIds.get(0);
     }
 
     public List<XkrLoginToken> getUserLoginRecordByIds(List<Long> userId){
