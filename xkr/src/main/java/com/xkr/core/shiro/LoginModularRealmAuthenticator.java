@@ -52,7 +52,7 @@ public class LoginModularRealmAuthenticator extends ModularRealmAuthenticator {
                 throw new ShiroException("token不存在!");
             }
         } catch (Exception e) {
-            throw new IncorrectCredentialsException("用户名或者密码错误!");
+            throw e;
         }
         return info;
     }

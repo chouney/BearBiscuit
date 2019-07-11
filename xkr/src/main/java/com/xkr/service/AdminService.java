@@ -20,6 +20,7 @@ import com.xkr.domain.dto.admin.permission.PermissionDTO;
 import com.xkr.domain.dto.resource.ResourceStatusEnum;
 import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.domain.entity.XkrAdminAccount;
+import com.xkr.domain.entity.XkrClass;
 import com.xkr.domain.entity.XkrLoginToken;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.shiro.SecurityUtils;
@@ -65,6 +66,8 @@ public class AdminService {
     @Autowired
     private XkrUserAgent xkrUserAgent;
 
+    @Autowired
+    private XkrClassAgent xkrClassAgent;
 
     /**
      * ——————————————————————管理员————————————————————
@@ -467,8 +470,10 @@ public class AdminService {
     }
 
     private void buildResourceAccountDTO(int classId, ResourceAccountDTO resourceAccountDTO){
-        Integer totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED,classId);
-        Integer unverifiedCount = xkrResourceAgent.getResourceTotal(ImmutableList.of(ResourceStatusEnum.STATUS_UNVERIFIED),classId);
+        List<XkrClass> xkrClasses = xkrClassAgent.getAllChildClassByClassId(Long.valueOf(classId));
+        List<Long> classIds = xkrClasses.stream().map(XkrClass::getId).collect(Collectors.toList());
+        Integer totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED,classIds);
+        Integer unverifiedCount = xkrResourceAgent.getResourceTotal(ImmutableList.of(ResourceStatusEnum.STATUS_UNVERIFIED),classIds);
 
         resourceAccountDTO.setDownloadCount(adminIndexRedisService.getDownLoadCount(classId));
         resourceAccountDTO.setUploadCount(adminIndexRedisService.getUploadCount(classId));

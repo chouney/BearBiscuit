@@ -1,5 +1,6 @@
 package com.xkr.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
@@ -138,7 +139,7 @@ public class ClassService {
         Map<Long, ClassMenuDTO> tmpMap = Maps.newHashMap();
         xkrClasses.forEach(xkrClass -> {
             ClassMenuDTO menuDTO = new ClassMenuDTO();
-            int totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED, xkrClass.getId().intValue());
+            int totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED, ImmutableList.of(xkrClass.getId()));
             menuDTO.setClassId(xkrClass.getId());
             menuDTO.setClassName(xkrClass.getClassName());
             menuDTO.setCount(totalCount);

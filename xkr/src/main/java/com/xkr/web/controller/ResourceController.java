@@ -281,9 +281,9 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "detail") String detail,
             @NotBlank
-            @RequestParam(name = "cp") String cp,
+            @RequestParam(name = "compressMd5") String cp,
             @NotBlank
-            @RequestParam(name = "up") String up,
+            @RequestParam(name = "fileName") String up,
             @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {

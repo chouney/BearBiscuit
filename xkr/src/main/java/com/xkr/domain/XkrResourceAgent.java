@@ -245,7 +245,7 @@ public class XkrResourceAgent {
         return xkrResourceMapper.getTotalResource(ImmutableMap.of("statuses",ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList())));
     }
 
-    public Integer getResourceTotal(List<ResourceStatusEnum> resourceStatusEnums,Integer classId){
+    public Integer getResourceTotal(List<ResourceStatusEnum> resourceStatusEnums,List<Long> classId){
         if(Objects.isNull(classId) || CollectionUtils.isEmpty(resourceStatusEnums)){
             return null;
         }

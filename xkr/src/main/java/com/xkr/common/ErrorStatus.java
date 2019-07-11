@@ -34,6 +34,8 @@ public enum ErrorStatus {
     USER_INCORRECT_LOGIN(11413,"登录账号或密码错误"),
     USER_ATTEMPT_EXCESSIVE_LOGIN(11414,"账号错误次数过多,请稍后再试"),
     USER_LOGIN_ERROR(11500,"登录异常,请稍后再试"),
+    USER_LOGIN_NEW(10501,"用户已在别处登录"),
+
 
     //评论
     COMMENT_USER_NOT_PRILIVEGED(12400,"用户无评论权限"),

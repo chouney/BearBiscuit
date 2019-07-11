@@ -45,7 +45,7 @@ public class AdminCredentialsMatcher extends SimpleCredentialsMatcher {
             //if retry count > 5 throw
             throw new ExcessiveAttemptsException();
         }
-
+        retryCount.getAndAdd(1);
         boolean matches = super.doCredentialsMatch(token, info);
         if (matches) {
             //clear retry count

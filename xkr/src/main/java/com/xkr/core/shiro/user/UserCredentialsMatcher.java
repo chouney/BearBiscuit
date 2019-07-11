@@ -41,6 +41,7 @@ public class UserCredentialsMatcher extends HashedCredentialsMatcher {
             //if retry count > 5 throw
             throw new ExcessiveAttemptsException();
         }
+        retryCount.getAndAdd(1);
 
         boolean matches = super.doCredentialsMatch(token, info);
         if(matches) {

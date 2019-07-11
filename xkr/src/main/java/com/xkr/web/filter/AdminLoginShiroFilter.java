@@ -8,17 +8,23 @@ import com.alibaba.fastjson.JSON;
 import com.xkr.common.Const;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.LoginEnum;
+import com.xkr.domain.XkrLoginTokenAgent;
+import com.xkr.domain.entity.XkrAdminAccount;
+import com.xkr.domain.entity.XkrLoginToken;
+import com.xkr.domain.entity.XkrUser;
 import com.xkr.web.model.BasicResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.servlet.AdviceFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 /**
  * author xkr
@@ -28,6 +34,9 @@ public class AdminLoginShiroFilter extends AdviceFilter {
 
     @Value("${spring.profiles.active}")
     private String runEnv;
+
+    @Autowired
+    private XkrLoginTokenAgent xkrLoginTokenAgent;
 
     /**
      * 在访问controller前判断是否登录，返回json，不进行重定向。
@@ -51,6 +60,18 @@ public class AdminLoginShiroFilter extends AdviceFilter {
 //            httpServletResponse.setContentType("application/json");
             httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.UNLOGIN_REDIRECT)));
             return false;
+        }
+        //检查是否有人登录该账号
+        XkrAdminAccount user = (XkrAdminAccount) principal;
+        XkrLoginToken xkrLoginToken = xkrLoginTokenAgent.getUserLoginRecordById(user.getId());
+        if(Objects.nonNull(xkrLoginToken)){
+            String sessionId = xkrLoginToken.getLoginToken();
+            if(!session.getId().equals(sessionId)){
+                httpServletResponse.setCharacterEncoding("UTF-8");
+//            httpServletResponse.setContentType("application/json");
+                httpServletResponse.getWriter().write(JSON.toJSONString(new BasicResult(ErrorStatus.USER_LOGIN_NEW)));
+                return false;
+            }
         }
         return true;
     }

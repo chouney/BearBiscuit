@@ -132,11 +132,11 @@ public class XkrUserAgent {
         XkrUser user = xkrUserMapper.selectByUserName(ImmutableMap.of(
                 "userLogin",userLogin,"statuses",statusesCode
         ));
-        if(Objects.isNull(user)){
-            user = xkrUserMapper.selectByEmail(ImmutableMap.of(
-                    "userLogin",userLogin,"statuses",statusesCode
-            ));
-        }
+//        if(Objects.isNull(user)){
+//            user = xkrUserMapper.selectByEmail(ImmutableMap.of(
+//                    "userLogin",userLogin,"statuses",statusesCode
+//            ));
+//        }
         return user;
     }
 
