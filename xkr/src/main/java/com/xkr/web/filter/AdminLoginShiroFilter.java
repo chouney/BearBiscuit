@@ -35,8 +35,8 @@ public class AdminLoginShiroFilter extends AdviceFilter {
     @Value("${spring.profiles.active}")
     private String runEnv;
 
-    @Autowired
-    private XkrLoginTokenAgent xkrLoginTokenAgent;
+//    @Autowired
+//    private XkrLoginTokenAgent xkrLoginTokenAgent;
 
     /**
      * 在访问controller前判断是否登录，返回json，不进行重定向。
