@@ -1,12 +1,9 @@
 package com.xkr.web.controller.admin;
 
-import com.google.common.collect.ImmutableList;
 import com.xkr.common.ErrorStatus;
 import com.xkr.domain.dto.admin.index.AdminIndexDTO;
 import com.xkr.domain.dto.admin.index.ResourceAccountDTO;
 import com.xkr.domain.dto.admin.index.UserAccountDTO;
-import com.xkr.domain.dto.resource.ResourceStatusEnum;
-import com.xkr.domain.dto.user.UserStatusEnum;
 import com.xkr.service.AdminService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.admin.index.AdminIndexVO;

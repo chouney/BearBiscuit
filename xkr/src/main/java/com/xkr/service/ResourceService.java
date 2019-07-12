@@ -370,10 +370,12 @@ public class ResourceService {
 
             //
 
-            //3更新资源库以及索引的下载数
-            xkrResourceAgent.updateDownloadCountById(resourceId);
 
         }
+
+        //3更新资源库以及索引的下载数
+        xkrResourceAgent.updateDownloadCountById(resourceId);
+
 
         //生成下载token
         try {
