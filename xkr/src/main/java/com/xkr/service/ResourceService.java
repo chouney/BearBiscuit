@@ -852,12 +852,15 @@ public class ResourceService {
         if(Objects.nonNull(currentClass)) {
             resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName(currentClass.getClassName());
+            resourceDTO.setRootClassId(rootClass.getId());
+            resourceDTO.setRootClassName(rootClass.getClassName());
         }else{
 //            resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName("分类不存在或被删除");
+//            resourceDTO.setRootClassId(rootClass.getId());
+//            resourceDTO.setRootClassName("");
         }
-        resourceDTO.setRootClassId(rootClass.getId());
-        resourceDTO.setRootClassName(rootClass.getClassName());
+
 
     }
 
