@@ -858,7 +858,7 @@ public class ResourceService {
 //            resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName("分类不存在或被删除");
 //            resourceDTO.setRootClassId(rootClass.getId());
-//            resourceDTO.setRootClassName("");
+            resourceDTO.setRootClassName("未知分类");
         }
 
 

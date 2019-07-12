@@ -56,8 +56,9 @@ public class OptLogAspect {
             if (!OptEnum.SYSTEM.equals(optEnum)) {
                 Subject subject = SecurityUtils.getSubject();
                 optLogService.saveOptLog(subject, moduleEnum, detail);
+            }else {
+                optLogService.saveOptLogByAuto(moduleEnum, detail);
             }
-            optLogService.saveOptLogByAuto(moduleEnum,detail);
         }
         return joinPoint.proceed(joinPoint.getArgs());
     }
