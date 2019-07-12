@@ -251,7 +251,7 @@ public class XkrResourceAgent {
         }
         return xkrResourceMapper.getTotalResource(ImmutableMap.of(
                 "statuses",resourceStatusEnums.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()),
-                "classIds", ImmutableList.of(classId))
+                "classIds", classId)
         );
     }
 
