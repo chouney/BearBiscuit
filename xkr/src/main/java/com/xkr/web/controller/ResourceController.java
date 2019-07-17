@@ -281,9 +281,9 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "detail") String detail,
             @NotBlank
-            @RequestParam(name = "cfu") String cfu,
+            @RequestParam(name = "cp") String cfu,
             @NotBlank
-            @RequestParam(name = "ufu") String ufu,
+            @RequestParam(name = "up") String ufu,
             @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {

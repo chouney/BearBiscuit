@@ -177,9 +177,9 @@ public class IndexTestController {
             @NotBlank
             @RequestParam(name = "detail") String detail,
             @NotBlank
-            @RequestParam(name = "cfu") String cfu,
+            @RequestParam(name = "cp") String cfu,
             @NotBlank
-            @RequestParam(name = "ufu") String ufu,
+            @RequestParam(name = "up") String ufu,
             @NotBlank
             @RequestParam(name = "userId") String userId,
             ValidResult result) {
