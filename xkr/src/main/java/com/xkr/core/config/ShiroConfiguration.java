@@ -150,7 +150,7 @@ public class ShiroConfiguration {
         //创建会话Cookie
         Cookie cookie = new SimpleCookie();
         cookie.setName("WEBID");
-        cookie.setDomain("xkr.com");
+        cookie.setDomain("sharecoder.cn");
         //1 hour
         cookie.setMaxAge(3600);
         cookie.setHttpOnly(true);
@@ -169,7 +169,7 @@ public class ShiroConfiguration {
         //System.out.println("ShiroConfiguration.rememberMeManager()");
         //创建会话Cookie
         Cookie cookie = new SimpleCookie(Const.SESSION_REMEMBER_COOKIE_NAME);
-        cookie.setDomain("xkr.com");
+        cookie.setDomain("sharecoder.cn");
         //1 hour
         cookie.setMaxAge(Const.REMEMBER_COOKIE_EXPIRE);
         cookie.setHttpOnly(true);

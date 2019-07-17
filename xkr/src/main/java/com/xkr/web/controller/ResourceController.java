@@ -281,9 +281,9 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "detail") String detail,
             @NotBlank
-            @RequestParam(name = "compressMd5") String cp,
+            @RequestParam(name = "cfu") String cfu,
             @NotBlank
-            @RequestParam(name = "fileName") String up,
+            @RequestParam(name = "ufu") String ufu,
             @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
@@ -303,7 +303,7 @@ public class ResourceController {
 
             XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
 
-            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),cp,up);
+            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),user.getId(),cfu,ufu);
 
             if(!ErrorStatus.OK.equals(resId.getStatus())){
                 return new BasicResult<>(resId.getStatus());
@@ -313,7 +313,7 @@ public class ResourceController {
 
             return new BasicResult<>(output);
         } catch (Exception e) {
-            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cp:{}", resTitle,resCost,detail,classId,cp, e);
+            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cfu:{}", resTitle,resCost,detail,classId,cfu, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }
