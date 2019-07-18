@@ -62,11 +62,11 @@ public class XkrUserAgent {
                     "list",userIds,"status",status.getCode()
             )) > 0;
         }
-        if(isSuccess){
-            if (!searchApiService.bulkUpdateIndexStatus("user", userIds, status.getCode())) {
-                logger.error("XkrUserAgent batchUpdateUserByIds failed ,userIds:{},status:{}", JSON.toJSONString(userIds),status);
-            }
-        }
+//        if(isSuccess){
+//            if (!searchApiService.bulkUpdateIndexStatus("user", userIds, status.getCode())) {
+//                logger.error("XkrUserAgent batchUpdateUserByIds failed ,userIds:{},status:{}", JSON.toJSONString(userIds),status);
+//            }
+//        }
         return isSuccess;
     }
 
@@ -148,12 +148,12 @@ public class XkrUserAgent {
         user.setId(userId);
         user.setStatus((byte)UserStatusEnum.USER_STATUS_NORMAL.getCode());
         if(xkrUserMapper.updateByPrimaryKeySelective(user) == 1){
-            UserIndexDTO userIndexDTO = new UserIndexDTO();
-            searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(user.getId()));
-            userIndexDTO.setStatus(UserStatusEnum.USER_STATUS_NORMAL.getCode());
-            if(!searchApiService.upsertIndex(userIndexDTO)){
-                logger.error("XkrUserAgent verifyUserAccountByUserId failed ,userId:{}",userId);
-            }
+//            UserIndexDTO userIndexDTO = new UserIndexDTO();
+//            searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO,String.valueOf(user.getId()));
+//            userIndexDTO.setStatus(UserStatusEnum.USER_STATUS_NORMAL.getCode());
+//            if(!searchApiService.upsertIndex(userIndexDTO)){
+//                logger.error("XkrUserAgent verifyUserAccountByUserId failed ,userId:{}",userId);
+//            }
             return true;
         }
         return false;
@@ -191,9 +191,9 @@ public class XkrUserAgent {
 
             buildUserIndexDTO(userIndexDTO,user);
 
-            if(!searchApiService.upsertIndex(userIndexDTO)){
-                logger.error("XkrUserAgent createUserAccount createIndex failed user:{}", JSON.toJSONString(user));
-            }
+//            if(!searchApiService.upsertIndex(userIndexDTO)){
+//                logger.error("XkrUserAgent createUserAccount createIndex failed user:{}", JSON.toJSONString(user));
+//            }
             return user;
         }
         return null;

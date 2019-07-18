@@ -69,11 +69,11 @@ public class XkrResourceCommentAgent {
                     "list",commentIds,"status",status.getCode()
             )) > 0;
         }
-        if(isSuccess){
-            if (!searchApiService.bulkUpdateIndexStatus("comment", commentIds, status.getCode())) {
-                logger.error("XkrResourceCommentAgent batchUpdateCommentrByIds index failed ,commentIds:{},status:{}", JSON.toJSONString(commentIds),status);
-            }
-        }
+//        if(isSuccess){
+//            if (!searchApiService.bulkUpdateIndexStatus("comment", commentIds, status.getCode())) {
+//                logger.error("XkrResourceCommentAgent batchUpdateCommentrByIds index failed ,commentIds:{},status:{}", JSON.toJSONString(commentIds),status);
+//            }
+//        }
         return isSuccess;
     }
 
@@ -86,12 +86,12 @@ public class XkrResourceCommentAgent {
         xkrResourceComment.setContent(content);
         xkrResourceComment.setUpdateTime(new Date());
         if(xkrResourceCommentMapper.updateByPrimaryKeySelective(xkrResourceComment) == 1){
-            Map<String,Object> map = Maps.newHashMap();
-            map.put("content",content);
-            map.put("updateTime",new Date().getTime());
-            if(!searchApiService.bulkUpdateIndex("comment", ImmutableList.of(commentId),map)){
-                logger.error("XkrResourceCommentAgent updateCommentById index failed ,commentId:{},content:{}", commentId,content);
-            }
+//            Map<String,Object> map = Maps.newHashMap();
+//            map.put("content",content);
+//            map.put("updateTime",new Date().getTime());
+//            if(!searchApiService.bulkUpdateIndex("comment", ImmutableList.of(commentId),map)){
+//                logger.error("XkrResourceCommentAgent updateCommentById index failed ,commentId:{},content:{}", commentId,content);
+//            }
             return true;
         }
         return false;
@@ -157,11 +157,11 @@ public class XkrResourceCommentAgent {
         resourceComment.setStatus((byte)CommentStatusEnum.STATUS_TOVERIFY.getCode());
         resourceComment.setUpdateTime(new Date());
         if(xkrResourceCommentMapper.insertSelective(resourceComment) == 1){
-            CommentIndexDTO commentIndexDTO = new CommentIndexDTO();
-            buildCommentIndexDTO(commentIndexDTO,user,resourceComment,xkrResource);
-            if(!searchApiService.upsertIndex(commentIndexDTO)){
-                logger.error("XkrResourceCommentAgent saveNewResourceComment create commentIndexDTO index failed ,commentId:{}",id);
-            }
+//            CommentIndexDTO commentIndexDTO = new CommentIndexDTO();
+//            buildCommentIndexDTO(commentIndexDTO,user,resourceComment,xkrResource);
+//            if(!searchApiService.upsertIndex(commentIndexDTO)){
+//                logger.error("XkrResourceCommentAgent saveNewResourceComment create commentIndexDTO index failed ,commentId:{}",id);
+//            }
             return new ResponseDTO<>(resourceComment);
         }
         return new ResponseDTO<>(ErrorStatus.ERROR);

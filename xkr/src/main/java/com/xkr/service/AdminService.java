@@ -203,12 +203,12 @@ public class AdminService {
         if(Objects.isNull(oriAdminAccount)){
             return new ResponseDTO<>(ErrorStatus.USER_NOT_EXIST);
         }
-        accountName = StringUtils.isEmpty(accountName) ?
-                oriAdminAccount.getAccountName() : accountName;
-        accountToken = StringUtils.isEmpty(accountToken) ?
-                oriAdminAccount.getAccountToken() : accountToken;
-        email = StringUtils.isEmpty(email) ?
-                oriAdminAccount.getEmail() : email;
+//        accountName = StringUtils.isEmpty(accountName) ?
+//                oriAdminAccount.getAccountName() : accountName;
+//        accountToken = StringUtils.isEmpty(accountToken) ?
+//                oriAdminAccount.getAccountToken() : accountToken;
+//        email = StringUtils.isEmpty(email) ?
+//                oriAdminAccount.getEmail() : email;
 
 //        if(StringUtils.isEmpty(strPermissionIds)){
 //            return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
@@ -221,7 +221,7 @@ public class AdminService {
 
         if(Objects.isNull(permissionIds)){
             //如果没传permissionIds则获取当前权限id
-            strPermissionIds = xkrAdminAccount.getPermissionIds() == null ? "" : xkrAdminAccount.getPermissionIds();
+            strPermissionIds = "";
         } else {
             strPermissionIds = String.join(";",permissionIds);
         }

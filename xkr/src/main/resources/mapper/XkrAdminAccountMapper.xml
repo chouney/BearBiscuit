@@ -23,16 +23,16 @@
     <update id="updateAdminAccountById" parameterType="java.util.Map">
         UPDATE xkr_admin_account
         <trim prefix="set" >
-            <if test="accountName!=null">
+            <if test="accountName!=null and accountName!=''">
                 account_name = #{accountName} ,
             </if>
-            <if test="accountToken!=null">
+            <if test="accountToken!=null and accountToken!=''">
                 account_token = #{accountToken} ,
             </if>
-            <if test="email!=null">
+            <if test="email!=null and email!=''">
                 email = #{email} ,
             </if>
-            <if test="permissionIds!=null">
+            <if test="permissionIds!=null and permissionIds!=''">
                 permission_ids = #{permissionIds} ,
             </if>
         </trim>
