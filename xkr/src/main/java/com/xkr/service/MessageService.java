@@ -84,6 +84,11 @@ public class MessageService {
                 MessageDTO dto = new MessageDTO();
                 dto.setDate(xkrMessage.getUpdateTime());
                 dto.setMsg(xkrMessage.getContent());
+                if(MessageStatusEnum.MESSAGE_STATUS_READ.getCode() == xkrMessage.getStatus()){
+                    dto.setHasRead(true);
+                }else if(MessageStatusEnum.MESSAGE_STATUS_UNREAD.getCode() == xkrMessage.getStatus()){
+                    dto.setHasRead(false);
+                }
                 result.getMsgList().add(dto);
             });
         }

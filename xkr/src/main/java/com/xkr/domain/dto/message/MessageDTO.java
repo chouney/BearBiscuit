@@ -20,6 +20,8 @@ public class MessageDTO implements Serializable{
 
     private String date;
 
+    private boolean hasRead;
+
     public String getMsg() {
         return msg;
     }
@@ -38,5 +40,13 @@ public class MessageDTO implements Serializable{
 
     public void setDate(Date date) {
         this.date = DATE_FORMAT.format(date);
+    }
+
+    public boolean isHasRead() {
+        return hasRead;
+    }
+
+    public void setHasRead(boolean hasRead) {
+        this.hasRead = hasRead;
     }
 }

@@ -114,7 +114,7 @@ CREATE TABLE xkr_class(
 	INDEX `idx_sta` (`status`,`update_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='栏目表';
 insert into xkr_class values('0','0','0','root','1',current_timestamp(),current_timestamp(),'{}');
-insert into xkr_class values('100000000','0','0-100000000','毕业设计','1',current_timestamp(),current_timestamp(),'{}');
+insert into xkr_class values('100000000','0','0-100000000','课题','1',current_timestamp(),current_timestamp(),'{}');
 insert into xkr_class values('200000000','0','0-200000000','资源','1',current_timestamp(),current_timestamp(),'{}');
 
 DROP TABLE IF EXISTS `xkr_resource_comment`;

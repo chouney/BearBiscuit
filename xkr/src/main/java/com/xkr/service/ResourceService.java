@@ -422,7 +422,7 @@ public class ResourceService {
                                              String cp, String up) {
 //        String filePath = String.format(UpLoadApiService.getCompressFilePathFormat(), userId, cp, up);
         try {
-            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInfo(up);
+            FileInfoDTO fileInfoDTO = upLoadApiService.getFileInfo(cp);
             if (Objects.isNull(fileInfoDTO)) {
                 logger.error("ResourceService saveNewResource failed : classId:{},userId:{},cp:{},up:{}",
                         classId, userId, cp, up);
