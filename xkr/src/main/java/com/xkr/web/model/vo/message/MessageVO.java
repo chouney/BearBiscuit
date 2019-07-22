@@ -21,6 +21,9 @@ public class MessageVO implements Serializable{
 
     private String date;
 
+    private boolean hasRead;
+
+
     public String getMsg() {
         return msg;
     }
@@ -42,5 +45,13 @@ public class MessageVO implements Serializable{
             return;
         }
         this.date = DATE_FORMAT.format(date);
+    }
+
+    public boolean isHasRead() {
+        return hasRead;
+    }
+
+    public void setHasRead(boolean hasRead) {
+        this.hasRead = hasRead;
     }
 }

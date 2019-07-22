@@ -76,6 +76,7 @@ public class MessageController {
             MessageVO messageVO = new MessageVO();
             messageVO.setMsg(messageDTO.getMsg());
             messageVO.setDate(messageDTO.getDate());
+            messageVO.setHasRead(messageDTO.isHasRead());
             listMessageVO.getMsgList().add(messageVO);
         });
         listMessageVO.setTotalCount(listMessageDTO.getTotalCount());
