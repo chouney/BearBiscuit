@@ -132,11 +132,11 @@ public class XkrUserAgent {
         XkrUser user = xkrUserMapper.selectByUserName(ImmutableMap.of(
                 "userLogin",userLogin,"statuses",statusesCode
         ));
-//        if(Objects.isNull(user)){
-//            user = xkrUserMapper.selectByEmail(ImmutableMap.of(
-//                    "userLogin",userLogin,"statuses",statusesCode
-//            ));
-//        }
+        if(Objects.isNull(user)){
+            user = xkrUserMapper.selectByEmail(ImmutableMap.of(
+                    "userLogin",userLogin,"statuses",statusesCode
+            ));
+        }
         return user;
     }
 
@@ -165,6 +165,13 @@ public class XkrUserAgent {
         }
         user.setUserToken(PasswordUtil.createUserPwd(userToken,user.getSalt()));
         user.setUpdateTime(new Date());
+        return xkrUserMapper.updateByPrimaryKeySelective(user) == 1;
+    }
+
+    public boolean updateUserByPKSelective(XkrUser user){
+        if(Objects.isNull(user)){
+            return false;
+        }
         return xkrUserMapper.updateByPrimaryKeySelective(user) == 1;
     }
 

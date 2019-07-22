@@ -368,8 +368,10 @@ public class ResourceService {
                 throw new RuntimeException("saveNew userRelationShip failed");
             }
 
-            //
-
+            //上传加相应积分
+            XkrUser xkrUser = xkrUserAgent.getUserById(resource.getUserId());
+            xkrUser.setWealth(xkrUser.getWealth()+ resource.getCost());
+            xkrUserAgent.updateUserByPKSelective(xkrUser);
 
         }
 
