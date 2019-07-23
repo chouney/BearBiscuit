@@ -889,7 +889,7 @@ public class ResourceService {
         resourceDTO.setReport(Integer.valueOf(resource.getReport()));
         resourceDTO.setDownloadCount(resource.getDownloadCount());
         resourceDTO.setCost(resource.getCost());
-        resourceDTO.setContent(resource.getDetail());
+//        resourceDTO.setContent(resource.getDetail());
         resourceDTO.setStatus(Integer.valueOf(resource.getStatus()));
         resourceDTO.setTitle(resource.getTitle());
         resourceDTO.setUpdateTime(resource.getUpdateTime());

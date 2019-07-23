@@ -429,7 +429,7 @@ public class ResourceController {
             ResourceVO resourceVO = new ResourceVO();
             resourceVO.setClassId(resourceDTO.getClassId());
             resourceVO.setClassName(resourceDTO.getClassName());
-            resourceVO.setContent(resourceDTO.getContent());
+//            resourceVO.setContent(resourceDTO.getContent());
             resourceVO.setCost(resourceDTO.getCost());
             resourceVO.setDownloadCount(resourceDTO.getDownloadCount());
             resourceVO.setReport(resourceDTO.getReport());
