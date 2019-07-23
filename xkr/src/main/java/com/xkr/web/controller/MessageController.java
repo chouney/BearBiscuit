@@ -61,7 +61,7 @@ public class MessageController {
 
     @RequestMapping(value = "/mark",method = {RequestMethod.POST})
     @ResponseBody
-    public BasicResult markUserMessage(@RequestParam(name = "messageIds") String[] messageIds) {
+    public BasicResult markUserMessage(@RequestParam(name = "messageIds[]") String[] messageIds) {
         try {
             boolean result = messageService.markedMessageById(Arrays.stream(messageIds).map(Long::valueOf).collect(Collectors.toList()));
             return new BasicResult(result ? ErrorStatus.OK : ErrorStatus.ERROR);
