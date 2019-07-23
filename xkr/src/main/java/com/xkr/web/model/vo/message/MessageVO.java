@@ -1,5 +1,8 @@
 package com.xkr.web.model.vo.message;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,6 +20,7 @@ public class MessageVO implements Serializable{
 
     private static final long serialVersionUID = -633513867681979271L;
 
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long id;
 
     private String msg;
