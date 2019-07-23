@@ -392,19 +392,15 @@ public class ResourceService {
 
 
             JSONObject ext = JSON.parseObject(resource.getExt());
-            String fileName = URLEncoder.encode(ext.getString(ResourceService.EXT_FILE_NAME_KEY), "utf-8");
-            String downloadUrl = String.format(UpLoadApiService.getCompressFilePathFormat(), resource.getUserId(), resource.getResourceUrl(), fileName);
+            String downloadUrl = resource.getResourceUrl();
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
                     UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
-                    "/" + fileBucket + downloadUrl, date);
+                    downloadUrl, date);
         } catch (UpException e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("ResourceService build response fileName failed", e);
-            throw new RuntimeException("generate download fileName failed", e);
         }
 
     }
@@ -482,7 +478,7 @@ public class ResourceService {
             logger.error("ResourceService getResourceMenuList fileName is null : resource:{}", JSON.toJSONString(resource));
             return list;
         }
-        return upLoadApiService.getDirInfo(up);
+        return upLoadApiService.getDirInfo(resUri);
     }
 
     /**
