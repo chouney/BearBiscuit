@@ -74,6 +74,7 @@ public class MessageController {
     private void buildListMessageVO(ListMessageVO listMessageVO,ListMessageDTO listMessageDTO){
         listMessageDTO.getMsgList().forEach(messageDTO -> {
             MessageVO messageVO = new MessageVO();
+            messageVO.setId(messageDTO.getId());
             messageVO.setMsg(messageDTO.getMsg());
             messageVO.setDate(messageDTO.getDate());
             messageVO.setHasRead(messageDTO.isHasRead());

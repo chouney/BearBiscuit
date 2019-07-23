@@ -17,12 +17,21 @@ public class MessageVO implements Serializable{
 
     private static final long serialVersionUID = -633513867681979271L;
 
+    private Long id;
+
     private String msg;
 
     private String date;
 
     private boolean hasRead;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getMsg() {
         return msg;

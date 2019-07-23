@@ -16,11 +16,21 @@ public class MessageDTO implements Serializable{
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private Long id;
+
     private String msg;
 
     private String date;
 
     private boolean hasRead;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getMsg() {
         return msg;

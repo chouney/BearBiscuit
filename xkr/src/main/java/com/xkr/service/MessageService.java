@@ -82,6 +82,7 @@ public class MessageService {
         if(!CollectionUtils.isEmpty(list)) {
             list.forEach(xkrMessage -> {
                 MessageDTO dto = new MessageDTO();
+                dto.setId(xkrMessage.getId());
                 dto.setDate(xkrMessage.getUpdateTime());
                 dto.setMsg(xkrMessage.getContent());
                 if(MessageStatusEnum.MESSAGE_STATUS_READ.getCode() == xkrMessage.getStatus()){
