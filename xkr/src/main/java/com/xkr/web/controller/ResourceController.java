@@ -135,7 +135,7 @@ public class ResourceController {
                 return new BasicResult<>(resourceDTOs.getStatus());
             }
 
-            buildListResourceVO(resourceVOs, resourceDTOs);
+            buildListResourceVO4User(resourceVOs, resourceDTOs);
 
             return new BasicResult<>(resourceVOs);
         } catch (Exception e) {
@@ -429,7 +429,28 @@ public class ResourceController {
             ResourceVO resourceVO = new ResourceVO();
             resourceVO.setClassId(resourceDTO.getClassId());
             resourceVO.setClassName(resourceDTO.getClassName());
-//            resourceVO.setContent(resourceDTO.getContent());
+            resourceVO.setContent(resourceDTO.getContent());
+            resourceVO.setCost(resourceDTO.getCost());
+            resourceVO.setDownloadCount(resourceDTO.getDownloadCount());
+            resourceVO.setReport(resourceDTO.getReport());
+            resourceVO.setResourceId(resourceDTO.getResourceId());
+            resourceVO.setRootClassId(resourceDTO.getRootClassId());
+            resourceVO.setRootClassName(resourceDTO.getRootClassName());
+            resourceVO.setTitle(resourceDTO.getTitle());
+            resourceVO.setUpdateTime(resourceDTO.getUpdateTime());
+            resourceVO.setUserId(resourceDTO.getUserId());
+            resourceVO.setUserName(resourceDTO.getUserName());
+            resourceVO.setStatus(resourceDTO.getStatus());
+            resourceVOs.getResList().add(resourceVO);
+        });
+        resourceVOs.setTotalCount(resourceDTOs.getTotalCount());
+    }
+
+    private void buildListResourceVO4User(ListResourceVO resourceVOs, ListResourceDTO resourceDTOs) {
+        resourceDTOs.getResList().forEach(resourceDTO -> {
+            ResourceVO resourceVO = new ResourceVO();
+            resourceVO.setClassId(resourceDTO.getClassId());
+            resourceVO.setClassName(resourceDTO.getClassName());
             resourceVO.setCost(resourceDTO.getCost());
             resourceVO.setDownloadCount(resourceDTO.getDownloadCount());
             resourceVO.setReport(resourceDTO.getReport());
