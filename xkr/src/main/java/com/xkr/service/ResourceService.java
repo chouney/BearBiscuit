@@ -396,9 +396,10 @@ public class ResourceService {
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
-                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
+                    "deprecated",
+//                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
                     downloadUrl, date);
-        } catch (UpException e) {
+        } catch (Exception e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);
         }

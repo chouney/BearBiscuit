@@ -228,7 +228,7 @@ public class ResourceController {
      * @param result
      * @return
      */
-    @RequestMapping(value = "/res_list", method = {RequestMethod.GET})
+//    @RequestMapping(value = "/res_list", method = {RequestMethod.GET})
     @ResponseBody
     @MethodValidate
     public BasicResult<ListResourceFolderVO> getResourceMenuList(
