@@ -422,6 +422,7 @@ public class ResourceController {
         resourceDetailVO.setUpdateTime(resourceDetailDTO.getUpdateTime());
         resourceDetailVO.setUserId(resourceDetailDTO.getUserId());
         resourceDetailVO.setUserName(resourceDetailDTO.getUserName());
+        resourceDetailVO.setStatus(resourceDetailDTO.getResStatus());
     }
 
     private void buildListResourceVO(ListResourceVO resourceVOs, ListResourceDTO resourceDTOs) {

@@ -41,6 +41,8 @@ public class ResourceDetailVO implements Serializable{
 
     private String updateTime;
 
+    private Byte status;
+
     public Long getResourceId() {
         return resourceId;
     }
@@ -125,5 +127,11 @@ public class ResourceDetailVO implements Serializable{
         this.updateTime = DateUtil.yyyyMMdd.format(updateTime);
     }
 
+    public Byte getStatus() {
+        return status;
+    }
 
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
 }

@@ -914,6 +914,7 @@ public class ResourceService {
         detailDTO.setTitle(resource.getTitle());
         detailDTO.setUserId(resource.getUserId());
         detailDTO.setUpdateTime(resource.getUpdateTime());
+        detailDTO.setResStatus(resource.getStatus());
         XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
         if (Objects.isNull(user)) {
             detailDTO.setUserName("未知账号");

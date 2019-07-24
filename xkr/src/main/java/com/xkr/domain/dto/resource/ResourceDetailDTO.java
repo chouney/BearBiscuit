@@ -39,6 +39,8 @@ public class ResourceDetailDTO extends BaseDTO implements Serializable{
 
     private Date updateTime;
 
+    private Byte resStatus;
+
     public Long getResourceId() {
         return resourceId;
     }
@@ -139,5 +141,11 @@ public class ResourceDetailDTO extends BaseDTO implements Serializable{
         }
     }
 
+    public Byte getResStatus() {
+        return resStatus;
+    }
 
+    public void setResStatus(Byte resStatus) {
+        this.resStatus = resStatus;
+    }
 }
