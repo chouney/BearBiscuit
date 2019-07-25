@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -430,7 +431,13 @@ public class ResourceController {
             ResourceVO resourceVO = new ResourceVO();
             resourceVO.setClassId(resourceDTO.getClassId());
             resourceVO.setClassName(resourceDTO.getClassName());
-            resourceVO.setContent(resourceDTO.getContent());
+
+            //返回内容精简
+            if(!StringUtils.isEmpty(resourceDTO.getContent())){
+                int length =resourceDTO.getContent().length() > 300 ? 300 : resourceDTO.getContent().length();
+                resourceVO.setContent(resourceDTO.getContent().substring(0,length));
+            }
+
             resourceVO.setCost(resourceDTO.getCost());
             resourceVO.setDownloadCount(resourceDTO.getDownloadCount());
             resourceVO.setReport(resourceDTO.getReport());
