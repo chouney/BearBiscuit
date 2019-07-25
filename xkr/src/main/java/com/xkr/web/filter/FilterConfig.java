@@ -79,6 +79,8 @@ public class FilterConfig {
         filterChainDefinitionMap.put("/api/res/search_list", "anon");
 
         filterChainDefinitionMap.put("/api/cls/list", "anon");
+        //数据分析
+        filterChainDefinitionMap.put("/api/admin/data/list", "anon");
 
         filterChainDefinitionMap.put("/api/comment/list", "anon");
 

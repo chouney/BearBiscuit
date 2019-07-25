@@ -59,7 +59,6 @@ public class AdminDataAnyController {
      *
      * @return
      */
-    @RequiresPermissions(PermissionEnum.Constant.DATAANY_PERM)
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     public BasicResult dataAnaList(@RequestParam(name = "startDate", required = false) String startDate,

@@ -23,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -139,7 +136,7 @@ public class ClassService {
         Map<Long, ClassMenuDTO> tmpMap = Maps.newHashMap();
         xkrClasses.forEach(xkrClass -> {
             ClassMenuDTO menuDTO = new ClassMenuDTO();
-            int totalCount = xkrResourceAgent.getResourceTotal(ResourceStatusEnum.NON_DELETE_STATUSED, ImmutableList.of(xkrClass.getId()));
+            int totalCount = xkrResourceAgent.getResourceTotal(Arrays.asList(ResourceStatusEnum.STATUS_FREEZED,ResourceStatusEnum.STATUS_NORMAL), ImmutableList.of(xkrClass.getId()));
             menuDTO.setClassId(xkrClass.getId());
             menuDTO.setClassName(xkrClass.getClassName());
             menuDTO.setCount(totalCount);

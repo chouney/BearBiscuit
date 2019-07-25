@@ -601,7 +601,7 @@ public class ResourceService {
 
         //过滤条件
         Map<String, Object> filterMap = ImmutableMap.of(
-                "status", ResourceStatusEnum.STATUS_NORMAL.getCode()
+                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(),ResourceStatusEnum.STATUS_FREEZED.getCode())
         );
 
         SearchResultListDTO<ResourceIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
@@ -725,7 +725,7 @@ public class ResourceService {
 
         Map<String, Object> filterMap = ImmutableMap.of(
                 "classId", classIds,
-                "status", ResourceStatusEnum.STATUS_NORMAL.getCode()
+                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(),ResourceStatusEnum.STATUS_FREEZED.getCode())
         );
 
         SearchResultListDTO<ResourceIndexDTO> searchResultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class,
@@ -774,7 +774,8 @@ public class ResourceService {
 
         //获取分类下所有资源
         List<XkrResource> resources = xkrResourceAgent.getResourceListByClassIds(classIds, ImmutableList.of(
-                ResourceStatusEnum.STATUS_NORMAL.getCode()
+                ResourceStatusEnum.STATUS_NORMAL.getCode(),
+                ResourceStatusEnum.STATUS_FREEZED.getCode()
         ));
 
         result.setTotalCount((int) page.getTotal());
