@@ -147,7 +147,7 @@
             AND (t.title like concat('%', #{keyWord},'%') OR t.detail like concat('%', #{keyWord},'%'))
         </if>
         <if test="userName!=null and userName!=''">
-            AND t1.user_name like concat('%', #{userName},'%')
+            AND t1.user_name like concat('%', #{userName},'%') and t1.status in ('1','2','3')
         </if>
         <if test="report!=null">
             AND t.report = #{report}
