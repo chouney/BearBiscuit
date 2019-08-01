@@ -138,25 +138,22 @@
         LEFT JOIN xkr_user t1 on t.user_id = t1.id
         WHERE 1=1
         <if test="status!=null">
-            AND status = #{status}
+            AND t.status = #{status}
         </if>
         <if test="startDate!=null">
-            AND create_time >  #{startDate}
+            AND t.update_time >  #{startDate}
         </if>
         <if test="keyWord!=null and keyWord!=''">
-            AND (title like concat('%', #{keyWord},'%') OR detail like concat('%', #{keyWord},'%'))
+            AND (t.title like concat('%', #{keyWord},'%') OR t.detail like concat('%', #{keyWord},'%'))
         </if>
         <if test="userName!=null and userName!=''">
             AND t1.user_name like concat('%', #{userName},'%')
         </if>
         <if test="report!=null">
-            AND report = #{report}
-        </if>
-        <if test="statuses!=null">
-            AND status #{status}
+            AND t.report = #{report}
         </if>
         <if test="classIds!=null and classIds.size()>0">
-            AND class_id in
+            AND t.class_id in
             <foreach collection="classIds" item="classId" separator="," open="(" close=")">
                 #{classId}
             </foreach>
