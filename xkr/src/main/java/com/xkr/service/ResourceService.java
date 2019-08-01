@@ -122,11 +122,12 @@ public class ResourceService {
      * @return
      */
     public ListResourceDTO getResourceSearchByAdmin(String keyword, Date startDate,
-                                                    Date endDate, Integer resType, ResourceStatusEnum status,
+                                                    Date endDate, Integer resType,
+                                                    String userName,ResourceStatusEnum status,
                                                     Integer report, int pageNum, int size) {
         ListResourceDTO result = new ListResourceDTO();
         if (StringUtils.isEmpty(keyword) && Objects.isNull(startDate) && Objects.isNull(endDate) &&
-                Objects.isNull(resType) && Objects.isNull(report) && Objects.isNull(status)) {
+                Objects.isNull(resType) && Objects.isNull(report) && Objects.isNull(status) && StringUtils.isEmpty(userName)) {
             result.setStatus(ErrorStatus.PARAM_ERROR);
             return result;
         }
@@ -146,7 +147,7 @@ public class ResourceService {
         String sortKey = "update_time" ;
         Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
         //全部走sql接口
-        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report,classIds);
+        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report,classIds,userName);
 
         result.setTotalCount((int) page.getTotal());
 

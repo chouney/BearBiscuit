@@ -25,6 +25,16 @@
     id,class_id,user_id,cost,status,report,file_size,title,resource_url,download_count,
     create_time,update_time,ext,detail
   </sql>
+    <sql id="resource_field_t_filter">
+        t.id as id,t.class_id as class_id,
+        t.user_id as user_id,t.cost as cost,
+        t.status as status,t.report as report,
+        t.file_size as file_size,t.title as title,
+        t.resource_url as resource_url, t.download_count as download_count,
+        t.create_time as create_time,t.update_time as update_time,
+        t.ext as ext,t.detail as detail
+    </sql>
+
 
     <delete id="batchDeleteResourceByIds" parameterType="java.util.List">
         DELETE FROM xkr_resource WHERE id IN
@@ -123,8 +133,10 @@
 
     <select id="searchByFilter" parameterType="java.util.Map" resultMap="BaseResultMap">
         SELECT
-        <include refid="resource_field"/>
-        FROM xkr_resource WHERE 1=1
+        <include refid="resource_field_t_filter"/>
+        FROM xkr_resource t
+        LEFT JOIN xkr_user t1 on t.user_id = t1.id
+        WHERE 1=1
         <if test="status!=null">
             AND status = #{status}
         </if>
@@ -133,6 +145,9 @@
         </if>
         <if test="keyWord!=null and keyWord!=''">
             AND (title like concat('%', #{keyWord},'%') OR detail like concat('%', #{keyWord},'%'))
+        </if>
+        <if test="userName!=null and userName!=''">
+            AND t1.user_name like concat('%', #{userName},'%')
         </if>
         <if test="report!=null">
             AND report = #{report}

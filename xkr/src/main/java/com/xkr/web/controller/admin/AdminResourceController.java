@@ -67,6 +67,7 @@ public class AdminResourceController {
     public BasicResult<ListAdminResourceVO> getResourceListBySearchWord(
             @RequestParam(name = "startDate", required = false, defaultValue = "") String startDate,
             @RequestParam(name = "keyWord", required = false, defaultValue = "") String keyWord,
+            @RequestParam(name = "userName", required = false, defaultValue = "") String userName,
             @RequestParam(name = "type") Integer type,
             @RequestParam(name = "status", required = false, defaultValue = "1") Integer status,
             @RequestParam(name = "report", required = false, defaultValue = "2") Integer report,
@@ -104,7 +105,7 @@ public class AdminResourceController {
             }
 
             ListResourceDTO resourceDTOs = resourceService.getResourceSearchByAdmin(keyWord, sDate,
-                    null, type, ResourceStatusEnum.getByCode(status), report, pageNum, size);
+                    null, type,userName, ResourceStatusEnum.getByCode(status), report, pageNum, size);
 
             if (!ErrorStatus.OK.equals(resourceDTOs.getStatus())) {
                 return new BasicResult<>(resourceDTOs.getStatus());

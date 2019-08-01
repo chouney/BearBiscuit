@@ -197,13 +197,14 @@ public class XkrResourceAgent {
         return null;
     }
 
-    public List<XkrResource> searchByFilter(Date startDate,String keyWord,Integer status,Integer report,List<Long> classIds) {
+    public List<XkrResource> searchByFilter(Date startDate,String keyWord,Integer status,Integer report,List<Long> classIds,String userName) {
         Map<String,Object> map = Maps.newHashMap();
         map.put("startDate",startDate);
         map.put("keyWord",keyWord);
         map.put("status",status);
         map.put("report",report);
         map.put("classIds",classIds);
+        map.put("userName",userName);
         return xkrResourceMapper.searchByFilter(map);
     }
 
