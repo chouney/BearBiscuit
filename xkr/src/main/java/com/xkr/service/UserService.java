@@ -28,10 +28,7 @@ import com.xkr.util.EncodeUtil;
 import com.xkr.util.IdUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -222,6 +219,11 @@ public class UserService {
         } catch (ExcessiveAttemptsException eae) {
             logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,错误次数过多");
             result.setStatus(ErrorStatus.USER_ATTEMPT_EXCESSIVE_LOGIN);
+            token.clear();
+            return result;
+        } catch (DisabledAccountException dae) {
+            logger.info("对用户[" + userAccount + "]进行登录验证..验证未通过,用户未激活");
+            result.setStatus(ErrorStatus.USER_NOT_ACTIVITE);
             token.clear();
             return result;
         } catch (Exception ae) {

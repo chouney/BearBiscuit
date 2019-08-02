@@ -63,6 +63,8 @@ public class UpLoadApiService {
     @Value("${upyun.root.path}")
     private String rootPath;
 
+    //userId:fileName
+    private static String DIR_PATH_FORMAT;
     //userId:md5FileName:fileName+postFix
     private static String COMPRESS_FILE_PATH_FORMAT;
     //userId:md5FileName:filePrefixName
@@ -74,6 +76,7 @@ public class UpLoadApiService {
 
     @PostConstruct
     public void init() {
+        DIR_PATH_FORMAT = rootPath + "/s/%s";
         EXT_FILE_PATH_FORMAT = rootPath + "/ext/%s";
         COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
         UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
@@ -92,6 +95,19 @@ public class UpLoadApiService {
     public boolean downLoadFile(String upyunFilePath, File targetFile) throws IOException, UpException {
         logger.info("云盘下载文件,upyunPath:{},fileName:{}", upyunFilePath, targetFile.getName());
         return upYun.readFile(upyunFilePath, targetFile);
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param upyunFilePath
+     * @return
+     * @throws IOException
+     * @throws UpException
+     */
+    public boolean deleteFile(String upyunFilePath) throws IOException, UpException {
+        logger.info("云盘下载文件,upyunPath:{}", upyunFilePath);
+        return upYun.deleteFile(upyunFilePath);
     }
 
     /**
@@ -355,6 +371,11 @@ public class UpLoadApiService {
     public static String getExtFilePathFormat() {
         return EXT_FILE_PATH_FORMAT;
     }
+
+    public static String getDirPathFormat() {
+        return DIR_PATH_FORMAT;
+    }
+
 
     public static String getCompressFilePathFormat() {
         return COMPRESS_FILE_PATH_FORMAT;

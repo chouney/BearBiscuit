@@ -20,6 +20,7 @@ nohup ${JAVA_HOME}/bin/java -d64 $java_opt -jar ${CODE_DIR}/target/xkr.jar --spr
 
 #check app
 APP_NAME=xkr.jar
+sleep 5
 tpid=`ps -ef|grep $APP_NAME|grep -v grep|grep -v kill|awk '{print $2}'`
 for (( i=1; i<100;i++))
     do

@@ -29,8 +29,6 @@ import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
 import main.java.com.upyun.UpException;
-import main.java.com.upyun.UpYunUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +40,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,7 +119,7 @@ public class ResourceService {
      */
     public ListResourceDTO getResourceSearchByAdmin(String keyword, Date startDate,
                                                     Date endDate, Integer resType,
-                                                    String userName,ResourceStatusEnum status,
+                                                    String userName, ResourceStatusEnum status,
                                                     Integer report, int pageNum, int size) {
         ListResourceDTO result = new ListResourceDTO();
         if (StringUtils.isEmpty(keyword) && Objects.isNull(startDate) && Objects.isNull(endDate) &&
@@ -144,16 +140,16 @@ public class ResourceService {
         List<Long> classIds = classList.stream().map(XkrClass::getId).collect(Collectors.toList());
 
         //排序的索引键值
-        String sortKey = "update_time" ;
+        String sortKey = "update_time";
         Page page = PageHelper.startPage(pageNum, size, sortKey + " desc");
         //全部走sql接口
-        resultList = xkrResourceAgent.searchByFilter(startDate,keyword,status.getCode(),report,classIds,userName);
+        resultList = xkrResourceAgent.searchByFilter(startDate, keyword, status.getCode(), report, classIds, userName);
 
         result.setTotalCount((int) page.getTotal());
 
         SqlUtil.clearLocalPage();
 
-        buildResourceByFilterOnOffline(result,resultList);
+        buildResourceByFilterOnOffline(result, resultList);
 
 
         /** ea search逻辑 **/
@@ -191,7 +187,7 @@ public class ResourceService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds,ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds, ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, resourceStatusEnum);
         if (success) {
@@ -282,7 +278,7 @@ public class ResourceService {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
         XkrAdminAccount adminAccount = (XkrAdminAccount) SecurityUtils.getSubject().getPrincipal();
-        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds,ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
+        List<XkrResource> resources = xkrResourceAgent.getResourceListByIds(resourceIds, ResourceStatusEnum.ALL_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
         Boolean success = xkrResourceAgent.batchUpdateResourceByIds(resourceIds, ResourceStatusEnum.STATUS_NORMAL);
         if (success) {
@@ -315,12 +311,18 @@ public class ResourceService {
         if (CollectionUtils.isEmpty(resourceIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
+
         //清除回收站资源
         boolean success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
         if (success) {
             //清除资源
             success = xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
+            if(success){
+                //删除又拍云资源
+                deleteUpyunResource(resourceIds);
+            }
         }
+
         return new ResponseDTO<>(success);
     }
 
@@ -371,7 +373,7 @@ public class ResourceService {
 
             //上传加相应积分
             XkrUser xkrUser = xkrUserAgent.getUserById(resource.getUserId());
-            xkrUser.setWealth(xkrUser.getWealth()+ resource.getCost());
+            xkrUser.setWealth(xkrUser.getWealth() + resource.getCost());
             xkrUserAgent.updateUserByPKSelective(xkrUser);
 
         }
@@ -399,7 +401,7 @@ public class ResourceService {
             return new FileDownloadResponseDTO(
                     "deprecated",
 //                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
-                    "/"+fileBucket+downloadUrl, date);
+                    "/" + fileBucket + downloadUrl, date);
         } catch (Exception e) {
             logger.error("ResourceService build response token failed", e);
             throw new RuntimeException("generate download token failed", e);
@@ -602,7 +604,7 @@ public class ResourceService {
 
         //过滤条件
         Map<String, Object> filterMap = ImmutableMap.of(
-                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(),ResourceStatusEnum.STATUS_FREEZED.getCode())
+                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(), ResourceStatusEnum.STATUS_FREEZED.getCode())
         );
 
         SearchResultListDTO<ResourceIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
@@ -726,7 +728,7 @@ public class ResourceService {
 
         Map<String, Object> filterMap = ImmutableMap.of(
                 "classId", classIds,
-                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(),ResourceStatusEnum.STATUS_FREEZED.getCode())
+                "status", Arrays.asList(ResourceStatusEnum.STATUS_NORMAL.getCode(), ResourceStatusEnum.STATUS_FREEZED.getCode())
         );
 
         SearchResultListDTO<ResourceIndexDTO> searchResultListDTO = searchApiService.searchByFilterField(ResourceIndexDTO.class,
@@ -743,7 +745,7 @@ public class ResourceService {
     }
 
     private void buildResourceByFilterOnOffline(ListResourceDTO resourceDTOList, List<XkrResource> xkrResources) {
-        if(CollectionUtils.isEmpty(xkrResources)){
+        if (CollectionUtils.isEmpty(xkrResources)) {
             return;
         }
 
@@ -752,7 +754,6 @@ public class ResourceService {
 
         //获取所有分配信息
         List<XkrClass> classList = xkrClassAgent.getClassByIds(classIds);
-
 
 
         List<Long> userIds = xkrResources.stream().map(XkrResource::getUserId).collect(Collectors.toList());
@@ -828,7 +829,7 @@ public class ResourceService {
             XkrClass xkrClass = xkrClassList.stream().filter(xkrClass1 -> resourceIndexDTO.getClassId().equals(xkrClass1.getId())).findAny().orElse(null);
 
             XkrClass rootClass = null;
-            if(Objects.nonNull(xkrClass)) {
+            if (Objects.nonNull(xkrClass)) {
                 String[] paths = xkrClass.getPath().split("-");
                 rootClass = paths.length > 1 ?
                         xkrClassAgent.getClassById(Long.valueOf(paths[1])) : xkrClass;
@@ -850,12 +851,12 @@ public class ResourceService {
         resourceDTO.setUpdateTime(resourceIndexDTO.getUpdateTime());
         resourceDTO.setUserId(resourceIndexDTO.getUserId());
         resourceDTO.setUserName(resourceIndexDTO.getUserName());
-        if(Objects.nonNull(currentClass)) {
+        if (Objects.nonNull(currentClass)) {
             resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName(currentClass.getClassName());
             resourceDTO.setRootClassId(rootClass.getId());
             resourceDTO.setRootClassName(rootClass.getClassName());
-        }else{
+        } else {
 //            resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName("分类不存在或被删除");
 //            resourceDTO.setRootClassId(rootClass.getId());
@@ -872,7 +873,7 @@ public class ResourceService {
         } else {
             resourceDTO.setUserName(user.getUserName());
         }
-        if(Objects.nonNull(currentClass)) {
+        if (Objects.nonNull(currentClass)) {
             String[] paths = currentClass.getPath().split("-");
             XkrClass rootClass = paths.length > 1 ?
                     xkrClassAgent.getClassById(Long.valueOf(paths[1])) : currentClass;
@@ -881,7 +882,7 @@ public class ResourceService {
             resourceDTO.setRootClassName(rootClass.getClassName());
             resourceDTO.setClassId(currentClass.getId());
             resourceDTO.setClassName(currentClass.getClassName());
-        }else{
+        } else {
             resourceDTO.setClassName("分类不存在或被删除");
             resourceDTO.setRootClassName("分类不存在或被删除");
 
@@ -934,6 +935,26 @@ public class ResourceService {
         }
 
 
+    }
+
+    private void deleteUpyunResource(List<Long> resourceIds){
+        //又拍云删除文件
+        List<XkrResource> xkrResources = xkrResourceAgent.getResourceListByIds(resourceIds,
+                ImmutableList.of(ResourceStatusEnum.STATUS_DELETED.getCode()));
+        if(!CollectionUtils.isEmpty(xkrResources)) {
+            xkrResources.forEach(resource -> {
+                String dirPath = "";
+                try {
+                    dirPath = resource.getResourceUrl().substring(0,resource.getResourceUrl().lastIndexOf("/"));
+                    logger.info("删除云资源，资源id:{},文件夹路径:{}", resource.getId(), dirPath);
+                    if(!StringUtils.isEmpty(dirPath)) {
+                        upLoadApiService.deleteFile(dirPath, true);
+                    }
+                } catch (Exception e) {
+                    logger.error("删除云资源失败，资源id:{},文件夹路径:{}", resource.getId(), dirPath, e);
+                }
+            });
+        }
     }
 
 
