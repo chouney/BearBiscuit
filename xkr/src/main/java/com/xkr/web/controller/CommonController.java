@@ -32,6 +32,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -87,12 +88,16 @@ public class CommonController {
             XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
 
             String bucket = "";
+            String fileUri = "";
             if(UpLoadApiService.COMPRESS_FILE_TYPE == type) {
                 bucket = fileBucket;
+                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), fileName);
             }else if(UpLoadApiService.IMAGE_FILE_TYPE == type){
                 bucket = imageBucket;
+                LocalDateTime date = LocalDateTime.now();
+                fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+                        date.getHour(), date.getMinute(), date.getSecond(), fileName);
             }
-            String fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), fileName);
             String policy = genPolicy(imageBucket, fileUri, 60, contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
             responseVO.setAuthorization(sign(fileUri,policy,bucket));
