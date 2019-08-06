@@ -88,13 +88,14 @@ public class CommonController {
             XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
 
             String bucket = "";
+            LocalDateTime date = LocalDateTime.now();
             String fileUri = "";
             if(UpLoadApiService.COMPRESS_FILE_TYPE == type) {
                 bucket = fileBucket;
-                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), fileName);
+                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(),date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+                        date.getHour(), date.getMinute(), date.getSecond(), fileName);
             }else if(UpLoadApiService.IMAGE_FILE_TYPE == type){
                 bucket = imageBucket;
-                LocalDateTime date = LocalDateTime.now();
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
             }
