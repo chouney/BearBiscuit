@@ -42,6 +42,7 @@ public class EncodeUtil {
     }
 
 
+    //admintest 66d4aaa5ea177ac32c69946de3731ec0
     //admin 21232f297a57a5a743894a0e4a801fc3
     public static void main(String[] args){
         System.out.println(md5("f9ec4879a5580a3fd810de254a220f52"));
