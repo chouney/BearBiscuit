@@ -17,6 +17,8 @@ public class FileUploadResponseVO implements Serializable{
 
     private String dirUri ;
 
+    private String policy ;
+
     public String getAuthorization() {
         return authorization;
     }
@@ -39,6 +41,14 @@ public class FileUploadResponseVO implements Serializable{
 
     public void setDirUri(String dirUri) {
         this.dirUri = dirUri;
+    }
+
+    public String getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(String policy) {
+        this.policy = policy;
     }
 
     //    private String compressMd5;

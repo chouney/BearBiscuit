@@ -22,6 +22,7 @@ public enum ErrorStatus {
     RESOURCE_USER_FREEZED(10401,"您无此权限"),
     RESOURCE_PAY_FAILED(10402,"财富值不足"),
     RESOURCE_ALREADY_EXIST(10403,"资源已存在"),
+    RESOURCE_UPLOAD_ERROR(10404,"上传失败"),
 
 
     //用户

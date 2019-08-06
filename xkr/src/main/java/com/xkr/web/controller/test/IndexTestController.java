@@ -79,9 +79,9 @@ public class IndexTestController {
 
     @RequestMapping(value = "/uploadDemo", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult uploadDemo(@RequestParam(name = "filePath")
-                                          String reqFile) throws URISyntaxException, IOException, UpException {
-        commonController.fileUpload(reqFile,new ValidResult());
+    public BasicResult uploadDemo( @RequestParam(name = "fileName") String fileName,
+                                   @RequestParam(name = "contentLength") String contentLength) throws URISyntaxException, IOException, UpException {
+        commonController.fileUpload(fileName,contentLength,new ValidResult());
         return new BasicResult(ErrorStatus.OK);
 //        resourceController.resourceUpload()
     }

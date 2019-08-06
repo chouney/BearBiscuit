@@ -1,5 +1,6 @@
 package com.xkr.web.controller;
 
+import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.valid.UserCheck;
@@ -8,9 +9,12 @@ import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
+import main.java.com.upyun.Base64Coder;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.websocket.server.UpgradeUtil;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.slf4j.Logger;
@@ -23,9 +27,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -61,6 +69,7 @@ public class CommonController {
     @MethodValidate
     public BasicResult fileUpload(
             @RequestParam(name = "fileName") String fileName,
+            @RequestParam(name = "contentLength") String contentLength,
 //            @ContainsInt({0, 1})
 //            @RequestParam(name = "type") Integer type,
             ValidResult result) {
@@ -71,14 +80,13 @@ public class CommonController {
         try {
             XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
 
-            SimpleDateFormat formater = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
-            formater.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String date = formater.format(new Date());
             String fileUri = String.format(UpLoadApiService.getDirPathFormat(),user.getId(),UpYunUtils.md5(fileName));
+            //60秒有效时间
+            String policy = genPolicy(fileBucket,fileUri,60,contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
-            responseVO.setDate(date);
-            responseVO.setAuthorization(UpYunUtils.sign("PUT", date, fileUri, this.userName, this.password, null).trim());
+            responseVO.setAuthorization(sign(fileUri,policy));
             responseVO.setDirUri(fileUri);
+            responseVO.setPolicy(policy);
 //        String filePath = String.join("/",TMP_DIR_PATH,String.valueOf(reqFile.getOriginalFilename()));
 //        File file = new File(filePath);
 //        try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -98,6 +106,61 @@ public class CommonController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
+    private String genPolicy(String bucket,String saveKeyPath,Integer expiration,String contentLength){
+        Map<String,Object> params = Maps.newHashMap();
+        params.put("expiration", Long.valueOf(System.currentTimeMillis() / 1000L + (long)expiration));
+        params.put("bucket", bucket);
+        params.put("content-length", contentLength);
+        params.put("save-key", saveKeyPath);
+        return UpYunUtils.getPolicy(params);
+
+    }
+
+    /**
+     * 签名算法
+     * @param fileUri
+     * @param policy
+     * @return
+     * @throws UpException
+     */
+    private String sign(String fileUri,
+                        String policy) throws UpException {
+
+        String signature = null;
+        StringBuilder sb = new StringBuilder();
+        String sp = "&";
+        sb.append("POST");
+        sb.append(sp);
+        sb.append("/" + fileBucket);
+        sb.append(sp);
+        sb.append(policy);
+
+        String raw = sb.toString().trim();
+        byte[] hmac = new byte[0];
+        try {
+            hmac = UpYunUtils.calculateRFC2104HMACRaw(getPassword(), raw);
+        } catch (SignatureException | NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.error("generate HMACRAW failure fileUri, raw：{}",fileUri,raw,e);
+            throw new UpException("生成加密hmac异常");
+        }
+        if(hmac != null) {
+            signature = Base64Coder.encodeLines(hmac);
+        }
+
+        logger.debug("fileUri, sign：{}",fileUri,signature);
+
+
+        return "UPYUN " + getUserName() + ":" + signature;
+    }
+
+
+    private String getUserName(){
+        return this.userName;
+    }
+
+    private String getPassword(){
+        return this.password;
+    }
 //    private void buildFileUploadResponseVO(FileUploadResponseVO responseVO, FileUploadResponseDTO responseDTO) {
 //        responseVO.setCompressMd5(responseDTO.getCompressMd5());
 //        responseVO.setImageMd5(responseDTO.getImageMd5());
