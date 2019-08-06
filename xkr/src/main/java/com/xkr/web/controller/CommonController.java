@@ -17,6 +17,7 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.websocket.server.UpgradeUtil;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
+import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,11 @@ public class CommonController {
     @Value("${upyun.bucket.file}")
     private String fileBucket;
 
+    @Value("${upyun.bucket.image}")
+    private String imageBucket;
+
+
+
 
     @CSRFGen
     @UserCheck
@@ -70,8 +76,8 @@ public class CommonController {
     public BasicResult fileUpload(
             @RequestParam(name = "fileName") String fileName,
             @RequestParam(name = "contentLength") String contentLength,
-//            @ContainsInt({0, 1})
-//            @RequestParam(name = "type") Integer type,
+            @ContainsInt({0, 1})
+            @RequestParam(name = "type") Integer type,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult(result);
@@ -80,11 +86,16 @@ public class CommonController {
         try {
             XkrUser user = (XkrUser) SecurityUtils.getSubject().getPrincipal();
 
-            String fileUri = String.format(UpLoadApiService.getDirPathFormat(),user.getId(),UpYunUtils.md5(fileName));
-            //60秒有效时间
-            String policy = genPolicy(fileBucket,fileUri,60,contentLength);
+            String bucket = "";
+            if(UpLoadApiService.COMPRESS_FILE_TYPE == type) {
+                bucket = fileBucket;
+            }else if(UpLoadApiService.IMAGE_FILE_TYPE == type){
+                bucket = imageBucket;
+            }
+            String fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), fileName);
+            String policy = genPolicy(imageBucket, fileUri, 60, contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
-            responseVO.setAuthorization(sign(fileUri,policy));
+            responseVO.setAuthorization(sign(fileUri,policy,bucket));
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
 //        String filePath = String.join("/",TMP_DIR_PATH,String.valueOf(reqFile.getOriginalFilename()));
@@ -124,14 +135,15 @@ public class CommonController {
      * @throws UpException
      */
     private String sign(String fileUri,
-                        String policy) throws UpException {
+                        String policy,
+                        String bucket) throws UpException {
 
         String signature = null;
         StringBuilder sb = new StringBuilder();
         String sp = "&";
         sb.append("POST");
         sb.append(sp);
-        sb.append("/" + fileBucket);
+        sb.append("/" + bucket);
         sb.append(sp);
         sb.append(policy);
 
