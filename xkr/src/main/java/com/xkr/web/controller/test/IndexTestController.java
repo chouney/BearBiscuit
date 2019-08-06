@@ -6,18 +6,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.hengyi.dzfilter.utils.TextUtils;
-import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.NoBasicAuth;
-import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
-import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.search.SearchResultListDTO;
 import com.xkr.domain.dto.search.UserIndexDTO;
 import com.xkr.domain.entity.XkrClass;
-import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.ResourceService;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.web.controller.CommonController;
@@ -25,11 +21,9 @@ import com.xkr.web.controller.ResourceController;
 import com.xkr.web.model.BasicResult;
 import main.java.com.upyun.UpException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidError;
 import org.chris.redbud.validator.result.ValidResult;
-import org.chris.redbud.validator.validate.annotation.ContainsInt;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -41,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -79,9 +72,10 @@ public class IndexTestController {
 
     @RequestMapping(value = "/uploadDemo", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult uploadDemo( @RequestParam(name = "fileName") String fileName,
-                                   @RequestParam(name = "contentLength") String contentLength) throws URISyntaxException, IOException, UpException {
-        commonController.fileUpload(fileName,contentLength,new ValidResult());
+    public BasicResult uploadDemo(@RequestParam(name = "fileName") String fileName,
+                                  @RequestParam(name = "contentLength") String contentLength,
+                                  @RequestParam(name = "type") Integer type) throws URISyntaxException, IOException, UpException {
+        commonController.fileUpload(fileName, contentLength, type, new ValidResult());
         return new BasicResult(ErrorStatus.OK);
 //        resourceController.resourceUpload()
     }
@@ -133,7 +127,8 @@ public class IndexTestController {
 
     @RequestMapping(value = "/bulkUpdateIndex", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<Boolean> TestBulkUpdateIndex(String email) throws URISyntaxException, IOException, UpException {
+    public BasicResult<Boolean> TestBulkUpdateIndex(String email) throws
+            URISyntaxException, IOException, UpException {
         return new BasicResult<>(searchApiService.bulkUpdateIndex("user", ImmutableList.of(5125121L, 412412123L),
                 ImmutableMap.of(
                         "email", email
@@ -142,13 +137,15 @@ public class IndexTestController {
 
     @RequestMapping(value = "/bulkUpdateIndexStatus", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<Boolean> TestBulkUpdateIndexStatus(Integer status) throws URISyntaxException, IOException, UpException {
+    public BasicResult<Boolean> TestBulkUpdateIndexStatus(Integer status) throws
+            URISyntaxException, IOException, UpException {
         return new BasicResult<>(searchApiService.bulkUpdateIndexStatus("user", ImmutableList.of(5125121L, 412412123L), status));
     }
 
     @RequestMapping(value = "/getAndBuildIndexDTOByIndexId", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<String> TestGetAndBuildIndexDTOByIndexId(Integer docId) throws URISyntaxException, IOException, UpException {
+    public BasicResult<String> TestGetAndBuildIndexDTOByIndexId(Integer docId) throws
+            URISyntaxException, IOException, UpException {
         UserIndexDTO userIndexDTO = new UserIndexDTO();
         searchApiService.getAndBuildIndexDTOByIndexId(userIndexDTO, String.valueOf(docId));
         return new BasicResult<>(JSON.toJSONString(userIndexDTO));
@@ -156,18 +153,19 @@ public class IndexTestController {
 
     @RequestMapping(value = "/searchByFilterField", method = {RequestMethod.GET})
     @ResponseBody
-    public BasicResult<String> TestSearchByFilterField(Integer status, Integer offset, Integer size) throws URISyntaxException, IOException, UpException {
+    public BasicResult<String> TestSearchByFilterField(Integer status, Integer offset, Integer size) throws
+            URISyntaxException, IOException, UpException {
         SearchResultListDTO searchResultListDTO = searchApiService.searchByFilterField(UserIndexDTO.class, ImmutableMap.of("status", status), null, null, null, offset, size);
         return new BasicResult<>(JSON.toJSONString(searchResultListDTO));
     }
 
     @NoBasicAuth
-    @RequestMapping(value = "/res_upload", method = {RequestMethod.POST,RequestMethod.GET})
+    @RequestMapping(value = "/res_upload", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @MethodValidate
     public BasicResult<JSONObject> resourceUpload(
             @NotBlank
-            @Length(max = 50,message = "标题长度大于25")
+            @Length(max = 50, message = "标题长度大于25")
             @RequestParam(name = "resTitle") String resTitle,
             @NotNull
             @RequestParam(name = "resCost") Integer resCost,
@@ -182,31 +180,31 @@ public class IndexTestController {
             @NotBlank
             @RequestParam(name = "userId") String userId,
             ValidResult result) {
-        if(result.hasErrors()){
+        if (result.hasErrors()) {
             return new BasicResult<>(result);
         }
         JSONObject output = new JSONObject();
         try {
 
             XkrClass xkrClass = xkrClassAgent.getClassById(Long.valueOf(classId));
-            if(Objects.isNull(xkrClass)){
+            if (Objects.isNull(xkrClass)) {
                 result = new ValidResult();
-                result.getErrors().add(new ValidError("","分类参数异常",classId));
+                result.getErrors().add(new ValidError("", "分类参数异常", classId));
                 return new BasicResult<>(result);
             }
 
 
-            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle,detail,resCost,Long.valueOf(classId),Long.valueOf(userId),cfu,ufu);
+            ResponseDTO<Long> resId = resourceService.saveNewResource(resTitle, detail, resCost, Long.valueOf(classId), Long.valueOf(userId), cfu, ufu);
 
-            if(!ErrorStatus.OK.equals(resId.getStatus())){
+            if (!ErrorStatus.OK.equals(resId.getStatus())) {
                 return new BasicResult<>(resId.getStatus());
             }
 
-            output.put("resId",String.valueOf(resId.getData()));
+            output.put("resId", String.valueOf(resId.getData()));
 
             return new BasicResult<>(output);
         } catch (Exception e) {
-            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cfu:{}", resTitle,resCost,detail,classId,cfu, e);
+            logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cfu:{}", resTitle, resCost, detail, classId, cfu, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
     }
