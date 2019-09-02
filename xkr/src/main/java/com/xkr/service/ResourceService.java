@@ -29,6 +29,7 @@ import com.xkr.service.api.SearchApiService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
 import main.java.com.upyun.UpException;
+import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -399,8 +400,8 @@ public class ResourceService {
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
-                    "deprecated",
-//                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
+//                    "deprecated",
+                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
                     "/" + fileBucket + downloadUrl, date);
         } catch (Exception e) {
             logger.error("ResourceService build response token failed", e);

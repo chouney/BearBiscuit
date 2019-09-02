@@ -1,6 +1,7 @@
 package com.xkr.service.api;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
@@ -11,6 +12,7 @@ import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;
 import com.xkr.util.FileUtil;
 import main.java.com.UpYun;
+import main.java.com.upyun.Base64Coder;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
@@ -28,6 +30,9 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +49,14 @@ import java.util.stream.Collectors;
 public class UpLoadApiService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+    @Value("${upyun.opt.user}")
+    private String userName;
+
+    @Value("${upyun.opt.password}")
+    private String password;
+
 
     @Resource(name = "fileYun")
     private UpYun upYun;
@@ -366,6 +379,63 @@ public class UpLoadApiService {
             upYun.rmDir(path);
         }
         upYun.deleteFile(path);
+    }
+
+    /**
+     * 签名算法
+     * @param fileUri
+     * @param policy
+     * @return
+     * @throws UpException
+     */
+    public String sign(String fileUri,
+                        String policy,
+                        String bucket) throws UpException {
+
+        String signature = null;
+        StringBuilder sb = new StringBuilder();
+        String sp = "&";
+        sb.append("POST");
+        sb.append(sp);
+        sb.append("/" + bucket);
+        sb.append(sp);
+        sb.append(policy);
+
+        String raw = sb.toString().trim();
+        byte[] hmac = new byte[0];
+        try {
+            hmac = UpYunUtils.calculateRFC2104HMACRaw(getPassword(), raw);
+        } catch (SignatureException | NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.error("generate HMACRAW failure fileUri, raw：{}",fileUri,raw,e);
+            throw new UpException("生成加密hmac异常");
+        }
+        if(hmac != null) {
+            signature = Base64Coder.encodeLines(hmac);
+        }
+
+        logger.debug("fileUri, sign：{}",fileUri,signature);
+
+
+        return "UPYUN " + getUserName() + ":" + signature;
+    }
+
+
+    public String genPolicy(String bucket,String saveKeyPath,Integer expiration,String contentLength){
+        Map<String,Object> params = Maps.newHashMap();
+        params.put("expiration", Long.valueOf(System.currentTimeMillis() / 1000L + (long)expiration));
+        params.put("bucket", bucket);
+        params.put("content-length", contentLength);
+        params.put("save-key", saveKeyPath);
+        return UpYunUtils.getPolicy(params);
+
+    }
+
+    private String getUserName(){
+        return this.userName;
+    }
+
+    private String getPassword(){
+        return this.password;
     }
 
     public static String getExtFilePathFormat() {

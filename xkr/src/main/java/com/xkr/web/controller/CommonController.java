@@ -54,11 +54,7 @@ public class CommonController {
     @Autowired
     private UpLoadApiService upLoadApiService;
 
-    @Value("${upyun.opt.user}")
-    private String userName;
 
-    @Value("${upyun.opt.password}")
-    private String password;
 
     @Value("${upyun.bucket.file}")
     private String fileBucket;
@@ -99,23 +95,11 @@ public class CommonController {
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
             }
-            String policy = genPolicy(imageBucket, fileUri, 60, contentLength);
+            String policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
-            responseVO.setAuthorization(sign(fileUri,policy,bucket));
+            responseVO.setAuthorization(upLoadApiService.sign(fileUri,policy,bucket));
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
-//        String filePath = String.join("/",TMP_DIR_PATH,String.valueOf(reqFile.getOriginalFilename()));
-//        File file = new File(filePath);
-//        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-//            outputStream.write(reqFile.getBytes());
-//            FileUploadResponseDTO responseDTO = upLoadApiService.upload(type, file);
-//            if(!ErrorStatus.OK.equals(responseDTO.getStatus())){
-//                return new BasicResult<>(responseDTO.getStatus());
-//            }
-//            FileUploadResponseVO responseVO = new FileUploadResponseVO();
-//
-//            buildFileUploadResponseVO(responseVO,responseDTO);
-//
             return new BasicResult<>(responseVO);
         } catch (UpException e) {
             logger.error("文件上传异常 fileName:{}", fileName, e);
@@ -123,65 +107,6 @@ public class CommonController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
-    private String genPolicy(String bucket,String saveKeyPath,Integer expiration,String contentLength){
-        Map<String,Object> params = Maps.newHashMap();
-        params.put("expiration", Long.valueOf(System.currentTimeMillis() / 1000L + (long)expiration));
-        params.put("bucket", bucket);
-        params.put("content-length", contentLength);
-        params.put("save-key", saveKeyPath);
-        return UpYunUtils.getPolicy(params);
-
-    }
-
-    /**
-     * 签名算法
-     * @param fileUri
-     * @param policy
-     * @return
-     * @throws UpException
-     */
-    private String sign(String fileUri,
-                        String policy,
-                        String bucket) throws UpException {
-
-        String signature = null;
-        StringBuilder sb = new StringBuilder();
-        String sp = "&";
-        sb.append("POST");
-        sb.append(sp);
-        sb.append("/" + bucket);
-        sb.append(sp);
-        sb.append(policy);
-
-        String raw = sb.toString().trim();
-        byte[] hmac = new byte[0];
-        try {
-            hmac = UpYunUtils.calculateRFC2104HMACRaw(getPassword(), raw);
-        } catch (SignatureException | NoSuchAlgorithmException | InvalidKeyException e) {
-            logger.error("generate HMACRAW failure fileUri, raw：{}",fileUri,raw,e);
-            throw new UpException("生成加密hmac异常");
-        }
-        if(hmac != null) {
-            signature = Base64Coder.encodeLines(hmac);
-        }
-
-        logger.debug("fileUri, sign：{}",fileUri,signature);
 
 
-        return "UPYUN " + getUserName() + ":" + signature;
-    }
-
-
-    private String getUserName(){
-        return this.userName;
-    }
-
-    private String getPassword(){
-        return this.password;
-    }
-//    private void buildFileUploadResponseVO(FileUploadResponseVO responseVO, FileUploadResponseDTO responseDTO) {
-//        responseVO.setCompressMd5(responseDTO.getCompressMd5());
-//        responseVO.setImageMd5(responseDTO.getImageMd5());
-//        responseVO.setFileName(responseDTO.getFileName());
-//    }
 }
