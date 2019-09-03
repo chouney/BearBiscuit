@@ -397,9 +397,13 @@ public class ResourceService {
 
 
             JSONObject ext = JSON.parseObject(resource.getExt());
-            String downloadUrl = URLEncoder.encode(resource.getResourceUrl(),"UTF-8");
+            String downloadUrl = resource.getResourceUrl();
             String date = DateUtil.getGMTRFCUSDate();
-
+            if(!StringUtils.isEmpty(downloadUrl)) {
+                String fileUri = downloadUrl.substring(0, downloadUrl.lastIndexOf("/"));
+                String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
+                downloadUrl = fileUri + "/" + URLEncoder.encode(fileName, "UTF-8");
+            }
             return new FileDownloadResponseDTO(
 //                    "deprecated",
                     UpYunUtils.sign("GET", date, downloadUrl, optUser, UpYunUtils.md5(optPassword), null),
