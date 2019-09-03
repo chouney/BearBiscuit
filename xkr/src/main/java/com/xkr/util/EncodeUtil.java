@@ -1,5 +1,7 @@
 package com.xkr.util;
 
+import main.java.com.upyun.UpException;
+import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -44,9 +46,13 @@ public class EncodeUtil {
 
     //admintest 66d4aaa5ea177ac32c69946de3731ec0
     //admin 21232f297a57a5a743894a0e4a801fc3
-    //19921221
-    public static void main(String[] args){
-        System.out.println(md5("19921221"));
+    //19921221 1929756b328478455b81d249f68d41aa
+    public static void main(String[] args) throws UpException {
+//        System.out.println(md5("19921221"));
+        String date = DateUtil.getGMTRFCUSDate();
+        String uri = "/sharecoder/xkr/dev/6545627560447840256/f83975f363dd296366da248d6fc61d67/%E6%96%B0%E5%BB%BA%E6%96%87%E4%BB%B6%E5%A4%B9.zip";
+        System.out.println(UpYunUtils.sign("GET",date,uri,"zhangqixiang",UpYunUtils.md5("zhangqixiang"),null));
+        System.out.println(date);
     }
 
     /**
