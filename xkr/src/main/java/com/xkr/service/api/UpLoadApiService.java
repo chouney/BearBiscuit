@@ -404,7 +404,7 @@ public class UpLoadApiService {
         String raw = sb.toString().trim();
         byte[] hmac = new byte[0];
         try {
-            hmac = UpYunUtils.calculateRFC2104HMACRaw(getPassword(), raw);
+            hmac = UpYunUtils.calculateRFC2104HMACRaw(UpYunUtils.md5(getPassword()), raw);
         } catch (SignatureException | NoSuchAlgorithmException | InvalidKeyException e) {
             logger.error("generate HMACRAW failure fileUri, raw：{}",fileUri,raw,e);
             throw new UpException("生成加密hmac异常");
