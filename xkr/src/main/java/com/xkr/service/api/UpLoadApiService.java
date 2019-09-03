@@ -410,7 +410,7 @@ public class UpLoadApiService {
             throw new UpException("生成加密hmac异常");
         }
         if(hmac != null) {
-            signature = Base64Coder.encodeLines(hmac);
+            signature = Base64Coder.encodeLines(hmac).trim();
         }
 
         logger.debug("fileUri, sign：{}",fileUri,signature);

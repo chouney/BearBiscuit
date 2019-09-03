@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -95,13 +96,14 @@ public class CommonController {
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
             }
+            fileUri = URLEncoder.encode(fileUri,"UTF-8");
             String policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
             responseVO.setAuthorization(upLoadApiService.sign(fileUri,policy,bucket));
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
             return new BasicResult<>(responseVO);
-        } catch (UpException e) {
+        } catch (Exception e) {
             logger.error("文件上传异常 fileName:{}", fileName, e);
         }
         return new BasicResult(ErrorStatus.ERROR);

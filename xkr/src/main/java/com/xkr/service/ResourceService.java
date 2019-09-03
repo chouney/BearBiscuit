@@ -41,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -396,7 +397,7 @@ public class ResourceService {
 
 
             JSONObject ext = JSON.parseObject(resource.getExt());
-            String downloadUrl = resource.getResourceUrl();
+            String downloadUrl = URLEncoder.encode(resource.getResourceUrl(),"UTF-8");
             String date = DateUtil.getGMTRFCUSDate();
 
             return new FileDownloadResponseDTO(
