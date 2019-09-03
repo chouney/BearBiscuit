@@ -406,7 +406,7 @@ public class ResourceService {
             }
             return new FileDownloadResponseDTO(
 //                    "deprecated",
-                    UpYunUtils.sign("GET", date, downloadUrl, optUser, UpYunUtils.md5(optPassword), null),
+                    UpYunUtils.sign("GET", date, downloadUrl,fileBucket, optUser, UpYunUtils.md5(optPassword), null),
                     "/" + fileBucket + downloadUrl, date);
         } catch (Exception e) {
             logger.error("ResourceService build response token failed", e);
