@@ -88,16 +88,18 @@ public class CommonController {
             LocalDateTime date = LocalDateTime.now();
             String fileUri = "";
             fileName = URLEncoder.encode(fileName,"UTF-8");
+            String policy = "";
             if(UpLoadApiService.COMPRESS_FILE_TYPE == type) {
                 bucket = fileBucket;
                 fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(),date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
+                policy = upLoadApiService.genPolicy(fileBucket, fileUri, 60, contentLength);
             }else if(UpLoadApiService.IMAGE_FILE_TYPE == type){
                 bucket = imageBucket;
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
+                policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
             }
-            String policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
             responseVO.setAuthorization(upLoadApiService.sign(fileUri,policy,bucket));
             responseVO.setDirUri(fileUri);
