@@ -23,6 +23,7 @@ public enum ErrorStatus {
     RESOURCE_PAY_FAILED(10402,"财富值不足"),
     RESOURCE_ALREADY_EXIST(10403,"资源已存在"),
     RESOURCE_UPLOAD_ERROR(10404,"上传失败"),
+    RESOURCE_UNCOMPRESSING(10405,"解压缩处理中"),
 
 
     //用户

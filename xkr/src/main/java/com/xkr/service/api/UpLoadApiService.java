@@ -71,6 +71,8 @@ public class UpLoadApiService {
 
     public static final int IMAGE_FILE_TYPE = 1;
 
+    public static final int UNCOMPRE_FILE_TYPE = 2;
+
     private static final int DEFAULT_BLOCK_SIZE = 512;
 
     @Value("${upyun.root.path}")
@@ -430,11 +432,11 @@ public class UpLoadApiService {
 
     }
 
-    private String getUserName(){
+    public String getUserName(){
         return this.userName;
     }
 
-    private String getPassword(){
+    public String getPassword(){
         return this.password;
     }
 

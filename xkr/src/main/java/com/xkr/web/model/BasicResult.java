@@ -25,6 +25,14 @@ public class BasicResult<T extends Serializable> implements Serializable{
 
     private Map<String,Object> ext;
 
+
+    public BasicResult(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+        this.data = (T) new JSONObject();
+        this.ext = Maps.newHashMap();
+    }
+
     public BasicResult(ErrorStatus status) {
         this.code = status.getCode();
         this.msg = status.getDesc();
