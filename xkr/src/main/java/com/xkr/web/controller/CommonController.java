@@ -1,25 +1,19 @@
 package com.xkr.web.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.dao.cache.BaseRedisService;
-import com.xkr.domain.dto.file.FileUploadResponseDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
 import com.xkr.web.model.vo.FileUploadReturnVO;
-import main.java.com.upyun.Base64Coder;
-import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.websocket.server.UpgradeUtil;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
 import org.chris.redbud.validator.validate.annotation.ContainsInt;
@@ -33,15 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * @author chriszhang
@@ -82,7 +68,7 @@ public class CommonController {
     public BasicResult fileUpload(
             @RequestParam(name = "fileName") String fileName,
             @RequestParam(name = "contentLength") String contentLength,
-            @ContainsInt({0, 1})
+            @ContainsInt({0, 1, 2})
             @RequestParam(name = "type") Integer type,
             ValidResult result) {
         if (result.hasErrors()) {
@@ -122,7 +108,7 @@ public class CommonController {
                 responseVO.setAuthorization(UpYunUtils.sign("POST", gmtDate, fileUri, bucket, upLoadApiService.getUserName(), UpYunUtils.md5(upLoadApiService.getPassword()), null));
                 responseVO.setDate(gmtDate);
                 //初始化解压缩状态
-                baseRedisService.set("UNCOMPRESS_/"+bucket+fileUri,HANDLING_STATUS,3600);
+                baseRedisService.set("UNCOMPRESS_/" + bucket + fileUri, HANDLING_STATUS, 3600);
             }
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
@@ -145,20 +131,20 @@ public class CommonController {
             String date = request.getHeader("Date");
             String contentMd5 = request.getHeader("Content-MD5");
             String uri = request.getRequestURI();
-            String comAuth = UpYunUtils.sign("POST",date,uri,upLoadApiService.getUserName(),upLoadApiService.getPassword(),contentMd5);
-            if(StringUtils.isEmpty(auth) || !auth.equals(comAuth)){
+            String comAuth = UpYunUtils.sign("POST", date, uri, upLoadApiService.getUserName(), upLoadApiService.getPassword(), contentMd5);
+            if (StringUtils.isEmpty(auth) || !auth.equals(comAuth)) {
                 return new BasicResult(ErrorStatus.BASIC_AUTH_ERROR);
             }
 
             //解析回调
-            FileUploadReturnVO returnVO = JSON.parseObject(jsonStr,FileUploadReturnVO.class);
-            if(returnVO != null){
+            FileUploadReturnVO returnVO = JSON.parseObject(jsonStr, FileUploadReturnVO.class);
+            if (returnVO != null) {
                 String fileUri = returnVO.getPath();
-                if(200 == returnVO.getStatus_code()){
-                    baseRedisService.set("UNCOMPRESS_"+fileUri,SUCCESS_STATUS,3600);
+                if (200 == returnVO.getStatus_code()) {
+                    baseRedisService.set("UNCOMPRESS_" + fileUri, SUCCESS_STATUS, 3600);
                     return new BasicResult<>(ErrorStatus.OK);
                 }
-                baseRedisService.set("UNCOMPRESS_"+fileUri,JSON.toJSONString(returnVO),3600);
+                baseRedisService.set("UNCOMPRESS_" + fileUri, JSON.toJSONString(returnVO), 3600);
                 return new BasicResult<>(ErrorStatus.OK);
             }
         } catch (Exception e) {
@@ -172,15 +158,15 @@ public class CommonController {
     public BasicResult pollUp(
             @RequestParam(name = "fileUri") String fileUri) {
         try {
-            String status = baseRedisService.get("UNCOMPRESS_"+fileBucket+fileUri);
-            if(StringUtils.isEmpty(status)){
+            String status = baseRedisService.get("UNCOMPRESS_" + fileBucket + fileUri);
+            if (StringUtils.isEmpty(status)) {
                 return new BasicResult(ErrorStatus.RESOURCE_UNCOMPRESSING);
             }
-            if(SUCCESS_STATUS.equals(status)){
+            if (SUCCESS_STATUS.equals(status)) {
                 return new BasicResult<>(ErrorStatus.OK);
             }
-            FileUploadReturnVO returnVO = JSON.parseObject(status,FileUploadReturnVO.class);
-            return new BasicResult(returnVO.getStatus_code(),returnVO.getError());
+            FileUploadReturnVO returnVO = JSON.parseObject(status, FileUploadReturnVO.class);
+            return new BasicResult(returnVO.getStatus_code(), returnVO.getError());
 
         } catch (Exception e) {
             logger.error("文件上传异常 fileUri:{}", fileUri, e);
