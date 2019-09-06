@@ -70,6 +70,7 @@ public class CommonController {
             @RequestParam(name = "contentLength") String contentLength,
             @ContainsInt({0, 1, 2})
             @RequestParam(name = "type") Integer type,
+            @RequestParam(name = "contentMD5",required = false,defaultValue = "") String  contentMD5,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult(result);
@@ -105,7 +106,7 @@ public class CommonController {
                 fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 String gmtDate = DateUtil.getGMTRFCUSDate();
-                responseVO.setAuthorization(UpYunUtils.sign("POST", gmtDate, fileUri, bucket, upLoadApiService.getUserName(), UpYunUtils.md5(upLoadApiService.getPassword()), null));
+                responseVO.setAuthorization(UpYunUtils.sign("POST", gmtDate, fileUri, bucket, upLoadApiService.getUserName(), UpYunUtils.md5(upLoadApiService.getPassword()), contentMD5));
                 responseVO.setDate(gmtDate);
                 //初始化解压缩状态
                 baseRedisService.set("UNCOMPRESS_/" + bucket + fileUri, HANDLING_STATUS, 3600);

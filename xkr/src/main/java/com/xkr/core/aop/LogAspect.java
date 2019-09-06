@@ -16,6 +16,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import java.util.Objects;
  * @date 2018/5/25
  */
 @Aspect
+@Order(0)
 public class LogAspect {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
