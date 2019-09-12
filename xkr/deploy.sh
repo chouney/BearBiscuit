@@ -1,5 +1,5 @@
 #!bin/bash
-profile=dev
+profile=test
 if [ 1 == $# ] ; then
     profile=$1
 fi

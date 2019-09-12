@@ -109,6 +109,7 @@ public class CommonController {
                 if (!ErrorStatus.OK.equals(fileUploadResponseDTO.getStatus())) {
                     return new BasicResult(fileUploadResponseDTO.getStatus());
                 }
+                fileUri = tarPath;
 
             }
             responseVO.setDirUri(fileUri);
