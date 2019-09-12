@@ -103,8 +103,10 @@ public class CommonController {
 //                if ((ind = fileName.lastIndexOf(".")) != -1) {
 //                    fileName = fileName.substring(0, ind);
 //                }
-                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
-                        date.getHour(), date.getMinute(), date.getSecond(), fileName);
+//                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+//                        date.getHour(), date.getMinute(), date.getSecond(), fileName);
+                //解压缩的fileName为fileUri
+                fileUri = fileName;
                 String gmtDate = DateUtil.getGMTRFCUSDate();
                 responseVO.setAuthorization(UpYunUtils.sign("POST", gmtDate, fileUri, bucket, upLoadApiService.getUserName(), UpYunUtils.md5(upLoadApiService.getPassword()), contentMD5));
                 responseVO.setDate(gmtDate);
