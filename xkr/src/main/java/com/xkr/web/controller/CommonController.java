@@ -99,20 +99,15 @@ public class CommonController {
                 policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
                 responseVO.setAuthorization(upLoadApiService.sign(fileUri, policy, bucket));
             } else if (UpLoadApiService.UNCOMPRE_FILE_TYPE == type) {
-                bucket = fileBucket;
-//                int ind;
-//                if ((ind = fileName.lastIndexOf(".")) != -1) {
-//                    fileName = fileName.substring(0, ind);
-//                }
-//                fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
-//                        date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 //解压缩的fileName为fileUri
-                fileUri = fileName;
-                String gmtDate = DateUtil.getGMTRFCUSDate();
-                responseVO.setAuthorization(UpYunUtils.sign("POST", gmtDate, fileUri, bucket, upLoadApiService.getUserName(), UpYunUtils.md5(upLoadApiService.getPassword()), contentMD5));
-                responseVO.setDate(gmtDate);
-                //初始化解压缩状态
-                baseRedisService.set("UNCOMPRESS_/" + bucket + fileUri, HANDLING_STATUS, 3600);
+                String sourcePath = fileName;
+                String tarPath = "";
+                int ind;
+                if((ind = sourcePath.lastIndexOf("/"))!=-1){
+                    tarPath = sourcePath.substring(0,ind);
+                }
+                upLoadApiService.unCompressDirSDK(sourcePath,tarPath);
+
             }
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
@@ -141,16 +136,16 @@ public class CommonController {
             }
 
             //解析回调
-            FileUploadReturnVO returnVO = JSON.parseObject(jsonStr, FileUploadReturnVO.class);
-            if (returnVO != null) {
-                String fileUri = returnVO.getPath();
-                if (200 == returnVO.getStatus_code()) {
-                    baseRedisService.set("UNCOMPRESS_" + fileUri, SUCCESS_STATUS, 3600);
-                    return new BasicResult<>(ErrorStatus.OK);
-                }
-                baseRedisService.set("UNCOMPRESS_" + fileUri, JSON.toJSONString(returnVO), 3600);
-                return new BasicResult<>(ErrorStatus.OK);
-            }
+//            FileUploadReturnVO returnVO = JSON.parseObject(jsonStr, FileUploadReturnVO.class);
+//            if (returnVO != null) {
+//                String taskId = returnVO.getTask_id();
+//                if (200 == returnVO.getStatus_code()) {
+//                    baseRedisService.set(taskId, SUCCESS_STATUS, 3600);
+//                    return new BasicResult<>(ErrorStatus.OK);
+//                }
+//                baseRedisService.set(taskId, JSON.toJSONString(returnVO), 3600);
+//                return new BasicResult<>(ErrorStatus.OK);
+//            }
         } catch (Exception e) {
             logger.error("文件上传异常 jsonStr:{}", jsonStr, e);
         }

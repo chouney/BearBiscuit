@@ -1,10 +1,14 @@
 package com.xkr.service.api;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.FileTypeEnum;
 import com.xkr.core.compress.UnCompressProcessorFacade;
+import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.dto.file.FileInfoDTO;
 import com.xkr.domain.dto.file.FileUploadResponseDTO;
 import com.xkr.domain.dto.file.FolderItemDTO;
@@ -12,9 +16,7 @@ import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;
 import com.xkr.util.FileUtil;
 import main.java.com.UpYun;
-import main.java.com.upyun.Base64Coder;
-import main.java.com.upyun.UpException;
-import main.java.com.upyun.UpYunUtils;
+import main.java.com.upyun.*;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +66,24 @@ public class UpLoadApiService {
     @Resource(name = "imageYun")
     private UpYun imageYun;
 
+    @Resource(name = "mediaHandler")
+    private MediaHandler mediaHandler;
+
+    @Value("${upyun.bucket.file}")
+    private String fileBucket;
+
+    @Value("${upyun.bucket.image}")
+    private String imageBucket;
+
+    @Value("${front.domain}")
+    private String frontDomain;
+
+    @Value("${server.port}")
+    private String port;
+
+    @Autowired
+    private BaseRedisService baseRedisService;
+
     @Autowired
     private UnCompressProcessorFacade compressProcessorFacade;
 
@@ -91,7 +111,7 @@ public class UpLoadApiService {
 
     @PostConstruct
     public void init() {
-        DIR_PATH_FORMAT = rootPath + "/%s/%d%d%d%d%d%d/%s";
+        DIR_PATH_FORMAT = rootPath + "/%s/%d%d%d%d%d%d-%s";
         EXT_FILE_PATH_FORMAT = rootPath + "/ext/%s";
         COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
         UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
@@ -354,6 +374,53 @@ public class UpLoadApiService {
             }
         });
         return isSuccess[0];
+    }
+
+    /**
+     * 同上
+     *
+     * @param sourcePath
+     * @param tarPath
+     * @return
+     * @throws UpException
+     * @throws IOException
+     */
+    public boolean unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
+        Map<String,Object> paramsMap = Maps.newHashMap();
+        //空间名
+        paramsMap.put(MediaHandler.Params.BUCKET_NAME, fileBucket);
+        //回调地址
+//        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url");
+        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "");
+        //选择处理任务
+        paramsMap.put(CompressHandler.Params.APP_NAME, "depress");
+
+        //已json格式生成任务信息
+        JSONArray array = new JSONArray();
+        JSONObject json = new JSONObject();
+
+        //添加处理参数
+        json.put(CompressHandler.Params.SOURCES, sourcePath);
+        json.put(CompressHandler.Params.SAVE_AS, tarPath);
+
+        array.add(json);
+
+        //添加任务信息
+        paramsMap.put(CompressHandler.Params.TASKS, array);
+
+        try {
+            Result result = mediaHandler.process(paramsMap);
+            logger.debug("UploadApiService unCompressDirSDK ,sourcePath:{},targetPath:{},解压缩结果:{}",sourcePath,tarPath, JSON.toJSONString(result));
+            if (result.isSucceed()) {
+//                String[] ids = mediaHandler.getTaskId(result.getMsg());
+//                Arrays.stream(ids).forEach(str -> baseRedisService.set(str, "0", 3600));
+                return true;
+
+            }
+        } catch (IOException | UpException e) {
+            logger.error("ploadApiService unCompressDirSDK 解压缩失败:sourcePath:{},targetPath:{},error:",sourcePath,tarPath,e);
+        }
+        return false;
     }
 
     /**

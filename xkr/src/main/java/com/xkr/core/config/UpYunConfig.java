@@ -1,6 +1,7 @@
 package com.xkr.core.config;
 
 import main.java.com.UpYun;
+import main.java.com.upyun.MediaHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +54,12 @@ public class UpYunConfig {
         upYun.setDebug(debug);
         upYun.setTimeout(timeout);
         return upYun;
+    }
+
+    @Bean(name = "mediaHandler")
+    public MediaHandler getMediaHandler(){
+        MediaHandler mediaHandler =  new MediaHandler(fileBucket,optUser,optPassword);
+        return mediaHandler;
     }
 
 }
