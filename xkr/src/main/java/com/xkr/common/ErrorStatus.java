@@ -24,6 +24,7 @@ public enum ErrorStatus {
     RESOURCE_ALREADY_EXIST(10403,"资源已存在"),
     RESOURCE_UPLOAD_ERROR(10404,"上传失败"),
     RESOURCE_UNCOMPRESSING(10405,"解压缩处理中"),
+    RESOURCE_FAILD_UNCOMPRESSING(10406,"解压缩提交失败"),
 
 
     //用户

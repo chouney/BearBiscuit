@@ -6,9 +6,9 @@ import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.dao.cache.BaseRedisService;
+import com.xkr.domain.dto.file.FileUploadResponseDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.UpLoadApiService;
-import com.xkr.util.DateUtil;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
 import com.xkr.web.model.vo.FileUploadReturnVO;
@@ -67,7 +67,7 @@ public class CommonController {
     @MethodValidate
     public BasicResult fileUpload(
             @RequestParam(name = "fileName") String fileName,
-            @RequestParam(name = "contentLength",required = false,defaultValue = "") String contentLength,
+            @RequestParam(name = "contentLength", required = false, defaultValue = "") String contentLength,
             @ContainsInt({0, 1, 2})
             @RequestParam(name = "type") Integer type,
             ValidResult result) {
@@ -102,10 +102,14 @@ public class CommonController {
                 String sourcePath = fileName;
                 String tarPath = "";
                 int ind;
-                if((ind = sourcePath.lastIndexOf("/"))!=-1){
-                    tarPath = sourcePath.substring(0,ind);
+                if ((ind = sourcePath.lastIndexOf(".")) != -1) {
+                    tarPath = sourcePath.substring(0, ind);
                 }
-                upLoadApiService.unCompressDirSDK(sourcePath,tarPath);
+                FileUploadResponseDTO fileUploadResponseDTO = upLoadApiService.unCompressDirSDK(sourcePath, tarPath);
+                if (!ErrorStatus.OK.equals(fileUploadResponseDTO.getStatus())) {
+                    return new BasicResult(fileUploadResponseDTO.getStatus());
+                }
+                fileUri = tarPath;
 
             }
             responseVO.setDirUri(fileUri);

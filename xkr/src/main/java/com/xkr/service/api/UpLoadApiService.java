@@ -385,7 +385,7 @@ public class UpLoadApiService {
      * @throws UpException
      * @throws IOException
      */
-    public boolean unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
+    public FileUploadResponseDTO unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
         Map<String,Object> paramsMap = Maps.newHashMap();
         //空间名
         paramsMap.put("service", fileBucket);
@@ -414,13 +414,12 @@ public class UpLoadApiService {
             if (result.isSucceed()) {
 //                String[] ids = mediaHandler.getTaskId(result.getMsg());
 //                Arrays.stream(ids).forEach(str -> baseRedisService.set(str, "0", 3600));
-                return true;
-
+                return new FileUploadResponseDTO(ErrorStatus.OK);
             }
         } catch (IOException | UpException e) {
             logger.error("ploadApiService unCompressDirSDK 解压缩失败:sourcePath:{},targetPath:{},error:",sourcePath,tarPath,e);
         }
-        return false;
+        return new FileUploadResponseDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING);
     }
 
     /**
