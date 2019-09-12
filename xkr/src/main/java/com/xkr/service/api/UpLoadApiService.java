@@ -388,7 +388,7 @@ public class UpLoadApiService {
     public boolean unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
         Map<String,Object> paramsMap = Maps.newHashMap();
         //空间名
-        paramsMap.put(MediaHandler.Params.BUCKET_NAME, fileBucket);
+        paramsMap.put("service", fileBucket);
         //回调地址
 //        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url");
         paramsMap.put(CompressHandler.Params.NOTIFY_URL, "");

@@ -67,10 +67,9 @@ public class CommonController {
     @MethodValidate
     public BasicResult fileUpload(
             @RequestParam(name = "fileName") String fileName,
-            @RequestParam(name = "contentLength") String contentLength,
+            @RequestParam(name = "contentLength",required = false,defaultValue = "") String contentLength,
             @ContainsInt({0, 1, 2})
             @RequestParam(name = "type") Integer type,
-            @RequestParam(name = "contentMD5",required = false,defaultValue = "") String  contentMD5,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult(result);
