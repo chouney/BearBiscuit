@@ -75,7 +75,7 @@ public class IndexTestController {
     public BasicResult uploadDemo(@RequestParam(name = "fileName") String fileName,
                                   @RequestParam(name = "contentLength") String contentLength,
                                   @RequestParam(name = "type") Integer type) throws URISyntaxException, IOException, UpException {
-        commonController.fileUpload(fileName, contentLength, type, "",new ValidResult());
+        commonController.fileUpload(fileName, contentLength, type,new ValidResult());
         return new BasicResult(ErrorStatus.OK);
 //        resourceController.resourceUpload()
     }
