@@ -390,8 +390,8 @@ public class UpLoadApiService {
         //空间名
         paramsMap.put("service", fileBucket);
         //回调地址
-//        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url");
-        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "");
+        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url");
+//        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "");
         //选择处理任务
         paramsMap.put(CompressHandler.Params.APP_NAME, "depress");
 
