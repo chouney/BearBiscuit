@@ -91,7 +91,7 @@ public class UpLoadApiService {
 
     @PostConstruct
     public void init() {
-        DIR_PATH_FORMAT = rootPath + "/%s/%d%d%d%d%d%d-%s";
+        DIR_PATH_FORMAT = rootPath + "/%s/%d%d%d%d%d%d/%s";
         EXT_FILE_PATH_FORMAT = rootPath + "/ext/%s";
         COMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";
         UNCOMPRESS_FILE_PATH_FORMAT = rootPath + "/%s/%s/%s";

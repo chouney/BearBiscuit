@@ -46,7 +46,7 @@ public class RemarkController {
 
     @ResponseBody
     @MethodValidate
-    @RequestMapping("/submit")
+    @RequestMapping(value = "/submit",method = {RequestMethod.POST})
     public BasicResult submitRemark(
             @NotBlank
             @RequestParam(name = "content") String content,

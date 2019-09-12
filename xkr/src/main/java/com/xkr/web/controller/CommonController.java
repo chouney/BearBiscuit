@@ -99,10 +99,10 @@ public class CommonController {
                 responseVO.setAuthorization(upLoadApiService.sign(fileUri, policy, bucket));
             } else if (UpLoadApiService.UNCOMPRE_FILE_TYPE == type) {
                 bucket = fileBucket;
-                int ind;
-                if ((ind = fileName.lastIndexOf(".")) != -1) {
-                    fileName = fileName.substring(0, ind);
-                }
+//                int ind;
+//                if ((ind = fileName.lastIndexOf(".")) != -1) {
+//                    fileName = fileName.substring(0, ind);
+//                }
                 fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 String gmtDate = DateUtil.getGMTRFCUSDate();
