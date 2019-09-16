@@ -473,21 +473,11 @@ public class ResourceService {
     /**
      * 获取资源目录列表
      *
-     * @param resource
      * @param resUri
      * @return
      */
-    private List<FolderItemDTO> getResourceMenuList(XkrResource resource, String resUri) {
-        List<FolderItemDTO> list = Lists.newArrayList();
-        if (Objects.isNull(resource)) {
-            logger.error("ResourceService getResourceMenuList resource info is null : resId:{},resUri:{}", "null", resUri);
-            return list;
-        }
-        String up = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
-        if (StringUtils.isEmpty(up)) {
-            logger.error("ResourceService getResourceMenuList fileName is null : resource:{}", JSON.toJSONString(resource));
-            return list;
-        }
+    private List<FolderItemDTO> getResourceMenuList(String resUri) {
+        logger.info("ResourceService getResourceMenuList info resUri: ",resUri);
         return upLoadApiService.getDirInfo(resUri);
     }
 
@@ -506,8 +496,8 @@ public class ResourceService {
             list.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
             return list;
         }
-        String rootUri = "";
-        List<FolderItemDTO> currentMenuList = getResourceMenuList(resource, rootUri);
+        String rootUri = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
+        List<FolderItemDTO> currentMenuList = getResourceMenuList(rootUri);
         currentMenuList.forEach(folderItemDTO -> {
             ResourceFolderDTO resourceFolderDTO = new ResourceFolderDTO();
             resourceFolderDTO.setName(folderItemDTO.getName());
@@ -516,7 +506,7 @@ public class ResourceService {
             if (folderItemDTO.isFolder()) {
                 String uri = rootUri + folderItemDTO.getName();
                 resourceFolderDTO.setFileType("d");
-                buildResourceSubFolder(resourceFolderDTO, resource, uri);
+                buildResourceSubFolder(resourceFolderDTO, uri);
             } else {
                 resourceFolderDTO.setFileType("-");
             }
@@ -525,10 +515,10 @@ public class ResourceService {
         return list;
     }
 
-    private void buildResourceSubFolder(ResourceFolderDTO resourceFolderDTO, XkrResource resource, String currentUri) {
+    private void buildResourceSubFolder(ResourceFolderDTO resourceFolderDTO, String currentUri) {
         if (Objects.nonNull(resourceFolderDTO) && "d".equals(resourceFolderDTO.getFileType())) {
             resourceFolderDTO.setSubFolders(Lists.newArrayList());
-            List<FolderItemDTO> subList = getResourceMenuList(resource, currentUri);
+            List<FolderItemDTO> subList = getResourceMenuList(currentUri);
             subList.forEach(folderItemDTO -> {
                 ResourceFolderDTO subFolder = new ResourceFolderDTO();
                 subFolder.setName(folderItemDTO.getName());
@@ -537,7 +527,7 @@ public class ResourceService {
                 if (folderItemDTO.isFolder()) {
                     String uri = currentUri + "/" + folderItemDTO.getName();
                     subFolder.setFileType("d");
-                    buildResourceSubFolder(subFolder, resource, uri);
+                    buildResourceSubFolder(subFolder, uri);
                 } else {
                     subFolder.setFileType("-");
                 }
