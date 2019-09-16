@@ -386,6 +386,7 @@ public class UpLoadApiService {
      * @throws IOException
      */
     public FileUploadResponseDTO unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
+
         Map<String,Object> paramsMap = Maps.newHashMap();
         //空间名
         paramsMap.put("service", fileBucket);
@@ -409,6 +410,11 @@ public class UpLoadApiService {
         paramsMap.put(CompressHandler.Params.TASKS, array);
 
         try {
+            //先创建一个文件夹
+            if(!upYun.mkDir(tarPath,true)){
+                return new FileUploadResponseDTO(ErrorStatus.RESOURCE_UPLOAD_ERROR);
+            }
+
             Result result = mediaHandler.process(paramsMap);
             logger.debug("UploadApiService unCompressDirSDK ,sourcePath:{},targetPath:{},解压缩结果:{}",sourcePath,tarPath, JSON.toJSONString(result));
             if (result.isSucceed()) {
