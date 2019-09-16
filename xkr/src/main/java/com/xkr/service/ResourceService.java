@@ -499,9 +499,8 @@ public class ResourceService {
      */
     public ListResourceFolderDTO getResourceMenuList(Long resourceId) {
         ListResourceFolderDTO list = new ListResourceFolderDTO();
-        XkrResource resource = xkrResourceAgent.getResourceById(resourceId, ImmutableList.of(
-                ResourceStatusEnum.STATUS_NORMAL.getCode()
-        ));
+        XkrResource resource = xkrResourceAgent.getResourceById(resourceId, ResourceStatusEnum.NON_DELETE_STATUSED.stream().
+                map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
         if (Objects.isNull(resource)) {
             logger.error("ResourceService getResourceMenuList resource info is null : resId:{}", resourceId);
             list.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
