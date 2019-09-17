@@ -7,6 +7,7 @@ import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.dto.file.FileUploadResponseDTO;
+import com.xkr.domain.dto.file.FileUploadStatusDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author chriszhang
@@ -155,23 +157,26 @@ public class CommonController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
-    @RequestMapping(value = "/poll_up", method = {RequestMethod.POST})
+    @RequestMapping(value = "/query", method = {RequestMethod.POST})
     @ResponseBody
     public BasicResult pollUp(
-            @RequestParam(name = "fileUri") String fileUri) {
+            @RequestParam(name = "taskId") String taskId,
+            @ContainsInt({1, 2})
+            @RequestParam(name = "type") Integer type) {
         try {
-            String status = baseRedisService.get("UNCOMPRESS_" + fileBucket + fileUri);
-            if (StringUtils.isEmpty(status)) {
-                return new BasicResult(ErrorStatus.RESOURCE_UNCOMPRESSING);
+            FileUploadStatusDTO fileUploadStatusDTO = new FileUploadStatusDTO(ErrorStatus.OK);
+            if(type == 1){
+                fileUploadStatusDTO = upLoadApiService.getUnCompressStatus(taskId);
+            }else if(type == 2){
+                fileUploadStatusDTO = upLoadApiService.getUnCompressResult(taskId);
             }
-            if (SUCCESS_STATUS.equals(status)) {
-                return new BasicResult<>(ErrorStatus.OK);
+            if (!ErrorStatus.OK.equals(fileUploadStatusDTO.getStatus())) {
+                return new BasicResult(fileUploadStatusDTO.getStatus());
             }
-            FileUploadReturnVO returnVO = JSON.parseObject(status, FileUploadReturnVO.class);
-            return new BasicResult(returnVO.getStatus_code(), returnVO.getError());
+            return new BasicResult<>(fileUploadStatusDTO);
 
         } catch (Exception e) {
-            logger.error("文件上传异常 fileUri:{}", fileUri, e);
+            logger.error("文件解压缩查询异常 taskId:{},type:{}", taskId,type, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }

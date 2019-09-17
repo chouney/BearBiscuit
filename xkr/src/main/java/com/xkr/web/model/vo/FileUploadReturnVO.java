@@ -1,5 +1,8 @@
 package com.xkr.web.model.vo;
 
+import com.xkr.common.ErrorStatus;
+import com.xkr.web.model.BasicResult;
+
 import java.io.Serializable;
 
 /**
@@ -13,11 +16,12 @@ public class FileUploadReturnVO implements Serializable {
 
     private String task_id;
 
-    private Integer status_code;
+    private String msg;
 
-    private String path;
-
-    private String error;
+    public FileUploadReturnVO(String task_id, String msg) {
+        this.task_id = task_id;
+        this.msg = msg;
+    }
 
     public String getTask_id() {
         return task_id;
@@ -27,27 +31,12 @@ public class FileUploadReturnVO implements Serializable {
         this.task_id = task_id;
     }
 
-    public Integer getStatus_code() {
-        return status_code;
+    public String getMsg() {
+        return msg;
     }
 
-    public void setStatus_code(Integer status_code) {
-        this.status_code = status_code;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
 }

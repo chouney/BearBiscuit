@@ -25,6 +25,7 @@ public enum ErrorStatus {
     RESOURCE_UPLOAD_ERROR(10404,"上传失败"),
     RESOURCE_UNCOMPRESSING(10405,"解压缩处理中"),
     RESOURCE_FAILD_UNCOMPRESSING(10406,"解压缩提交失败"),
+    RESOURCE_FAILD_UNCOMPRESSING_QUERY(10407,"解压缩查询失败"),
 
 
     //用户
@@ -68,5 +69,6 @@ public enum ErrorStatus {
     public String getDesc() {
         return desc;
     }
+
 }
 

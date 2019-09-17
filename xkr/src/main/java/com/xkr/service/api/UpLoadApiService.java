@@ -11,6 +11,7 @@ import com.xkr.core.compress.UnCompressProcessorFacade;
 import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.dto.file.FileInfoDTO;
 import com.xkr.domain.dto.file.FileUploadResponseDTO;
+import com.xkr.domain.dto.file.FileUploadStatusDTO;
 import com.xkr.domain.dto.file.FolderItemDTO;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.exception.UpFileExistException;
@@ -377,7 +378,7 @@ public class UpLoadApiService {
     }
 
     /**
-     * 同上
+     * 异步调用解压缩文件
      *
      * @param sourcePath
      * @param tarPath
@@ -426,6 +427,60 @@ public class UpLoadApiService {
             logger.error("ploadApiService unCompressDirSDK 解压缩失败:sourcePath:{},targetPath:{},error:",sourcePath,tarPath,e);
         }
         return new FileUploadResponseDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING);
+    }
+
+    /**
+     * 异步调用解压缩文件
+     *
+     * @param taskId
+     * @return
+     * @throws UpException
+     * @throws IOException
+     */
+    public FileUploadStatusDTO getUnCompressResult(String taskId) throws UpException, IOException {
+
+        Map<String,Object> paramsMap = Maps.newHashMap();
+        //空间名
+        paramsMap.put("service", fileBucket);
+        //添加任务信息
+        paramsMap.put(CompressHandler.Params.TASKS, taskId);
+
+        try {
+            Result result = mediaHandler.getResult(paramsMap);
+            if (result.isSucceed()) {
+                return new FileUploadStatusDTO(taskId,result.getMsg());
+            }
+        } catch (IOException | UpException e) {
+            logger.error("ploadApiService getUnCompressStatus 解压缩查询失败:taskId:{},error:",taskId,e);
+        }
+        return new FileUploadStatusDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING_QUERY);
+    }
+
+    /**
+     * 异步调用解压缩文件
+     *
+     * @param taskId
+     * @return
+     * @throws UpException
+     * @throws IOException
+     */
+    public FileUploadStatusDTO getUnCompressStatus(String taskId) throws UpException, IOException {
+
+        Map<String,Object> paramsMap = Maps.newHashMap();
+        //空间名
+        paramsMap.put("service", fileBucket);
+        //添加任务信息
+        paramsMap.put(CompressHandler.Params.TASKS, taskId);
+
+        try {
+            Result result = mediaHandler.getStatus(paramsMap);
+            if (result.isSucceed()) {
+                return new FileUploadStatusDTO(taskId,result.getMsg());
+            }
+        } catch (IOException | UpException e) {
+            logger.error("ploadApiService getUnCompressStatus 解压缩查询失败:taskId:{},error:",taskId,e);
+        }
+        return new FileUploadStatusDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING_QUERY);
     }
 
     /**
