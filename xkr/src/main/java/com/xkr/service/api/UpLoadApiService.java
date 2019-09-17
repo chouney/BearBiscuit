@@ -443,7 +443,7 @@ public class UpLoadApiService {
         //空间名
         paramsMap.put("service", fileBucket);
         //添加任务信息
-        paramsMap.put(CompressHandler.Params.TASKS, taskId);
+        paramsMap.put(CompressHandler.Params.TASK_ID, taskId);
 
         try {
             Result result = mediaHandler.getResult(paramsMap);
@@ -471,7 +471,7 @@ public class UpLoadApiService {
         //空间名
         paramsMap.put("service", fileBucket);
         //添加任务信息
-        paramsMap.put(CompressHandler.Params.TASKS, taskId);
+        paramsMap.put(CompressHandler.Params.TASK_ID, taskId);
 
         try {
             Result result = mediaHandler.getStatus(paramsMap);
