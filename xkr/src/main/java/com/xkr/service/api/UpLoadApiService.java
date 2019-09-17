@@ -386,7 +386,7 @@ public class UpLoadApiService {
      * @throws UpException
      * @throws IOException
      */
-    public FileUploadResponseDTO unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
+    public FileUploadStatusDTO unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
 
         Map<String,Object> paramsMap = Maps.newHashMap();
         //空间名
@@ -413,20 +413,20 @@ public class UpLoadApiService {
         try {
             //先创建一个文件夹
             if(!upYun.mkDir(tarPath,true)){
-                return new FileUploadResponseDTO(ErrorStatus.RESOURCE_UPLOAD_ERROR);
+                return new FileUploadStatusDTO(ErrorStatus.RESOURCE_UPLOAD_ERROR);
             }
 
             Result result = mediaHandler.process(paramsMap);
             logger.debug("UploadApiService unCompressDirSDK ,sourcePath:{},targetPath:{},解压缩结果:{}",sourcePath,tarPath, JSON.toJSONString(result));
             if (result.isSucceed()) {
-//                String[] ids = mediaHandler.getTaskId(result.getMsg());
+                String[] ids = mediaHandler.getTaskId(result.getMsg());
 //                Arrays.stream(ids).forEach(str -> baseRedisService.set(str, "0", 3600));
-                return new FileUploadResponseDTO(ErrorStatus.OK);
+                return new FileUploadStatusDTO(ids[0],result.getMsg());
             }
         } catch (IOException | UpException e) {
             logger.error("ploadApiService unCompressDirSDK 解压缩失败:sourcePath:{},targetPath:{},error:",sourcePath,tarPath,e);
         }
-        return new FileUploadResponseDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING);
+        return new FileUploadStatusDTO(ErrorStatus.RESOURCE_FAILD_UNCOMPRESSING);
     }
 
     /**
@@ -447,6 +447,7 @@ public class UpLoadApiService {
 
         try {
             Result result = mediaHandler.getResult(paramsMap);
+            logger.debug("UploadApiService getUnCompressResult ,taskId:{},解压缩结果:{}",taskId, JSON.toJSONString(result));
             if (result.isSucceed()) {
                 return new FileUploadStatusDTO(taskId,result.getMsg());
             }
@@ -474,6 +475,7 @@ public class UpLoadApiService {
 
         try {
             Result result = mediaHandler.getStatus(paramsMap);
+            logger.debug("UploadApiService getUnCompressStatus ,taskId:{},解压缩结果:{}",taskId, JSON.toJSONString(result));
             if (result.isSucceed()) {
                 return new FileUploadStatusDTO(taskId,result.getMsg());
             }
