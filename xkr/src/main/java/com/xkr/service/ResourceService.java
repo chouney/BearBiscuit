@@ -504,7 +504,7 @@ public class ResourceService {
             resourceFolderDTO.setDate(folderItemDTO.getDate());
             resourceFolderDTO.setSize(folderItemDTO.getSize());
             if (folderItemDTO.isFolder()) {
-                String uri = rootUri + folderItemDTO.getName();
+                String uri = rootUri +"/"+ folderItemDTO.getName();
                 resourceFolderDTO.setFileType("d");
                 buildResourceSubFolder(resourceFolderDTO, uri);
             } else {

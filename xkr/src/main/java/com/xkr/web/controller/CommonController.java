@@ -109,7 +109,7 @@ public class CommonController {
                 }
                 FileUploadStatusDTO fileUploadStatusDTO = upLoadApiService.unCompressDirSDK(sourcePath, tarPath);
                 if (!ErrorStatus.OK.equals(fileUploadStatusDTO.getStatus())) {
-                    return new BasicResult(fileUploadStatusDTO);
+                    return new BasicResult(fileUploadStatusDTO.getStatus());
                 }
                 fileUri = tarPath;
 
