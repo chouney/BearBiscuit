@@ -39,13 +39,13 @@ public class PaymentApiService implements InitializingBean{
     @Value("${beecloud.app_id}")
     private String appId;
 
-    @Value("${ubeecloud.test_secret}")
+    @Value("${beecloud.test_secret}")
     private String testSecret;
 
-    @Value("${ubeecloud.master_secret}")
+    @Value("${beecloud.master_secret}")
     private String masterSecret;
 
-    @Value("${ubeecloud.app_secret}")
+    @Value("${beecloud.app_secret}")
     private String appSecret;
 
     /**
