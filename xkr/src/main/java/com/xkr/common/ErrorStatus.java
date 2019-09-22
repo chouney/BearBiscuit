@@ -51,6 +51,13 @@ public enum ErrorStatus {
     //后台
     ADMIN_EXIST_HOLDING_ROLE_ACCOUNT(20000,"存在拥有该角色的管理账户"),
 
+    //支付
+    ORDER_GENERATE_FAILED(12600,"生成支付订单失败"),
+    ORDER_SUBMIT_FAILED_STATUS(12601,"支付订单失败-订单状态异常"),
+    ORDER_SUBMIT_FAILED_USER(12602,"支付订单失败-无法找到支付用户信息"),
+    ORDER_SUBMIT_FAILED_USER_WEALTH(12603,"支付订单失败-更新用户财富值失败"),
+    ORDER_SUBMIT_UNCOMPAREABLE_WEALTH(12604,"支付订单失败-金额不一致"),
+
 
 
     ;

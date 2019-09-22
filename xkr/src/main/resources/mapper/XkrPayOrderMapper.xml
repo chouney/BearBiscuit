@@ -21,4 +21,26 @@
     <result column="pay_time" property="payTime" jdbcType="TIMESTAMP" />
     <result column="ext" property="ext" jdbcType="VARCHAR" />
   </resultMap>
+  <sql id="order_field" >
+    id,user_id,pay_type_code,trade_type,pay_order_no,pre_pay_id,pay_id,client_ip,pay_amount,
+    status,code_url,create_time,expire_time,pay_time,ext
+  </sql>
+
+  <select id="getOrderByOrderId" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT <include refid="order_field"/>
+    FROM xkr_pay_order WHERE pay_order_no = #{orderId}
+    <if test="statuses!=null">
+      AND status in
+      <foreach collection="statuses" item="status" separator="," open="(" close=")">
+        #{status}
+      </foreach>
+    </if>
+  </select>
+
+  <update id="payOrderStatusByOrderId" parameterType="java.util.Map">
+    UPDATE xkr_pay_order SET status = #{status}, ext=#{ext} ,update_time = now(),pay_time = now()
+    where pay_order_no = #{orderId}
+  </update>
+
+
 </mapper>

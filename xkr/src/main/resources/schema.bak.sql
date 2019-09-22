@@ -201,7 +201,8 @@ CREATE TABLE xkr_pay_order(
 	`pay_time` DATETIME DEFAULT NULL COMMENT '付款时间',
 	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段,包含支付结果信息,买家账号信息,订单详情信息等',
 	PRIMARY KEY (`id`),
-	INDEX `idx_sta_up` (`status`,`pay_time`)
+	INDEX `idx_sta_up` (`status`,`pay_time`),
+	UNIQUE INDEX `idx_ord_no` (`pay_order_no`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='账单信息表';
 
 DROP TABLE IF EXISTS `xkr_database_backup`;

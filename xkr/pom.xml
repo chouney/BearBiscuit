@@ -283,6 +283,13 @@
             <version>${mapper.version}</version>
         </dependency>
 
+        <!-- 支付包 -->
+        <dependency>
+            <groupId>cn.beecloud</groupId>
+            <artifactId>beecloud-java-sdk</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+
         <!--解压锁依赖-->
         <dependency>
             <groupId>org.gnu</groupId>
