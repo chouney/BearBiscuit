@@ -75,7 +75,7 @@ public class PaymentService {
             return paymentDTO;
         }
         //插入订单流水
-        if(xkrPayOrderAgent.insertPayOrder(xkrUser.getId(),payTypeCode,busOrderNo,"",clientIp,(int)MoneyUtil.yuan2fen(amount),bcOrder.getCodeUrl(),bcOrder.getBillTimeout())){
+        if(xkrPayOrderAgent.insertPayOrder(xkrUser.getId(),payTypeCode,busOrderNo,busOrderNo,clientIp,(int)MoneyUtil.yuan2fen(amount),bcOrder.getCodeUrl(),bcOrder.getBillTimeout())){
             paymentDTO.setHtml(bcOrder.getHtml());
             paymentDTO.setUrl(bcOrder.getUrl());
             paymentDTO.setCodeUrl(bcOrder.getCodeUrl());
