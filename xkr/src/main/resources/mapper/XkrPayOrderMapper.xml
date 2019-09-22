@@ -42,7 +42,7 @@
     <if test="payId!=null and payId!=''">
       pay_id=#{payId},
     </if>
-     ext=#{ext} ,update_time = now(),pay_time = now()
+     ext=#{ext} ,pay_time = now()
     where pay_order_no = #{orderId}
   </update>
 
