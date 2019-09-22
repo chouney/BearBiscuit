@@ -49,12 +49,6 @@ public class PaymentService {
     @Autowired
     private XkrUserAgent xkrUserAgent;
 
-    @Value("${beecloud.app_id}")
-    private String appId;
-
-    @Value("${beecloud.secret}")
-    private String secret;
-
 
     /**
      * 生成订单
