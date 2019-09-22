@@ -13,7 +13,7 @@ import java.util.Objects;
 public enum PaymentEnum {
 
     ALIPAY_PC_ENUM(1,"支付宝pc", BCEumeration.PAY_CHANNEL.ALI_WEB),
-    WECHAT_SCAN_ENUM(2,"微信扫码", BCEumeration.PAY_CHANNEL.BC_WX_SCAN),
+    WECHAT_SCAN_ENUM(2,"微信扫码", BCEumeration.PAY_CHANNEL.WX_NATIVE),
     ;
     private int code;
     private String desc;
