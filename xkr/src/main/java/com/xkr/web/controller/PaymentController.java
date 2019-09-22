@@ -75,13 +75,13 @@ public class PaymentController {
         try {
             PaymentVO paymentVO = new PaymentVO();
             PaymentDTO paymentDTO = paymentService.genBill(IpUtil.getIpAddr(request),amount,channelCode,returnUrl);
-            if(!ErrorStatus.OK.equals(paymentDTO)){
+            if(!ErrorStatus.OK.equals(paymentDTO.getStatus())){
                 return new BasicResult<>(paymentDTO.getStatus());
             }
             paymentVO.setCodeUrl(paymentDTO.getCodeUrl());
             paymentVO.setHtml(paymentDTO.getHtml());
             paymentVO.setUrl(paymentDTO.getUrl());
-            return new BasicResult<>(paymentDTO);
+            return new BasicResult<>(paymentVO);
         } catch (Exception e) {
             logger.error("PaymentController genPayOrder error ,payTypeCode:{},returnUrl:{},amount:{}", channelCode, returnUrl, amount, e);
         }

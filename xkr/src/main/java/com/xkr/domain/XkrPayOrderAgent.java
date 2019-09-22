@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -71,7 +72,7 @@ public class XkrPayOrderAgent {
     public XkrPayOrder getOrderByOrderId(String orderId){
         Map<String,Object> params = Maps.newHashMap();
         params.put("orderId",orderId);
-        params.put("statuses",PaymentStatusEnum.NON_DELETE_STATUSED);
+        params.put("statuses",PaymentStatusEnum.NON_DELETE_STATUSED.stream().map(PaymentStatusEnum::getCode).collect(Collectors.toList()));
         return xkrPayOrderMapper.getOrderByOrderId(params);
     }
 
@@ -79,7 +80,7 @@ public class XkrPayOrderAgent {
         Map<String,Object> params = Maps.newHashMap();
         params.put("orderId",orderId);
         params.put("payId",payId);
-        params.put("status",PaymentStatusEnum.STATUS_PAYED);
+        params.put("status",Lists.newArrayList(PaymentStatusEnum.STATUS_PAYED.getCode()));
         if(Objects.nonNull(ext)) {
             params.put("ext", JSON.toJSONString(ext));
         }
