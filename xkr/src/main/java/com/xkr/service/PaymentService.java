@@ -3,6 +3,7 @@ package com.xkr.service;
 import cn.beecloud.BCPay;
 import cn.beecloud.bean.BCException;
 import cn.beecloud.bean.BCOrder;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.PaymentEnum;
@@ -60,7 +61,7 @@ public class PaymentService {
     @Transactional(rollbackFor = Exception.class)
     public PaymentDTO genBill(String clientIp,String amount,int payTypeCode,String returnUrl){
         PaymentDTO paymentDTO = new PaymentDTO();
-        XkrUser xkrUser = (XkrUser) SecurityUtils.getSubject();
+        XkrUser xkrUser = (XkrUser) SecurityUtils.getSubject().getPrincipal();
         if(xkrUser == null){
             paymentDTO.setStatus(ErrorStatus.USER_NOT_EXIST);
             return paymentDTO;
@@ -98,7 +99,7 @@ public class PaymentService {
         //查看订单状态，是否为待支付或者已支付（保证幂等性）
         if(Objects.isNull(order) || !PaymentStatusEnum.NORMAL_STATUSED.contains(PaymentStatusEnum.getByCode(order.getStatus()))){
             baseDTO.setStatus(ErrorStatus.ORDER_SUBMIT_FAILED_STATUS);
-            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,baseDTO);
+            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
         //验证金额是否相等
@@ -106,7 +107,7 @@ public class PaymentService {
         BigDecimal orderFee = new BigDecimal(order.getPayAmount());
         if(retFee.compareTo(orderFee) != 0){
             baseDTO.setStatus(ErrorStatus.ORDER_SUBMIT_UNCOMPAREABLE_WEALTH);
-            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,baseDTO);
+            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId, JSON.toJSONString(baseDTO));
             return baseDTO;
         }
 
@@ -114,7 +115,7 @@ public class PaymentService {
         XkrUser user = xkrUserAgent.getUserById(order.getUserId());
         if(Objects.isNull(user)){
             baseDTO.setStatus(ErrorStatus.ORDER_SUBMIT_FAILED_USER);
-            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,baseDTO);
+            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
         //更新支付金额
@@ -122,12 +123,12 @@ public class PaymentService {
                 .divide(BigDecimal.TEN).setScale(2,BigDecimal.ROUND_HALF_UP).longValue());
         if(!xkrUserAgent.updateUserByPKSelective(user)){
             baseDTO.setStatus(ErrorStatus.ORDER_SUBMIT_FAILED_USER_WEALTH);
-            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,baseDTO);
+            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
         //更新订单状态
         if(!xkrPayOrderAgent.payOrderStatusByOrderId(orderId,meesageDetail)){
-            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,baseDTO);
+            logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             throw new RuntimeException("更新订单失败");
         }
         return baseDTO;
