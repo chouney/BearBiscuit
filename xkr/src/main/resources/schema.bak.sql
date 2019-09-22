@@ -195,7 +195,7 @@ CREATE TABLE xkr_pay_order(
 	`client_ip` varchar(64) NOT NULL COMMENT '客户端ip',
 	`pay_amount` bigint(20) UNSIGNED NOT NULL COMMENT '支付金额,分为单位',
 	`status` tinyint(4) NOT NULL COMMENT '订单状态',
-	`code_url` varchar(4) NOT NULL DEFAULT '' COMMENT '二维码url',
+	`code_url` varchar(1024) NOT NULL DEFAULT '' COMMENT '二维码url',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`expire_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',
 	`pay_time` DATETIME DEFAULT NULL COMMENT '付款时间',

@@ -245,25 +245,28 @@ insert into xkr_admin_permission (id,permission_name,status) VALUES ('2','p2','1
 insert into xkr_admin_permission (id,permission_name,status) VALUES ('3','p3','2');
 
 
-DROP TABLE IF EXISTS xkr_pay_order;
+DROP TABLE IF EXISTS `xkr_pay_order`;
 CREATE TABLE xkr_pay_order(
-	id bigint(20) UNSIGNED NOT NULL ,
-	user_id bigint(20) UNSIGNED NOT NULL ,
-	pay_type_code tinyint(4) NOT NULL ,
-	trade_type tinyint(4) NOT NULL ,
-	pay_order_no varchar(128) NOT NULL ,
-	pre_pay_id varchar(128) NOT NULL DEFAULT '' ,
-	pay_id varchar(128) NOT NULL DEFAULT '' ,
-	client_ip varchar(64) NOT NULL ,
-	pay_amount bigint(20) UNSIGNED NOT NULL ,
-	status tinyint(4) NOT NULL ,
-	code_url varchar(4) NOT NULL DEFAULT '' ,
-	create_time DATETIME DEFAULT CURRENT_TIMESTAMP ,
-	expire_time DATETIME DEFAULT CURRENT_TIMESTAMP ,
-	pay_time DATETIME DEFAULT NULL ,
-	ext varchar(1024) NOT NULL DEFAULT '{}' ,
-	PRIMARY KEY (id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+	`id` bigint(20) UNSIGNED NOT NULL COMMENT '账单id',
+	`user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户id',
+	`pay_type_code` tinyint(4) NOT NULL COMMENT '支付类型,微信,支付宝',
+	`trade_type` tinyint(4) NOT NULL COMMENT '交易类型,扫码,app等',
+	`pay_order_no` varchar(128) NOT NULL COMMENT '业务订单号',
+	`pre_pay_id` varchar(128) NOT NULL DEFAULT '' COMMENT '预支付订单号',
+	`pay_id` varchar(128) NOT NULL DEFAULT '' COMMENT '支付订单号',
+	`client_ip` varchar(64) NOT NULL COMMENT '客户端ip',
+	`pay_amount` bigint(20) UNSIGNED NOT NULL COMMENT '支付金额,分为单位',
+	`status` tinyint(4) NOT NULL COMMENT '订单状态',
+	`code_url` varchar(1024) NOT NULL DEFAULT '' COMMENT '二维码url',
+	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+	`expire_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',
+	`pay_time` DATETIME DEFAULT NULL COMMENT '付款时间',
+	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段,包含支付结果信息,买家账号信息,订单详情信息等',
+	PRIMARY KEY (`id`),
+	INDEX `idx_sta_up` (`status`,`pay_time`),
+	UNIQUE INDEX `idx_ord_no` (`pay_order_no`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='账单信息表';
+
 
 DROP TABLE IF EXISTS xkr_database_backup;
 CREATE TABLE xkr_database_backup(
