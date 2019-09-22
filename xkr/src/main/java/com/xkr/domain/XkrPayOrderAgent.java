@@ -80,7 +80,7 @@ public class XkrPayOrderAgent {
         Map<String,Object> params = Maps.newHashMap();
         params.put("orderId",orderId);
         params.put("payId",payId);
-        params.put("status",Lists.newArrayList(PaymentStatusEnum.STATUS_PAYED.getCode()));
+        params.put("status",PaymentStatusEnum.STATUS_PAYED.getCode());
         if(Objects.nonNull(ext)) {
             params.put("ext", JSON.toJSONString(ext));
         }
