@@ -70,6 +70,7 @@ public class PaymentService {
         //生成业务订单号
         String busOrderNo = "XKR"+idGenerator.generateId();
         BCOrder bcOrder = paymentApiService.genBill(busOrderNo,amount,payTypeCode,returnUrl);
+        logger.debug("生成支付订单 , BCOrder :{}",JSON.toJSONString(bcOrder));
         if(Objects.isNull(bcOrder)){
             logger.error("生成支付订单失败,clientIp:{},amount:{},payTypeCode,:{},returnUrl:{}",clientIp,amount,payTypeCode,returnUrl);
             paymentDTO.setStatus(ErrorStatus.ORDER_GENERATE_FAILED);
