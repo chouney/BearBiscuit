@@ -56,6 +56,7 @@ public class XkrPayOrderAgent {
         payOrder.setTradeType((byte) 0); //暂存字段，留存
         payOrder.setPayOrderNo(busOrderNo);
         payOrder.setPrePayId(preOrderNo);
+        payOrder.setPayId(null);
         payOrder.setClientIp(clientIp);
         payOrder.setPayAmount(Long.valueOf(payAmount));
         payOrder.setStatus((byte) PaymentStatusEnum.STATUS_WAIT_PAY.getCode());
@@ -75,9 +76,10 @@ public class XkrPayOrderAgent {
         return xkrPayOrderMapper.getOrderByOrderId(params);
     }
 
-    public boolean payOrderStatusByOrderId(String orderId,JSONObject ext){
+    public boolean payOrderStatusByOrderId(String orderId,String payId,JSONObject ext){
         Map<String,Object> params = Maps.newHashMap();
         params.put("orderId",orderId);
+        params.put("payId",payId);
         params.put("status",PaymentStatusEnum.STATUS_PAYED);
         if(Objects.nonNull(ext)) {
             params.put("ext", JSON.toJSONString(ext));

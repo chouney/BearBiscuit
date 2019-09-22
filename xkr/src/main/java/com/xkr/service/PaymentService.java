@@ -1,5 +1,6 @@
 package com.xkr.service;
 
+import cn.beecloud.BCEumeration;
 import cn.beecloud.BCPay;
 import cn.beecloud.bean.BCException;
 import cn.beecloud.bean.BCOrder;
@@ -75,7 +76,7 @@ public class PaymentService {
             return paymentDTO;
         }
         //插入订单流水
-        if(xkrPayOrderAgent.insertPayOrder(xkrUser.getId(),payTypeCode,busOrderNo,busOrderNo,clientIp,(int)MoneyUtil.yuan2fen(amount),bcOrder.getCodeUrl(),bcOrder.getBillTimeout())){
+        if(xkrPayOrderAgent.insertPayOrder(xkrUser.getId(),payTypeCode,busOrderNo,"",clientIp,(int)MoneyUtil.yuan2fen(amount),bcOrder.getCodeUrl(),bcOrder.getBillTimeout())){
             paymentDTO.setHtml(bcOrder.getHtml());
             paymentDTO.setUrl(bcOrder.getUrl());
             paymentDTO.setCodeUrl(bcOrder.getCodeUrl());
@@ -92,7 +93,7 @@ public class PaymentService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public BaseDTO complatePay(String orderId, String transactionFee, JSONObject meesageDetail){
+    public BaseDTO complatePay(String orderId, String transactionFee, JSONObject messageDetail){
         BaseDTO baseDTO = new BaseDTO();
         //获取订单详情
         XkrPayOrder order = xkrPayOrderAgent.getOrderByOrderId(orderId);
@@ -126,8 +127,16 @@ public class PaymentService {
             logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
+        BCEumeration.PAY_CHANNEL chanlType = PaymentEnum.getChannelByCode(order.getPayTypeCode());
+        String tradeNo=null;
+        if(BCEumeration.PAY_CHANNEL.ALI_WEB.equals(chanlType)){
+            tradeNo = messageDetail.getString("tradeNo");
+        }
+        if(BCEumeration.PAY_CHANNEL.BC_WX_SCAN.equals(chanlType)){
+            tradeNo = messageDetail.getString("transaction_id");
+        }
         //更新订单状态
-        if(!xkrPayOrderAgent.payOrderStatusByOrderId(orderId,meesageDetail)){
+        if(!xkrPayOrderAgent.payOrderStatusByOrderId(orderId,tradeNo,messageDetail)){
             logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             throw new RuntimeException("更新订单失败");
         }
