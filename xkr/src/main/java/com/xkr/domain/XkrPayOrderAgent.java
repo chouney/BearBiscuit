@@ -56,14 +56,13 @@ public class XkrPayOrderAgent {
         payOrder.setTradeType((byte) 0); //暂存字段，留存
         payOrder.setPayOrderNo(busOrderNo);
         payOrder.setPrePayId(preOrderNo);
-        payOrder.setPayId(null);
         payOrder.setClientIp(clientIp);
         payOrder.setPayAmount(Long.valueOf(payAmount));
         payOrder.setStatus((byte) PaymentStatusEnum.STATUS_WAIT_PAY.getCode());
         payOrder.setCodeUrl(codeUrl);
         LocalDateTime time = LocalDateTime.now().plusSeconds(expireTime);
         payOrder.setExpireTime(new Date(time.toEpochSecond(ZoneOffset.UTC)));
-        if(xkrPayOrderMapper.insert(payOrder)==1) {
+        if(xkrPayOrderMapper.insertSelective(payOrder)==1) {
             return true;
         }
         return false;
