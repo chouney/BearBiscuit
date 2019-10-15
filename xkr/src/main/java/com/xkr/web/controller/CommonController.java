@@ -157,7 +157,7 @@ public class CommonController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
-    @RequestMapping(value = "/query", method = {RequestMethod.POST})
+    @RequestMapping(value = "/query", method = {RequestMethod.GET,RequestMethod.POST})
     @ResponseBody
     public BasicResult pollUp(
             @RequestParam(name = "taskId") String taskId,

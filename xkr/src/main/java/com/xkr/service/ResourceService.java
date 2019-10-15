@@ -477,7 +477,7 @@ public class ResourceService {
      * @return
      */
     private List<FolderItemDTO> getResourceMenuList(String resUri) {
-        logger.info("ResourceService getResourceMenuList info resUri: ",resUri);
+        logger.info("ResourceService getResourceMenuList info resUri: {}",resUri);
         return upLoadApiService.getDirInfo(resUri);
     }
 

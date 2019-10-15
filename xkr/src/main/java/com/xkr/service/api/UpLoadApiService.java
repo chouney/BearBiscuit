@@ -183,6 +183,7 @@ public class UpLoadApiService {
             if(CollectionUtils.isEmpty(folderItems)){
                 return Lists.newArrayList();
             }
+            logger.debug("获取云盘列表信息,dicPath:{}, result:{}",dicPath,JSON.toJSONString(folderItems));
             return folderItems.stream().map(folderItem -> new FolderItemDTO(folderItem.name, "Folder".equals(folderItem.type),
                     folderItem.size, folderItem.date)).collect(Collectors.toList());
         } catch (IOException | UpException e) {

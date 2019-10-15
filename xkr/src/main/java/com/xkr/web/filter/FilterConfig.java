@@ -72,6 +72,7 @@ public class FilterConfig {
         filterChainDefinitionMap.put("/api/user/pre_update", "anon");
         filterChainDefinitionMap.put("/api/user/validate", "anon");
         filterChainDefinitionMap.put("/api/user/update", "anon");
+        filterChainDefinitionMap.put("/api/common/return_url", "anon");
         // 订单更新
         filterChainDefinitionMap.put("/api/payment/update", "anon");
 
