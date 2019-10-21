@@ -280,6 +280,7 @@ public class ResourceController {
             @IsNumberic
             @RequestParam(name = "classId") String classId,
             @NotBlank
+//            @Length(max = 11000,message = "内容长度不能大于10000字")
             @RequestParam(name = "detail") String detail,
             @NotBlank
             @RequestParam(name = "cp") String cfu,
