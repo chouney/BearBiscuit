@@ -510,8 +510,9 @@ public class UpLoadApiService {
                 }
             });
             upYun.rmDir(path);
+        }else {
+            upYun.deleteFile(path);
         }
-        upYun.deleteFile(path);
     }
 
     /**
