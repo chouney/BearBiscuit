@@ -402,7 +402,7 @@ public class ResourceService {
             if(!StringUtils.isEmpty(downloadUrl)) {
                 String fileUri = downloadUrl.substring(0, downloadUrl.lastIndexOf("/"));
                 String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
-                downloadUrl = fileUri + "/" + URLEncoder.encode(fileName, "UTF-8");
+                downloadUrl = fileUri + "/" + fileName;
             }
             return new FileDownloadResponseDTO(
 //                    "deprecated",
