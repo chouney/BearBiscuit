@@ -1,5 +1,6 @@
 package com.xkr.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.xkr.common.CaptchaEnum;
@@ -10,17 +11,21 @@ import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.domain.XkrClassAgent;
+import com.xkr.domain.XkrResourceAgent;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
+import com.xkr.domain.dto.file.FileUploadStatusDTO;
 import com.xkr.domain.dto.resource.ListResourceDTO;
 import com.xkr.domain.dto.resource.ListResourceFolderDTO;
 import com.xkr.domain.dto.resource.ResourceDetailDTO;
 import com.xkr.domain.dto.resource.ResourceFolderDTO;
 import com.xkr.domain.entity.XkrClass;
+import com.xkr.domain.entity.XkrResource;
 import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.ClassService;
 import com.xkr.service.DataAnalyzeService;
 import com.xkr.service.ResourceService;
+import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.resource.*;
 import org.apache.shiro.SecurityUtils;
@@ -55,6 +60,9 @@ public class ResourceController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
+    private XkrResourceAgent xkrResourceAgent;
+
+    @Autowired
     private ResourceService resourceService;
 
     @Autowired
@@ -62,6 +70,9 @@ public class ResourceController {
 
     @Autowired
     private XkrClassAgent xkrClassAgent;
+
+    @Autowired
+    private UpLoadApiService upLoadApiService;
 
     /**
      * 根据分类获取资源
@@ -241,7 +252,18 @@ public class ResourceController {
         }
         ListResourceFolderVO listResourceFolderVO = new ListResourceFolderVO();
         try {
-            ListResourceFolderDTO listResourceFolderDTO = resourceService.getResourceMenuList(Long.valueOf(resourceId));
+            XkrResource xkrResource = xkrResourceAgent.getResourceById(Long.valueOf(resourceId));
+            if(Objects.isNull(xkrResource)){
+                return new BasicResult<>(ErrorStatus.RESOURCE_NOT_FOUND);
+            }
+            String ext = xkrResource.getExt();
+            JSONObject extJson = JSON.parseObject(ext);
+            ListResourceFolderDTO listResourceFolderDTO;
+            if(extJson == null ||
+                    (listResourceFolderDTO = extJson.getObject(ResourceService.EXT_FILE_MENU_KEY,ListResourceFolderDTO.class))  == null){
+                logger.debug("=========获取资源解压缩目录失败，尝试重新获取");
+                listResourceFolderDTO = resourceService.saveNewFileMenu(resourceId);
+            }
 
             if(!ErrorStatus.OK.equals(listResourceFolderDTO.getStatus())){
                 return new BasicResult<>(listResourceFolderDTO.getStatus());
@@ -285,7 +307,7 @@ public class ResourceController {
             @NotBlank
             @RequestParam(name = "cp") String cfu,
             @NotBlank
-            @RequestParam(name = "up") String ufu,
+            @RequestParam(name = "up",required = false) String ufu,
             @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
             @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
@@ -310,6 +332,10 @@ public class ResourceController {
             if(!ErrorStatus.OK.equals(resId.getStatus())){
                 return new BasicResult<>(resId.getStatus());
             }
+
+            //直接解压缩文件
+            resourceService.unCompressFile(String.valueOf(resId.getData()),cfu);
+
 
             output.put("resId",String.valueOf(resId.getData()));
 

@@ -15,7 +15,9 @@ import com.xkr.common.OptEnum;
 import com.xkr.common.OptLogModuleEnum;
 import com.xkr.common.annotation.OptLog;
 import com.xkr.dao.cache.AdminIndexRedisService;
+import com.xkr.dao.mapper.XkrResourceMapper;
 import com.xkr.domain.*;
+import com.xkr.domain.dto.BaseDTO;
 import com.xkr.domain.dto.ResponseDTO;
 import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.file.FileInfoDTO;
@@ -35,13 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,9 @@ import java.util.stream.Collectors;
 @Service
 public class ResourceService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private XkrResourceMapper xkrResourceMapper;
 
     @Autowired
     private XkrClassAgent xkrClassAgent;
@@ -101,6 +106,7 @@ public class ResourceService {
     public static final String EXT_MD5_UNCOMPRESS_FILE_KEY = "unCompressMd5";
 
     public static final String EXT_FILE_NAME_KEY = "fileName";
+    public static final String EXT_FILE_MENU_KEY = "fileMenu";
 
 
     /**
@@ -319,7 +325,7 @@ public class ResourceService {
         if (success) {
             //清除资源
             success = xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
-            if(success){
+            if (success) {
                 //删除又拍云资源
                 deleteUpyunResource(resourceIds);
             }
@@ -399,14 +405,14 @@ public class ResourceService {
             JSONObject ext = JSON.parseObject(resource.getExt());
             String downloadUrl = resource.getResourceUrl();
             String date = DateUtil.getGMTRFCUSDate();
-            if(!StringUtils.isEmpty(downloadUrl)) {
+            if (!StringUtils.isEmpty(downloadUrl)) {
                 String fileUri = downloadUrl.substring(0, downloadUrl.lastIndexOf("/"));
                 String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
                 downloadUrl = fileUri + "/" + fileName;
             }
             return new FileDownloadResponseDTO(
 //                    "deprecated",
-                    UpYunUtils.sign("GET", date, downloadUrl,fileBucket, optUser, UpYunUtils.md5(optPassword), null),
+                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
                     "/" + fileBucket + downloadUrl, date);
         } catch (Exception e) {
             logger.error("ResourceService build response token failed", e);
@@ -470,6 +476,55 @@ public class ResourceService {
     }
 
 
+    @Async
+    public void unCompressFile(String resId, String fileName) {
+        //上传成功调用解压缩方法
+        String sourcePath = fileName;
+        String tarPath = sourcePath;
+        int ind;
+        if ((ind = sourcePath.lastIndexOf(".")) != -1) {
+            tarPath = sourcePath.substring(0, ind);
+        }
+        try {
+            upLoadApiService.unCompressDirSDK(resId,sourcePath, tarPath);
+        } catch (UpException | IOException e) {
+            logger.error("解压缩文件失败，需要重试,resId:{},fileName:{},error:", resId, fileName, e);
+        }
+    }
+
+    /**
+     * 保存目录
+     * @param resId
+     */
+    public ListResourceFolderDTO saveNewFileMenu(String resId){
+        ListResourceFolderDTO listResourceFolderDTO = getResourceMenuList(Long.valueOf(resId));
+        if(!ErrorStatus.OK.equals(listResourceFolderDTO.getStatus())){
+            return listResourceFolderDTO;
+        }
+        XkrResource resource = xkrResourceAgent.getResourceById(Long.valueOf(resId));
+        if(Objects.isNull(resource)){
+            listResourceFolderDTO.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
+            return listResourceFolderDTO;
+        }
+        String ext = resource.getExt();
+        JSONObject extJson = JSON.parseObject(ext);
+        if(Objects.nonNull(extJson)) {
+            String fileDir = extJson.getString(ResourceService.EXT_FILE_NAME_KEY);
+            extJson.put(ResourceService.EXT_FILE_MENU_KEY, listResourceFolderDTO);
+            resource.setExt(extJson.toJSONString());
+            xkrResourceMapper.updateByPrimaryKeySelective(resource);
+            try {
+                //删除目录
+                upLoadApiService.deleteFile(fileDir,true);
+            } catch (IOException | UpException e) {
+                logger.error("删除目录失败",e);
+            }
+
+        }
+
+        return listResourceFolderDTO;
+    }
+
     /**
      * 获取资源目录列表
      *
@@ -477,7 +532,7 @@ public class ResourceService {
      * @return
      */
     private List<FolderItemDTO> getResourceMenuList(String resUri) {
-        logger.info("ResourceService getResourceMenuList info resUri: {}",resUri);
+        logger.info("ResourceService getResourceMenuList info resUri: {}", resUri);
         return upLoadApiService.getDirInfo(resUri);
     }
 
@@ -496,7 +551,16 @@ public class ResourceService {
             list.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
             return list;
         }
-        String rootUri = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
+        String sourcePath = resource.getResourceUrl();
+        int ind;
+        if(Objects.isNull(sourcePath) || (ind = sourcePath.lastIndexOf(".")) == -1){
+            logger.error("ResourceService getResourceMenuList resource info is null : resId:{}", resourceId);
+            list.setStatus(ErrorStatus.RESOURCE_NOT_FOUND);
+            return list;
+        }
+        final String rootUri = sourcePath.substring(0, ind);
+
+//        String rootUri = JSONObject.parseObject(resource.getExt()).getString(EXT_FILE_NAME_KEY);
         List<FolderItemDTO> currentMenuList = getResourceMenuList(rootUri);
         currentMenuList.forEach(folderItemDTO -> {
             ResourceFolderDTO resourceFolderDTO = new ResourceFolderDTO();
@@ -504,7 +568,7 @@ public class ResourceService {
             resourceFolderDTO.setDate(folderItemDTO.getDate());
             resourceFolderDTO.setSize(folderItemDTO.getSize());
             if (folderItemDTO.isFolder()) {
-                String uri = rootUri +"/"+ folderItemDTO.getName();
+                String uri = rootUri + "/" + folderItemDTO.getName();
                 resourceFolderDTO.setFileType("d");
                 buildResourceSubFolder(resourceFolderDTO, uri);
             } else {
@@ -932,18 +996,18 @@ public class ResourceService {
 
     }
 
-    private void deleteUpyunResource(List<Long> resourceIds){
+    private void deleteUpyunResource(List<Long> resourceIds) {
         //又拍云删除文件
         List<XkrResource> xkrResources = xkrResourceAgent.getResourceListByIds(resourceIds,
                 ImmutableList.of(ResourceStatusEnum.STATUS_DELETED.getCode()));
-        if(!CollectionUtils.isEmpty(xkrResources)) {
+        if (!CollectionUtils.isEmpty(xkrResources)) {
             xkrResources.forEach(resource -> {
                 String dirPath = "";
                 try {
-                    dirPath = resource.getResourceUrl().substring(0,resource.getResourceUrl().lastIndexOf("/"));
+                    dirPath = resource.getResourceUrl();
                     logger.info("删除云资源，资源id:{},文件夹路径:{}", resource.getId(), dirPath);
-                    if(!StringUtils.isEmpty(dirPath)) {
-                        upLoadApiService.deleteFile(dirPath, true);
+                    if (!StringUtils.isEmpty(dirPath)) {
+                        upLoadApiService.deleteFile(dirPath, false);
                     }
                 } catch (Exception e) {
                     logger.error("删除云资源失败，资源id:{},文件夹路径:{}", resource.getId(), dirPath, e);

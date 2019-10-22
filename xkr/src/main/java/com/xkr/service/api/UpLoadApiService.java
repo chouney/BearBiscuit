@@ -387,13 +387,14 @@ public class UpLoadApiService {
      * @throws UpException
      * @throws IOException
      */
-    public FileUploadStatusDTO unCompressDirSDK(String sourcePath,String tarPath) throws UpException, IOException {
+    public FileUploadStatusDTO unCompressDirSDK(String resId,String sourcePath,String tarPath) throws UpException, IOException {
 
         Map<String,Object> paramsMap = Maps.newHashMap();
         //空间名
         paramsMap.put("service", fileBucket);
         //回调地址
-        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url");
+        //暂时写死
+        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "http://"+frontDomain+":"+port+"/api/common/return_url?resId="+resId);
 //        paramsMap.put(CompressHandler.Params.NOTIFY_URL, "");
         //选择处理任务
         paramsMap.put(CompressHandler.Params.APP_NAME, "depress");

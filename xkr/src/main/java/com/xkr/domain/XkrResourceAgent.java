@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -172,6 +173,13 @@ public class XkrResourceAgent {
         resource.setReport((byte) REPORT_NORMAL);
         resource.setStatus((byte) ResourceStatusEnum.STATUS_UNVERIFIED.getCode());
         resource.setUserId(userId);
+        if(StringUtils.isEmpty(up)){
+            up = cp;
+            int ind;
+            if ((ind = cp.lastIndexOf(".")) != -1) {
+                up = cp.substring(0, ind);
+            }
+        }
         JSONObject ext = new JSONObject();
         ext.put(ResourceService.EXT_FILE_NAME_KEY,up);
         resource.setExt(ext.toJSONString());

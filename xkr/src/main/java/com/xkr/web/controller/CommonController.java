@@ -1,18 +1,18 @@
 package com.xkr.web.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.NoBasicAuth;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.dao.cache.BaseRedisService;
-import com.xkr.domain.dto.file.FileUploadResponseDTO;
+import com.xkr.dao.mapper.XkrResourceMapper;
+import com.xkr.domain.dto.BaseDTO;
 import com.xkr.domain.dto.file.FileUploadStatusDTO;
 import com.xkr.domain.entity.XkrUser;
+import com.xkr.service.ResourceService;
 import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
-import com.xkr.web.model.vo.FileUploadReturnVO;
 import main.java.com.upyun.UpYunUtils;
 import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
@@ -57,6 +57,13 @@ public class CommonController {
     @Autowired
     private BaseRedisService baseRedisService;
 
+    @Autowired
+    private XkrResourceMapper xkrResourceMapper;
+
+
+    @Autowired
+    private ResourceService resourceService;
+
     private static final String HANDLING_STATUS = "0";
 
     private static final String SUCCESS_STATUS = "1";
@@ -99,20 +106,20 @@ public class CommonController {
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 policy = upLoadApiService.genPolicy(imageBucket, fileUri, 60, contentLength);
                 responseVO.setAuthorization(upLoadApiService.sign(fileUri, policy, bucket));
-            } else if (UpLoadApiService.UNCOMPRE_FILE_TYPE == type) {
-                //解压缩的fileName为fileUri
-                String sourcePath = fileName;
-                String tarPath = "";
-                int ind;
-                if ((ind = sourcePath.lastIndexOf(".")) != -1) {
-                    tarPath = sourcePath.substring(0, ind);
-                }
-                FileUploadStatusDTO fileUploadStatusDTO = upLoadApiService.unCompressDirSDK(sourcePath, tarPath);
-                if (!ErrorStatus.OK.equals(fileUploadStatusDTO.getStatus())) {
-                    return new BasicResult(fileUploadStatusDTO.getStatus());
-                }
-                fileUri = tarPath;
-
+//            } else if (UpLoadApiService.UNCOMPRE_FILE_TYPE == type) {
+//                //解压缩的fileName为fileUri
+//                String sourcePath = fileName;
+//                String tarPath = "";
+//                int ind;
+//                if ((ind = sourcePath.lastIndexOf(".")) != -1) {
+//                    tarPath = sourcePath.substring(0, ind);
+//                }
+//                FileUploadStatusDTO fileUploadStatusDTO = upLoadApiService.unCompressDirSDK(sourcePath, tarPath);
+//                if (!ErrorStatus.OK.equals(fileUploadStatusDTO.getStatus())) {
+//                    return new BasicResult(fileUploadStatusDTO.getStatus());
+//                }
+//                fileUri = tarPath;
+//
             }
             responseVO.setDirUri(fileUri);
             responseVO.setPolicy(policy);
@@ -130,6 +137,7 @@ public class CommonController {
             @RequestBody String jsonStr,
             HttpServletRequest request) {
         try {
+            logger.debug("==========接收到解压缩回调,jsonStr:{}", jsonStr);
             //签名认证
             String auth = request.getHeader("Authorization");
             String date = request.getHeader("Date");
@@ -139,7 +147,18 @@ public class CommonController {
             if (StringUtils.isEmpty(auth) || !auth.equals(comAuth)) {
                 return new BasicResult(ErrorStatus.BASIC_AUTH_ERROR);
             }
+            //拿到resId
+            String resId = request.getParameter("resId");
+            if (Objects.isNull(resId)) {
+                return new BasicResult(ErrorStatus.PARAM_ERROR);
+            }
+            logger.info("接收到解压缩回调，验签成功，获取resId成功，resId:{}", resId);
 
+            //保存目录
+            BaseDTO result = resourceService.saveNewFileMenu(resId);
+
+            return new BasicResult(result.getStatus());
+            //
             //解析回调
 //            FileUploadReturnVO returnVO = JSON.parseObject(jsonStr, FileUploadReturnVO.class);
 //            if (returnVO != null) {
@@ -157,7 +176,7 @@ public class CommonController {
         return new BasicResult(ErrorStatus.ERROR);
     }
 
-    @RequestMapping(value = "/query", method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/query", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public BasicResult pollUp(
             @RequestParam(name = "taskId") String taskId,
@@ -165,9 +184,9 @@ public class CommonController {
             @RequestParam(name = "type") Integer type) {
         try {
             FileUploadStatusDTO fileUploadStatusDTO = new FileUploadStatusDTO(ErrorStatus.OK);
-            if(type == 1){
+            if (type == 1) {
                 fileUploadStatusDTO = upLoadApiService.getUnCompressStatus(taskId);
-            }else if(type == 2){
+            } else if (type == 2) {
                 fileUploadStatusDTO = upLoadApiService.getUnCompressResult(taskId);
             }
             if (!ErrorStatus.OK.equals(fileUploadStatusDTO.getStatus())) {
@@ -176,7 +195,7 @@ public class CommonController {
             return new BasicResult<>(fileUploadStatusDTO);
 
         } catch (Exception e) {
-            logger.error("文件解压缩查询异常 taskId:{},type:{}", taskId,type, e);
+            logger.error("文件解压缩查询异常 taskId:{},type:{}", taskId, type, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
     }
