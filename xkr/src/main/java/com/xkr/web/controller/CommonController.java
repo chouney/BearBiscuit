@@ -144,6 +144,7 @@ public class CommonController {
             String contentMd5 = request.getHeader("Content-MD5");
             String uri = request.getRequestURI();
             String comAuth = UpYunUtils.sign("POST", date, uri, upLoadApiService.getUserName(), upLoadApiService.getPassword(), contentMd5);
+            logger.debug("==========接收到解压缩回调头部信息,auth:{},date:{},contentMd5:{},uri:{},comAuth:{}", auth,date,contentMd5,uri,comAuth);
             if (StringUtils.isEmpty(auth) || !auth.equals(comAuth)) {
                 return new BasicResult(ErrorStatus.BASIC_AUTH_ERROR);
             }

@@ -30,7 +30,7 @@ CREATE TABLE xkr_resource(
 	`download_count` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '下载量',
 	`create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-	`ext` varchar(1024) NOT NULL DEFAULT '{}' COMMENT '扩展字段，存储内容简要等,file_size等',
+	`ext` LONGBLOB  COMMENT '扩展字段，存储内容简要等,file_size等',
 	PRIMARY KEY (`id`),
 	INDEX `idx_cla_sta` (`class_id`,`status`,`update_time`),
 	INDEX `idx_cla_sta_dc` (`class_id`,`status`,`download_count`),
