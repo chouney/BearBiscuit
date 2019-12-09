@@ -138,11 +138,12 @@ public class CommonController {
             HttpServletRequest request) {
         try {
             logger.debug("==========接收到解压缩回调,jsonStr:{}", jsonStr);
+            String resId = request.getParameter("resId");
             //签名认证
             String auth = request.getHeader("Authorization");
             String date = request.getHeader("Date");
             String contentMd5 = request.getHeader("Content-MD5");
-            String uri = request.getRequestURI();
+            String uri = request.getRequestURI()+"?resId="+resId;
             String comAuth = UpYunUtils.sign(request.getMethod(), date, uri, upLoadApiService.getUserName(),
                     UpYunUtils.md5(upLoadApiService.getPassword()), contentMd5);
             logger.debug("==========接收到解压缩回调头部信息,auth:{},method:{},date:{},contentMd5:{},uri:{},comAuth:{}", auth,request.getMethod(),date,contentMd5,uri,comAuth);
@@ -150,7 +151,6 @@ public class CommonController {
                 return new BasicResult(ErrorStatus.BASIC_AUTH_ERROR);
             }
             //拿到resId
-            String resId = request.getParameter("resId");
             if (Objects.isNull(resId)) {
                 return new BasicResult(ErrorStatus.PARAM_ERROR);
             }
