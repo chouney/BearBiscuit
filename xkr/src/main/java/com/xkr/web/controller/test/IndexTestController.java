@@ -16,6 +16,7 @@ import com.xkr.domain.dto.search.UserIndexDTO;
 import com.xkr.domain.entity.XkrClass;
 import com.xkr.service.ResourceService;
 import com.xkr.service.api.SearchApiService;
+import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.controller.CommonController;
 import com.xkr.web.controller.ResourceController;
 import com.xkr.web.model.BasicResult;
@@ -68,6 +69,9 @@ public class IndexTestController {
 
     @Autowired
     private ResourceController resourceController;
+
+    @Autowired
+    private UpLoadApiService upLoadApiService;
 
 
     @RequestMapping(value = "/uploadDemo", method = {RequestMethod.GET})
@@ -207,6 +211,16 @@ public class IndexTestController {
             logger.error("资源上传异常,resTitle:{},resCost:{},detail:{},classId:{},cfu:{}", resTitle, resCost, detail, classId, cfu, e);
         }
         return new BasicResult<>(ErrorStatus.ERROR);
+    }
+
+
+    @RequestMapping(value = "/unCom", method = {RequestMethod.GET})
+    @ResponseBody
+    public BasicResult unCom(@RequestParam(name = "resId") String resId,
+                             @RequestParam(name = "source") String sour,
+                             @RequestParam(name = "target") String tar) throws URISyntaxException, IOException, UpException {
+        upLoadApiService.unCompressDirSDK(resId,sour,tar);
+        return new BasicResult<>(ErrorStatus.OK);
     }
 
 }
