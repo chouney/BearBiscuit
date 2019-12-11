@@ -482,14 +482,15 @@ public class ResourceService {
         String sourcePath = fileName;
         String tarPath = sourcePath;
         try {
+            int lastInd;
+            if ((lastInd = sourcePath.lastIndexOf("/")) != -1) {
+                sourcePath = sourcePath.substring(0, lastInd) + "/" + URLDecoder.decode(sourcePath.substring(lastInd + 1), "UTF-8");
+            }
             int ind;
             if ((ind = sourcePath.lastIndexOf(".")) != -1) {
-                int lastInd;
-                if ((lastInd = sourcePath.lastIndexOf("/")) != -1) {
-                    sourcePath = sourcePath.substring(0, lastInd) + "/" + URLDecoder.decode(sourcePath.substring(lastInd + 1), "UTF-8");
-                }
                 tarPath = sourcePath.substring(0, ind);
             }
+
             upLoadApiService.unCompressDirSDK(resId, sourcePath, tarPath);
         } catch (UpException | IOException e) {
             logger.error("解压缩文件失败，需要重试,resId:{},fileName:{},error:", resId, fileName, e);
