@@ -558,10 +558,8 @@ public class UpLoadApiService {
 
 
 //    public static void main(String[] args) throws UpException, UnsupportedEncodingException {
-//        String fileName = "20191211222135-english 2";
-//        fileName = new URLEncoder().encode(fileName,"UTF-8");
 //        int ind;
-//        String sourcePath = "/xkr/dev/6552367636141838336/"+fileName+".zip";
+//        String sourcePath = "/xkr/dev/6552367636141838336/%E4%B8%AD%E6%96%87%E6%B5%8B%E8%AF%95%281%29%202.zip";
 //        if ((ind = sourcePath.lastIndexOf(".")) != -1) {
 //            int lastInd;
 //            if ((lastInd = sourcePath.lastIndexOf("/")) != -1) {

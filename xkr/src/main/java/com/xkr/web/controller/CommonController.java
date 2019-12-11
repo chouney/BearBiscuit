@@ -93,14 +93,14 @@ public class CommonController {
             String policy = "";
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
             if (UpLoadApiService.COMPRESS_FILE_TYPE == type) {
-                fileName = new URLEncoder().encode(fileName, "UTF-8");
+                fileName = getFileUrlEncodeName(fileName);
                 bucket = fileBucket;
                 fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 policy = upLoadApiService.genPolicy(fileBucket, fileUri, 60, contentLength);
                 responseVO.setAuthorization(upLoadApiService.sign(fileUri, policy, bucket));
             } else if (UpLoadApiService.IMAGE_FILE_TYPE == type) {
-                fileName = new URLEncoder().encode(fileName, "UTF-8");
+                fileName = getFileUrlEncodeName(fileName);
                 bucket = imageBucket;
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
@@ -200,6 +200,18 @@ public class CommonController {
             logger.error("文件解压缩查询异常 taskId:{},type:{}", taskId, type, e);
         }
         return new BasicResult(ErrorStatus.ERROR);
+    }
+
+    private String getFileUrlEncodeName(String fileName){
+        String postFix ="";
+        String preFix = "";
+        int ind;
+        if((ind = fileName.lastIndexOf(".")) != -1){
+            preFix = fileName.substring(0,ind);
+            postFix = fileName.substring(ind);
+            return new URLEncoder().encode(preFix,"UTF-8")+postFix;
+        }
+        return fileName;
     }
 
 }

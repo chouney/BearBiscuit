@@ -476,7 +476,7 @@ public class ResourceService {
     }
 
 
-    @Async
+//    @Async
     public void unCompressFile(String resId, String fileName) {
         //上传成功调用解压缩方法
         String sourcePath = fileName;
