@@ -18,6 +18,7 @@ import com.xkr.exception.UpFileExistException;
 import com.xkr.util.FileUtil;
 import main.java.com.UpYun;
 import main.java.com.upyun.*;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -553,6 +556,22 @@ public class UpLoadApiService {
         return "UPYUN " + getUserName() + ":" + signature;
     }
 
+
+//    public static void main(String[] args) throws UpException, UnsupportedEncodingException {
+//        String fileName = "20191211222135-english 2";
+//        fileName = new URLEncoder().encode(fileName,"UTF-8");
+//        int ind;
+//        String sourcePath = "/xkr/dev/6552367636141838336/"+fileName+".zip";
+//        if ((ind = sourcePath.lastIndexOf(".")) != -1) {
+//            int lastInd;
+//            if ((lastInd = sourcePath.lastIndexOf("/")) != -1) {
+//                sourcePath = sourcePath.substring(0, lastInd) + "/" + URLDecoder.decode(sourcePath.substring(lastInd + 1), "UTF-8");
+//            }
+//        }
+//
+//        System.out.println(sourcePath);
+//        System.out.println("UPYUN zhangqixiang:g/ZLebPdsKc2kGHlpCWX8JouP1w=");
+//    }
 
     public String genPolicy(String bucket,String saveKeyPath,Integer expiration,String contentLength){
         Map<String,Object> params = Maps.newHashMap();

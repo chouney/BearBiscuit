@@ -14,6 +14,7 @@ import com.xkr.service.api.UpLoadApiService;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.FileUploadResponseVO;
 import main.java.com.upyun.UpYunUtils;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
 import org.chris.redbud.validator.result.ValidResult;
@@ -27,7 +28,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -93,14 +93,14 @@ public class CommonController {
             String policy = "";
             FileUploadResponseVO responseVO = new FileUploadResponseVO();
             if (UpLoadApiService.COMPRESS_FILE_TYPE == type) {
-                fileName = URLEncoder.encode(fileName, "UTF-8");
+                fileName = new URLEncoder().encode(fileName, "UTF-8");
                 bucket = fileBucket;
                 fileUri = String.format(UpLoadApiService.getDirPathFormat(), user.getId(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
                 policy = upLoadApiService.genPolicy(fileBucket, fileUri, 60, contentLength);
                 responseVO.setAuthorization(upLoadApiService.sign(fileUri, policy, bucket));
             } else if (UpLoadApiService.IMAGE_FILE_TYPE == type) {
-                fileName = URLEncoder.encode(fileName, "UTF-8");
+                fileName = new URLEncoder().encode(fileName, "UTF-8");
                 bucket = imageBucket;
                 fileUri = String.format(UpLoadApiService.getImageFilePathFormat(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
                         date.getHour(), date.getMinute(), date.getSecond(), fileName);
