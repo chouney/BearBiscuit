@@ -11,7 +11,6 @@ import javax.persistence.*;
 
 @Table(name = "xkr_resource")
 public class XkrResource extends BaseEntity{
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -317,7 +316,7 @@ public class XkrResource extends BaseEntity{
         try {
             return new String(ext, CharsetNames.UTF_8);
         } catch (UnsupportedEncodingException e) {
-            logger.error("Resource getExt UTF8转义,错误 ",e);
+            e.printStackTrace();
         }
         return new String(ext);
     }
