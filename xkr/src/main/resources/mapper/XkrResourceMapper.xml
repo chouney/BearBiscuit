@@ -17,7 +17,7 @@
         <result column="download_count" property="downloadCount" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
-        <result column="ext" property="ext" jdbcType="VARCHAR"/>
+        <result column="ext" property="ext" jdbcType="BLOB"  typeHandler="org.apache.ibatis.type.BlobTypeHandler"/>
         <result column="detail" property="detail" jdbcType="LONGVARCHAR"/>
     </resultMap>
 
