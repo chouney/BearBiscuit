@@ -1,18 +1,10 @@
 package com.xkr.domain.entity;
 
-import org.apache.commons.compress.utils.CharsetNames;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "xkr_resource")
 public class XkrResource extends BaseEntity{
-
-
     /**
      * 资源id
      */
@@ -84,7 +76,7 @@ public class XkrResource extends BaseEntity{
     /**
      * 扩展字段，存储(md5加密后文件名(不带后缀的))
      */
-    private byte[] ext;
+    private String ext;
 
     /**
      * 资源详情，5000字内
@@ -313,12 +305,7 @@ public class XkrResource extends BaseEntity{
      * @return ext - 扩展字段，存储内容简要等,file_size等
      */
     public String getExt() {
-        try {
-            return new String(ext, CharsetNames.UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return new String(ext);
+        return ext;
     }
 
     /**
@@ -327,7 +314,7 @@ public class XkrResource extends BaseEntity{
      * @param ext 扩展字段，存储内容简要等,file_size等
      */
     public void setExt(String ext) {
-        this.ext = ext.getBytes();
+        this.ext = ext;
     }
 
     /**
