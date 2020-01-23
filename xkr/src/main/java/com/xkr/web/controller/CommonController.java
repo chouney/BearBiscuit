@@ -1,8 +1,10 @@
 package com.xkr.web.controller;
 
+import com.xkr.common.CaptchaEnum;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.NoBasicAuth;
+import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.UserCheck;
 import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.dao.mapper.XkrResourceMapper;
@@ -79,6 +81,8 @@ public class CommonController {
             @RequestParam(name = "contentLength", required = false, defaultValue = "") String contentLength,
             @ContainsInt({0, 1, 2})
             @RequestParam(name = "type") Integer type,
+            @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
+            @RequestParam(name = "captcha",required = false,defaultValue = "") String captcha,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult(result);

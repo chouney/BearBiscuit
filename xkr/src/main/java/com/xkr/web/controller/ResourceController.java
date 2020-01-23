@@ -284,7 +284,7 @@ public class ResourceController {
      * @param resCost
      * @param classId
      * @param detail
-     * @param captcha
+//     * @param captcha
      * @param result
      * @return
      */
@@ -308,8 +308,8 @@ public class ResourceController {
             @RequestParam(name = "cp") String cfu,
             @NotBlank
             @RequestParam(name = "up",required = false) String ufu,
-            @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
-            @RequestParam(name = "captcha") String captcha,
+//            @Captcha(CaptchaEnum.UPLOAD_RES_TYPE)
+//            @RequestParam(name = "captcha") String captcha,
             ValidResult result) {
         if(result.hasErrors()){
             return new BasicResult<>(result);

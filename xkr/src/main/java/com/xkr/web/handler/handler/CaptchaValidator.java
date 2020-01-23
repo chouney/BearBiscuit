@@ -29,6 +29,10 @@ public class CaptchaValidator implements ConstraintValidator<Captcha, String> {
     @Override
     public boolean isValid(String text, ConstraintValidatorContext constraintValidatorContext) {
         if(StringUtils.isEmpty(text)){
+            //如果是资源上传验证码，且验证码为空，则跳过验证码校验（防止图片上传被验证码拦截）
+            if(CaptchaEnum.UPLOAD_RES_TYPE.equals(checkType)){
+                return true;
+            }
             return false;
         }
         Session session = SecurityUtils.getSubject().getSession();
