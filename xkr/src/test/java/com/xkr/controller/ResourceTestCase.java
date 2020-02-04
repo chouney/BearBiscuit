@@ -56,7 +56,6 @@ public class ResourceTestCase extends BaseServiceTest{
         genTokenAndSetReturn(basicResult);
         String token = (String) basicResult.getExt().get("token");
         valid(token);
-
     }
 
     private void genTokenAndSetReturn(BasicResult basicResult) throws IOException {

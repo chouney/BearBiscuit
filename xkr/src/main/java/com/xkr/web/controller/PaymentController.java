@@ -27,6 +27,7 @@ import com.xkr.web.model.vo.payment.PaymentUpdateInVO;
 import com.xkr.web.model.vo.payment.PaymentVO;
 import org.apache.shiro.SecurityUtils;
 import org.chris.redbud.validator.annotation.MethodValidate;
+import org.chris.redbud.validator.result.ValidError;
 import org.chris.redbud.validator.result.ValidResult;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -72,6 +73,13 @@ public class PaymentController {
         if (result.hasErrors()) {
             return new BasicResult(result);
         }
+
+        if(Integer.parseInt(amount) % 10 != 0) {
+            result = new ValidResult(400);
+            result.getErrors().add(new ValidError("", "提交的金额必须为10的整数倍", amount));
+            return new BasicResult(result);
+        }
+
         try {
             PaymentVO paymentVO = new PaymentVO();
             PaymentDTO paymentDTO = paymentService.genBill(IpUtil.getIpAddr(request),amount,channelCode,returnUrl);

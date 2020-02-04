@@ -8,6 +8,7 @@ import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.Captcha;
 import com.xkr.common.annotation.valid.IsNumberic;
+import com.xkr.common.annotation.valid.UserValValid;
 import com.xkr.core.shiro.LoginAuthenticationToken;
 import com.xkr.dao.cache.BaseRedisService;
 import com.xkr.domain.dto.ResponseDTO;
@@ -71,7 +72,8 @@ public class UserController {
     @MethodValidate
     public BasicResult<JSONObject> regUser(
             @NotBlank
-            @Length(min = 6,max = 15,message = "用户名长度需在{min}和{max}之间")
+            @Length(min = 6,max = 12,message = "用户名长度需在{min}和{max}之间")
+            @UserValValid
             @RequestParam(name = "userName") String userName,
             @NotBlank
 //            @Length(min = 6,max = 15,message = "密码长度需在{min}和{max}之间")
@@ -178,6 +180,7 @@ public class UserController {
     @ResponseBody
     public BasicResult<JSONObject> login(
             @NotBlank
+            @UserValValid
             @RequestParam(name = "userName")
                     String userAccount,
             @NotBlank
