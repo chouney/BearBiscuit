@@ -26,8 +26,7 @@ public class UserValidValidator implements ConstraintValidator<UserValValid, Str
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
         Pattern p = Pattern.compile("^[0-9a-zA-Z_]{6,12}$");
         Matcher m = p.matcher(s);
-        boolean b = m.matches();
-        logger.info("b->>>>>>>>>>>>>>>>>>>>>>>>>>>>" + b);
-        return false;
+//        boolean b = m.matches();
+        return m.matches();
     }
 }
