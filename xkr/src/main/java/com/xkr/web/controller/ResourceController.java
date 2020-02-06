@@ -462,7 +462,10 @@ public class ResourceController {
             //返回内容精简
             if(!StringUtils.isEmpty(resourceDTO.getContent())){
                 int length =resourceDTO.getContent().length() > 300 ? 300 : resourceDTO.getContent().length();
-                resourceVO.setContent(resourceDTO.getContent().substring(0,length));
+                String subStr = resourceDTO.getContent().substring(0,length);
+                String tagStr = new String("</em>");
+                length = subStr.lastIndexOf(tagStr) + 5;
+                resourceVO.setContent(subStr.substring(0,length));
             }
 
             resourceVO.setCost(resourceDTO.getCost());
