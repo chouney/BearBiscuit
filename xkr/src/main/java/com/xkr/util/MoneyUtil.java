@@ -17,4 +17,12 @@ public class MoneyUtil {
         return new BigDecimal(yuan).setScale(2,BigDecimal.ROUND_FLOOR).multiply(new BigDecimal(100)).longValue();
     }
 
+    public static long yuanAdd(long lx, long rx){
+        return new BigDecimal(lx).setScale(2,BigDecimal.ROUND_FLOOR).add(new BigDecimal(rx).setScale(2, BigDecimal.ROUND_FLOOR)).longValue();
+    }
+
+    public static long yuan2fen(long yuan){
+        return new BigDecimal(yuan).setScale(2,BigDecimal.ROUND_FLOOR).multiply(new BigDecimal(100)).longValue();
+    }
+
 }

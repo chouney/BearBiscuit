@@ -120,9 +120,15 @@ public class PaymentService {
             logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
+
         //更新支付金额
-        user.setWealth(new BigDecimal(order.getPayAmount())
-                .divide(BigDecimal.TEN).setScale(2,BigDecimal.ROUND_HALF_UP).longValue());
+        logger.info("Get user wealth: " + user.getWealth());
+        Long oldWealth = MoneyUtil.yuan2fen(user.getWealth());
+        logger.info("oldWealth->" + oldWealth);
+        Long newWealth = MoneyUtil.yuanAdd(oldWealth, order.getPayAmount());
+        logger.info("newWealth->" + newWealth);
+        user.setWealth(new BigDecimal(newWealth)
+                .divide(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP).longValue());
         if(!xkrUserAgent.updateUserByPKSelective(user)){
             baseDTO.setStatus(ErrorStatus.ORDER_SUBMIT_FAILED_USER_WEALTH);
             logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
