@@ -319,16 +319,15 @@ public class ResourceService {
         if (CollectionUtils.isEmpty(resourceIds)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-
         //清除回收站资源
         boolean success = xkrAdminRecycleAgent.batchDeleteResourceRecycleByIds(resourceIds);
         if (success) {
+
+            //删除又拍云资源
+            deleteUpyunResource(resourceIds);
+
             //清除资源
-            success = xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
-            if (success) {
-                //删除又拍云资源
-                deleteUpyunResource(resourceIds);
-            }
+            xkrResourceAgent.batchPhysicDeleteResourceByIds(resourceIds);
         }
 
         return new ResponseDTO<>(success);

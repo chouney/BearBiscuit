@@ -121,12 +121,15 @@ public class PaymentService {
             return baseDTO;
         }
 
+        //总数增加
+        Long oldTotalRecharge = MoneyUtil.yuan2fen(user.getTotalRecharge());
+        Long newTotal = MoneyUtil.yuanAdd(oldTotalRecharge, order.getPayAmount());
+        user.setTotalRecharge(new BigDecimal(newTotal)
+                .divide(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP).longValue());
+
         //更新支付金额
-        logger.info("Get user wealth: " + user.getWealth());
         Long oldWealth = MoneyUtil.yuan2fen(user.getWealth());
-        logger.info("oldWealth->" + oldWealth);
         Long newWealth = MoneyUtil.yuanAdd(oldWealth, order.getPayAmount());
-        logger.info("newWealth->" + newWealth);
         user.setWealth(new BigDecimal(newWealth)
                 .divide(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP).longValue());
         if(!xkrUserAgent.updateUserByPKSelective(user)){
@@ -134,6 +137,7 @@ public class PaymentService {
             logger.error("生成支付订单失败,orderId:{},baseDTO:{}",orderId,JSON.toJSONString(baseDTO));
             return baseDTO;
         }
+
         BCEumeration.PAY_CHANNEL chanlType = PaymentEnum.getChannelByCode(order.getPayTypeCode());
         String tradeNo=null;
         if(BCEumeration.PAY_CHANNEL.ALI_WEB.equals(chanlType)){
