@@ -58,12 +58,10 @@ public class XkrLoginTokenAgent {
         xkrLoginToken.setUserId(userId);
         xkrLoginToken.setStatus((byte) 1);
         xkrLoginToken = xkrLoginTokenMapper.selectOne(xkrLoginToken);
-        logger.info("GetClientIp------------------------->" + getClientIp(sra.getRequest()));
         if(Objects.isNull(xkrLoginToken)){
             xkrLoginToken = new XkrLoginToken();
             xkrLoginToken.setId(idGenerator.generateId());
             xkrLoginToken.setLoginCount(1);
-            logger.info("GetClientIp------------------------->" + getClientIp(sra.getRequest()));
             xkrLoginToken.setClientIp(getClientIp(sra.getRequest()));
             xkrLoginToken.setUserId(userId);
             xkrLoginToken.setStatus((byte) 1);
@@ -73,7 +71,7 @@ public class XkrLoginTokenAgent {
             xkrLoginTokenMapper.insertSelective(xkrLoginToken);
             return ;
         }
-        xkrLoginToken.setClientIp(session.getHost());
+        xkrLoginToken.setClientIp(getClientIp(sra.getRequest()));
         Integer count = xkrLoginToken.getLoginCount() == null ? 0 : xkrLoginToken.getLoginCount();
         xkrLoginToken.setLoginCount(count+1);
         xkrLoginToken.setUpdateTime(new Date());
