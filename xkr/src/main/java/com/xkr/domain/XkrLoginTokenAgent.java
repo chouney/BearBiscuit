@@ -58,6 +58,7 @@ public class XkrLoginTokenAgent {
         xkrLoginToken.setUserId(userId);
         xkrLoginToken.setStatus((byte) 1);
         xkrLoginToken = xkrLoginTokenMapper.selectOne(xkrLoginToken);
+        logger.info("GetClientIp------------------------->" + getClientIp(sra.getRequest()));
         if(Objects.isNull(xkrLoginToken)){
             xkrLoginToken = new XkrLoginToken();
             xkrLoginToken.setId(idGenerator.generateId());
