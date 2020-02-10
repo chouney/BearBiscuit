@@ -8,6 +8,7 @@ import com.xkr.common.LoginEnum;
 import com.xkr.core.IdGenerator;
 import com.xkr.dao.mapper.XkrLoginTokenMapper;
 import com.xkr.domain.entity.XkrLoginToken;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -47,10 +48,7 @@ public class XkrLoginTokenAgent {
 
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-        HttpServletRequest request = sra.getRequest();
-        String ip = request.getHeader("X-Real-IP");
 
-        logger.info("Real ip->" + ip);
 
         //存储登录类型key
         session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, loginEnum.getType());
@@ -64,7 +62,8 @@ public class XkrLoginTokenAgent {
             xkrLoginToken = new XkrLoginToken();
             xkrLoginToken.setId(idGenerator.generateId());
             xkrLoginToken.setLoginCount(1);
-            xkrLoginToken.setClientIp(session.getHost());
+            logger.info("GetClientIp------------------------->" + getClientIp(sra.getRequest()));
+            xkrLoginToken.setClientIp(getClientIp(sra.getRequest()));
             xkrLoginToken.setUserId(userId);
             xkrLoginToken.setStatus((byte) 1);
             xkrLoginToken.setLoginToken(String.valueOf(session.getId()));
@@ -81,6 +80,24 @@ public class XkrLoginTokenAgent {
         //存储token
         session.setAttribute(Const.SESSION_LOGIN_TOKEN_KEY,JSON.toJSONString(xkrLoginToken));
         xkrLoginTokenMapper.updateByPrimaryKeySelective(xkrLoginToken);
+    }
+
+
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if(StringUtils.isNotEmpty(ip) && !"unKnown".equalsIgnoreCase(ip)){
+            int index = ip.indexOf(",");
+            if(index != -1){
+                return ip.substring(0,index);
+            }else{
+                return ip;
+            }
+        }
+        ip = request.getHeader("X-Real-IP");
+        if(StringUtils.isNotEmpty(ip) && !"unKnown".equalsIgnoreCase(ip)){
+            return ip;
+        }
+        return request.getRemoteAddr();
     }
 
     public XkrLoginToken getUserLoginRecordById(Long userId){
