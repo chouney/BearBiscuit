@@ -90,7 +90,7 @@
       AND t.update_time > #{updateDate}
     </if>
     <if test="keyword!=null and keyword!=''">
-      AND t.content like  concat('%', #{keyWord},'%')
+      AND t.content like  concat('%', #{keyword},'%')
     </if>
     <if test="userName!=null and userName!=''">
       AND (t1.user_name like  concat('%', #{userName},'%') or t1.email like concat('%', #{userName},'%'))

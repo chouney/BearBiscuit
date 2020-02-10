@@ -41,7 +41,7 @@ public class AdminCredentialsMatcher extends SimpleCredentialsMatcher {
             retryCount = new AtomicInteger(0);
             passwordRetryCache.put(username, retryCount);
         }
-        if (retryCount.incrementAndGet() > 20) {
+        if (retryCount.incrementAndGet() > 5) {
             //if retry count > 5 throw
             throw new ExcessiveAttemptsException();
         }

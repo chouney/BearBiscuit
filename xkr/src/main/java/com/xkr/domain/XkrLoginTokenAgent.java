@@ -15,7 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -40,8 +44,18 @@ public class XkrLoginTokenAgent {
         if(Objects.isNull(userId)){
             return;
         }
+
+        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+        HttpServletRequest request = sra.getRequest();
+        String ip = request.getHeader("X-Real-IP");
+
+        logger.info("Real ip->" + ip);
+
         //存储登录类型key
         session.setAttribute(Const.SESSION_LOGIN_TYPE_KEY, loginEnum.getType());
+
+
         XkrLoginToken xkrLoginToken = new XkrLoginToken();
         xkrLoginToken.setUserId(userId);
         xkrLoginToken.setStatus((byte) 1);
