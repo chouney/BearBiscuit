@@ -18,7 +18,7 @@ public enum ErrorStatus {
     FREQUENCY_OPT(510,"操作太频繁了"),
     //资源
     RESOURCE_NOT_FOUND(10404,"资源未找到"),
-    RESOURCE_FREEZED(10400,"资源已被冻结"),
+    RESOURCE_FREEZED(10400,"资源已被冻结或被删除"),
     RESOURCE_USER_FREEZED(10401,"您无此权限"),
     RESOURCE_PAY_FAILED(10402,"财富值不足"),
     RESOURCE_ALREADY_EXIST(10403,"资源已存在"),
