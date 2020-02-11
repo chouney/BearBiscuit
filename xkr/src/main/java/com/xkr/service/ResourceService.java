@@ -352,7 +352,10 @@ public class ResourceService {
             logger.error("ResourceService downloadResouce resource not found,resouceId:{}", resourceId);
             return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_NOT_FOUND);
         }
-        if (ResourceStatusEnum.STATUS_NORMAL.getCode() != resource.getStatus().intValue()) {
+
+        //未审核的可以下载供管理员审查
+        if (ResourceStatusEnum.STATUS_NORMAL.getCode() == resource.getStatus().intValue() ||
+                ResourceStatusEnum.STATUS_UNVERIFIED.getCode() == resource.getStatus().intValue()) {
             return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_FREEZED);
         }
 
