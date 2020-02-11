@@ -1,5 +1,7 @@
 package com.xkr.domain.entity;
 
+import org.springframework.web.util.HtmlUtils;
+
 import java.util.Date;
 import javax.persistence.*;
 
@@ -323,7 +325,7 @@ public class XkrResource extends BaseEntity{
      * @return detail - 资源详情，5000字内
      */
     public String getDetail() {
-        return detail;
+        return HtmlUtils.htmlUnescape(detail);
     }
 
     /**
@@ -332,6 +334,6 @@ public class XkrResource extends BaseEntity{
      * @param detail 资源详情，5000字内
      */
     public void setDetail(String detail) {
-        this.detail = detail;
+        this.detail = HtmlUtils.htmlEscapeDecimal(detail,"utf-8");
     }
 }

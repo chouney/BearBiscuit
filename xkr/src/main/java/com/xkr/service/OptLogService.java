@@ -67,7 +67,6 @@ public class OptLogService {
         ListOptLogDTO result = new ListOptLogDTO();
         pageNum = pageNum < 1 ? 1 : pageNum;
         size = size  < 1 ? 10 : size;
-        Page page = PageHelper.startPage(pageNum,size,"update_time desc");
         Long adminAccountId = null;
         if(!StringUtils.isEmpty(accountName)) {
             XkrAdminAccount adminAccount = xkrAdminAccountAgent.getAdminAccountByName(accountName);
@@ -75,10 +74,12 @@ public class OptLogService {
                 adminAccountId = adminAccount.getId();
             }
         }
+        Page page = PageHelper.startPage(pageNum,size,"update_time desc");
         List<XkrAdminOptLog> list = xkrAdminOptLogAgent.getAllList(adminAccountId);
         result.setTotalCount((int) page.getTotal());
 
-        List<Long> adminAccountIds = list.stream().map(XkrAdminOptLog::getAdminAccountId).collect(Collectors.toList());
+        List<Long> adminAccountIds = list.stream().map(XkrAdminOptLog::getAdminAccountId).
+                distinct().collect(Collectors.toList());
 
         List<XkrAdminAccount> adminAccounts = xkrAdminAccountAgent.getListByIds(adminAccountIds);
 

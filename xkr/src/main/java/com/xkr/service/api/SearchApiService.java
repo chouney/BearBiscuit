@@ -238,7 +238,7 @@ public class SearchApiService {
 
     public <T extends BaseIndexDTO> SearchResultListDTO<T> searchByKeyWordInField(Class<T> resultIndexDTO, String keyword, Map<String, Float> fieldWeight, Map<String, Object> filterFieldValues,
                                                                                   Pair<Date, Date> rangeDate, String dateKey,
-                                                                                  String sortKey, Set<String> hightField, int offset, int size) {
+                                                                                  List<Pair<String,SortOrder>> sortKeys, Set<String> hightField, int offset, int size) {
         if (offset < 0 || size < 0) {
             throw new IllegalArgumentException("error argument");
         }
@@ -257,8 +257,8 @@ public class SearchApiService {
             }
 
             //排序
-            if (!StringUtils.isEmpty(sortKey)) {
-                builder.sort(sortKey, SortOrder.DESC);
+            if (!CollectionUtils.isEmpty(sortKeys)) {
+                sortKeys.forEach(pair -> builder.sort(pair.getLeft(),pair.getRight()));
             }
             //分页
             builder.from(offset).size(size);

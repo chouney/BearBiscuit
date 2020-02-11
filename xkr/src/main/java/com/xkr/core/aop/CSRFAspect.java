@@ -109,9 +109,9 @@ public class CSRFAspect {
                     //执行失败后重新注入token
                     if (retValue instanceof BasicResult) {
                         BasicResult basicResult = (BasicResult) retValue;
-                        if(ErrorStatus.OK.getCode() != basicResult.getCode()) {
+//                        if(ErrorStatus.OK.getCode() != basicResult.getCode()) {
                             genTokenAndSetReturn(basicResult);
-                        }
+//                        }
                     }
                     return retValue;
                 }

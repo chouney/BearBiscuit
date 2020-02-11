@@ -102,4 +102,11 @@
     </if>
   </select>
 
+  <select id="selectByEmailAndUserName" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT <include refid="user_fields"/>
+    FROM xkr_user WHERE email = #{email}
+    AND status = #{status}
+    AND user_name = #{userLogin}
+  </select>
+
 </mapper>

@@ -3,6 +3,7 @@ package com.xkr.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorStatus;
+import com.xkr.common.annotation.CSRFGen;
 import com.xkr.common.annotation.CSRFValid;
 import com.xkr.common.annotation.valid.IsNumberic;
 import com.xkr.common.annotation.valid.UserCheck;
@@ -50,6 +51,7 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    @CSRFGen
     @RequestMapping(value = "/list",method = {RequestMethod.GET})
     @ResponseBody
     @MethodValidate

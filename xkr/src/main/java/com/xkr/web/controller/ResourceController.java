@@ -409,6 +409,7 @@ public class ResourceController {
             if(ErrorStatus.OK.equals(responseDTO.getStatus())){
                 return new BasicResult<>(ErrorStatus.OK);
             }
+            return new BasicResult<>(responseDTO.getStatus());
         } catch (Exception e) {
             logger.error("获取资源目录异常,resId:{}", resourceId, e);
         }

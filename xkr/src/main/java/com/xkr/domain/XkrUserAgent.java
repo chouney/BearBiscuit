@@ -159,6 +159,16 @@ public class XkrUserAgent {
         return false;
     }
 
+    public XkrUser selectByEmailAndUserNameUnChecked(String userLogin,String email){
+        if(StringUtils.isEmpty(userLogin) || StringUtils.isEmpty(email)){
+            return null;
+        }
+        XkrUser user = xkrUserMapper.selectByUserName(ImmutableMap.of(
+                "userLogin",userLogin,"email",email,"status",UserStatusEnum.USER_STATUS_UNVERIFIED.getCode()
+        ));
+        return user;
+    }
+
     public boolean updateUserTokenByUser(XkrUser user,String userToken){
         if(StringUtils.isEmpty(userToken) || Objects.isNull(user)){
             return false;

@@ -26,6 +26,7 @@ import com.xkr.service.api.MailApiService;
 import com.xkr.service.api.SearchApiService;
 import com.xkr.util.EncodeUtil;
 import com.xkr.util.IdUtil;
+import com.xkr.util.PasswordUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -268,19 +269,33 @@ public class UserService {
                 StringUtils.isEmpty(email)) {
             return new ResponseDTO<>(ErrorStatus.PARAM_ERROR);
         }
-        XkrUser oldUser = xkrUserAgent.getUserByNameOrEmail(userName);
-        if (Objects.nonNull(oldUser)) {
-            return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
+        //找到是否有**未激活**的重名用户
+        XkrUser newUser = xkrUserAgent.selectByEmailAndUserNameUnChecked(userName,email);
+        if(Objects.isNull(newUser)) {
+            //没有则按新用户逻辑处理
+            XkrUser oldUser = xkrUserAgent.getUserByNameOrEmail(userName);
+            if (Objects.nonNull(oldUser)) {
+                return new ResponseDTO<>(ErrorStatus.USER_NAME_ALREADY_EXIST);
+            }
+            oldUser = xkrUserAgent.getUserByNameOrEmail(email);
+            if (Objects.nonNull(oldUser)) {
+                return new ResponseDTO<>(ErrorStatus.USER_EMAIL_ALREADY_EXIST);
+            }
+            newUser = xkrUserAgent.createUserAccount(userName, userToken, email);
+            if (Objects.isNull(newUser)) {
+                logger.error("UserService createUserAccount failed , userEmail:{},userName:{},userToken:{}", email, userName, userToken);
+                return new ResponseDTO<>(ErrorStatus.ERROR);
+            }
+        }else{
+            //如果有则执行update更新逻辑
+            newUser.setUserToken(PasswordUtil.createUserPwd(userToken,newUser.getSalt()));
+            boolean isSuccess = xkrUserAgent.updateUserByPKSelective(newUser);
+            if (!isSuccess) {
+                logger.error("UserService createUserAccount failed , userEmail:{},userName:{},userToken:{}", email, userName, userToken);
+                return new ResponseDTO<>(ErrorStatus.ERROR);
+            }
         }
-        oldUser = xkrUserAgent.getUserByNameOrEmail(email);
-        if (Objects.nonNull(oldUser)) {
-            return new ResponseDTO<>(ErrorStatus.USER_EMAIL_ALREADY_EXIST);
-        }
-        XkrUser newUser = xkrUserAgent.createUserAccount(userName, userToken, email);
-        if (Objects.isNull(newUser)) {
-            logger.error("UserService createUserAccount failed , userEmail:{},userName:{},userToken:{}", email, userName, userToken);
-            return new ResponseDTO<>(ErrorStatus.ERROR);
-        }
+
         //发送验证邀请
         try {
 

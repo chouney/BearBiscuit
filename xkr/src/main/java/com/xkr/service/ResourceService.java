@@ -31,12 +31,13 @@ import com.xkr.service.api.UpLoadApiService;
 import com.xkr.util.DateUtil;
 import main.java.com.upyun.UpException;
 import main.java.com.upyun.UpYunUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.shiro.SecurityUtils;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -364,8 +365,8 @@ public class ResourceService {
             return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_USER_FREEZED);
         }
         //下载鉴权,已购买直接生成token
-        List<XkrResourceUser> payedList = xkrResourceUserAgent.getResourceByUserId(downloadUser.getId(), XkrResourceUserAgent.STATUS_PAYED);
-        boolean alreadyPayed = payedList.stream().anyMatch(xkrResourceUser -> Objects.equals(xkrResourceUser.getResourceId(), resourceId));
+        List<XkrResourceUser> payedList = xkrResourceUserAgent.getResourceByResAndUserId(downloadUser.getId(), resourceId, XkrResourceUserAgent.STATUS_PAYED);
+        boolean alreadyPayed = !CollectionUtils.isEmpty(payedList);
 
         if (!alreadyPayed) {
             //用户检查2积分充足
@@ -381,10 +382,12 @@ public class ResourceService {
                 throw new RuntimeException("saveNew userRelationShip failed");
             }
 
-            //上传加相应积分
+            //上传加相应积分,如果作者还在的话
             XkrUser xkrUser = xkrUserAgent.getUserById(resource.getUserId());
-            xkrUser.setWealth(xkrUser.getWealth() + resource.getCost());
-            xkrUserAgent.updateUserByPKSelective(xkrUser);
+            if (!Objects.isNull(xkrUser)) {
+                xkrUser.setWealth(xkrUser.getWealth() + resource.getCost());
+                xkrUserAgent.updateUserByPKSelective(xkrUser);
+            }
 
         }
 
@@ -478,7 +481,7 @@ public class ResourceService {
     }
 
 
-//    @Async
+    //    @Async
     public void unCompressFile(String resId, String fileName) {
         //上传成功调用解压缩方法
         String sourcePath = fileName;
@@ -656,7 +659,14 @@ public class ResourceService {
         }
 
         //排序的索引键值
-        String sortKey = orderType == ORDER_BY_DOWNLOAD_COUNT ? "downloadCount" : "updateTime";
+        List<Pair<String, SortOrder>> sortKeys = Lists.newArrayList();
+        if (orderType == ORDER_BY_DOWNLOAD_COUNT) {
+            sortKeys.add(Pair.of("downloadCount", SortOrder.DESC));
+            sortKeys.add(Pair.of("updateTime", SortOrder.DESC));
+        } else {
+            sortKeys.add(Pair.of("updateTime", SortOrder.DESC));
+            sortKeys.add(Pair.of("downloadCount", SortOrder.DESC));
+        }
         size = size <= 0 ? 10 : size;
         int offset = pageNum - 1 < 0 ? 0 : (pageNum - 1) * size;
 
@@ -676,7 +686,7 @@ public class ResourceService {
 
         SearchResultListDTO<ResourceIndexDTO> searchResultListDTO = searchApiService.searchByKeyWordInField(
                 ResourceIndexDTO.class, keyword, field, filterMap,
-                null, null, sortKey, highLight, offset, size
+                null, null, sortKeys, highLight, offset, size
         );
 
         List<Long> classIds = searchResultListDTO.getSearchResultDTO().stream().map(ResourceIndexDTO::getClassId).collect(Collectors.toList());
@@ -741,7 +751,7 @@ public class ResourceService {
 
         //上传或者下载相关
         if (USER_TYPE_UPLOAD == userType) {
-            page = PageHelper.startPage(pageNum, size, "update_time desc");
+            page = PageHelper.startPage(pageNum, size, "create_time desc");
             list = xkrResourceAgent.getResourceByUserId(userId, ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
         } else {
             List<XkrResourceUser> resourceUsers = xkrResourceUserAgent.getResourceByUserId(userId, XkrResourceUserAgent.STATUS_PAYED);
@@ -749,7 +759,7 @@ public class ResourceService {
                 return result;
             }
             List<Long> resIds = resourceUsers.stream().map(XkrResourceUser::getResourceId).collect(Collectors.toList());
-            page = PageHelper.startPage(pageNum, size, "update_time desc");
+            page = PageHelper.startPage(pageNum, size, "create_time desc");
             list = xkrResourceAgent.getResourceListByIds(resIds, ImmutableList.of(
                     ResourceStatusEnum.STATUS_NORMAL.getCode()
             ));
@@ -983,7 +993,7 @@ public class ResourceService {
         detailDTO.setResourceId(resource.getId());
         detailDTO.setTitle(resource.getTitle());
         detailDTO.setUserId(resource.getUserId());
-        detailDTO.setUpdateTime(resource.getUpdateTime());
+        detailDTO.setUpdateTime(resource.getCreateTime());
         detailDTO.setResStatus(resource.getStatus());
         XkrUser user = xkrUserAgent.getUserById(resource.getUserId());
         if (Objects.isNull(user)) {

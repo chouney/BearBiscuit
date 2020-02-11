@@ -322,7 +322,7 @@ public class XkrResourceAgent {
     private void buildResourceIndexDTO(ResourceIndexDTO indexDTO, XkrResource resource,int resType) {
         indexDTO.setClassId(resource.getClassId());
         //对内容进行html标签过滤
-        indexDTO.setContent(TextUtils.delHtmlTag(resource.getDetail()));
+        indexDTO.setContent(resource.getDetail());
         indexDTO.setCost(resource.getCost());
         indexDTO.setDownloadCount(resource.getDownloadCount());
         indexDTO.setReport((int) resource.getReport());
