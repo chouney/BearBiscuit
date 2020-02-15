@@ -28,10 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -56,6 +53,9 @@ public class XkrResourceAgent {
 
     @Autowired
     private IdGenerator idGenerator;
+
+    @Autowired
+    private XkrResourceAgent xkrResourceAgent;
 
     public static final int REPORT_NORMAL = 0;
 
@@ -87,6 +87,20 @@ public class XkrResourceAgent {
                             "statuses", ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList())
                     ));
                     return Objects.isNull(resource) ? 0 : resource.getDownloadCount();
+                }
+            });
+
+
+    //获取资源总数
+    private LoadingCache<Integer, Integer> resourceCountCache = CacheBuilder
+            .newBuilder()
+            .expireAfterWrite(24, TimeUnit.HOURS)
+            .build(new RemedyCacheLoader<Integer, Integer>() {
+
+                @Override
+                public Integer load(Integer aLong) throws Exception {
+                    int totalCount = xkrResourceAgent.getResourceTotal();
+                    return totalCount;
                 }
             });
 
@@ -248,6 +262,10 @@ public class XkrResourceAgent {
         }
         return getResourceListByIds(resIds,ResourceStatusEnum.NON_DELETE_STATUSED.stream().map(ResourceStatusEnum::getCode).collect(Collectors.toList()));
 
+    }
+
+    public  Integer getResourceTotalCache() throws ExecutionException {
+        return resourceCountCache.get(0);
     }
 
     public Integer getResourceTotal(){

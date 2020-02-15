@@ -1,23 +1,24 @@
 package com.xkr.web.controller.admin;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.xkr.common.ErrorMsgConst;
 import com.xkr.common.ErrorStatus;
 import com.xkr.common.PermissionEnum;
 import com.xkr.domain.XkrClassAgent;
 import com.xkr.domain.dto.ResponseDTO;
+import com.xkr.domain.dto.file.FileDownloadResponseDTO;
 import com.xkr.domain.dto.resource.ListResourceDTO;
 import com.xkr.domain.dto.resource.ListResourceRecycleDTO;
+import com.xkr.domain.dto.resource.ResourceDetailDTO;
 import com.xkr.domain.dto.resource.ResourceStatusEnum;
+import com.xkr.domain.entity.XkrUser;
 import com.xkr.service.ResourceService;
 import com.xkr.util.DateUtil;
 import com.xkr.web.model.BasicResult;
 import com.xkr.web.model.vo.admin.resource.AdminResourceVO;
 import com.xkr.web.model.vo.admin.resource.ListAdminResourceVO;
-import com.xkr.web.model.vo.resource.ListResourceRecycleVO;
-import com.xkr.web.model.vo.resource.ListResourceVO;
-import com.xkr.web.model.vo.resource.ResourceRecycleVO;
-import com.xkr.web.model.vo.resource.ResourceVO;
+import com.xkr.web.model.vo.resource.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -134,25 +135,50 @@ public class AdminResourceController {
     public BasicResult batchOptResource(
             @NotEmpty(message = ErrorMsgConst.PARAM_NOT_NULL)
             @RequestParam(name = "resIds[]") String[] resourceIds,
-            @ContainsInt(value = {1, 3, 4}) @RequestParam(name = "optType") Integer optType,
+            @ContainsInt(value = {1, 2, 3, 4}) @RequestParam(name = "optType") Integer optType,
             ValidResult result) {
         if (result.hasErrors()) {
             return new BasicResult<>(result);
         }
         try {
-            List<Long> ids = Arrays.stream(resourceIds).map(Long::valueOf).collect(Collectors.toList());
-            ResourceStatusEnum resourceStatusEnum = ResourceStatusEnum.getByCode(optType);
-            ResponseDTO<Boolean> responseDTO;
-            if (ResourceStatusEnum.STATUS_DELETED.equals(resourceStatusEnum)) {
-                responseDTO = resourceService.batchDeleteResource(ids);
+            if(optType == 2) {
+                JSONObject output = new JSONObject();
+
+//                XkrUser user = (XkrUser)SecurityUtils.getSubject().getPrincipal();
+
+                FileDownloadResponseDTO responseDTO = resourceService.downloadResourceAdmin(Long.valueOf(resourceIds[0]));
+
+                if(!ErrorStatus.OK.equals(responseDTO.getStatus())){
+                    return new BasicResult<>(responseDTO.getStatus());
+                }
+
+                output.put("token",responseDTO.getToken());
+                output.put("downloadUrl",responseDTO.getDownloadUrl());
+                output.put("date",responseDTO.getDate());
+
+                return new BasicResult<>(output);
+//                ResourceDetailVO resourceVOs = new ResourceDetailVO();
+//                ResourceDetailDTO detailDTO = resourceService.downloadResourceAdmin(Long.valueOf(resourceIds[0]));
+//                if(!ErrorStatus.OK.equals(detailDTO.getStatus())){
+//                    return new BasicResult<>(detailDTO.getStatus());
+//                }
+//                buildResourceDetailVO(detailDTO, resourceVOs);
+//                return new BasicResult<>(resourceVOs);
             } else {
-                responseDTO = resourceService.batchUpdateResourceStatus(ids, resourceStatusEnum);
-            }
-            if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
-                return new BasicResult<>(responseDTO.getStatus());
+                List<Long> ids = Arrays.stream(resourceIds).map(Long::valueOf).collect(Collectors.toList());
+                ResourceStatusEnum resourceStatusEnum = ResourceStatusEnum.getByCode(optType);
+                ResponseDTO<Boolean> responseDTO;
+                if (ResourceStatusEnum.STATUS_DELETED.equals(resourceStatusEnum)) {
+                    responseDTO = resourceService.batchDeleteResource(ids);
+                } else {
+                    responseDTO = resourceService.batchUpdateResourceStatus(ids, resourceStatusEnum);
+                }
+                if (!ErrorStatus.OK.equals(responseDTO.getStatus())) {
+                    return new BasicResult<>(responseDTO.getStatus());
+                }
+                return new BasicResult<>(responseDTO.getData());
             }
 
-            return new BasicResult<>(responseDTO.getData());
         } catch (Exception e) {
             logger.error("后台操作资源异常,resIds:{},optType:{}", JSON.toJSONString(resourceIds), optType, e);
         }
@@ -258,5 +284,18 @@ public class AdminResourceController {
             resourceVOs.getList().add(resourceVO);
         });
         resourceVOs.setTotalCount(resourceDTOs.getTotalCount());
+    }
+
+    private void buildResourceDetailVO(ResourceDetailDTO resourceDetailDTO, ResourceDetailVO resourceDetailVO) {
+        resourceDetailVO.setCost(resourceDetailDTO.getCost());
+        resourceDetailVO.setDetail(resourceDetailDTO.getDetail());
+        resourceDetailVO.setDownloadCount(resourceDetailDTO.getDownloadCount());
+        resourceDetailVO.setFileSize(resourceDetailDTO.getFileSize());
+        resourceDetailVO.setpClass(resourceDetailDTO.getpClass());
+        resourceDetailVO.setTitle(resourceDetailDTO.getTitle());
+        resourceDetailVO.setUpdateTime(resourceDetailDTO.getUpdateTime());
+        resourceDetailVO.setUserId(resourceDetailDTO.getUserId());
+        resourceDetailVO.setUserName(resourceDetailDTO.getUserName());
+        resourceDetailVO.setStatus(resourceDetailDTO.getResStatus());
     }
 }

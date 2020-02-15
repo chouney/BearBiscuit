@@ -87,6 +87,8 @@ public class FilterConfig {
 
         filterChainDefinitionMap.put("/api/comment/list", "anon");
 
+        filterChainDefinitionMap.put("/api/res/res_count", "anon");
+
         //必须登录的url
         filterChainDefinitionMap.put("/api/admin/**", "adminLogin");
         filterChainDefinitionMap.put("/api/res/**", "userLogin");

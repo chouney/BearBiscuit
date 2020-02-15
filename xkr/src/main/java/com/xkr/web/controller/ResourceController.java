@@ -74,6 +74,21 @@ public class ResourceController {
     @Autowired
     private UpLoadApiService upLoadApiService;
 
+
+    @RequestMapping(value = "/res_count", method = {RequestMethod.POST})
+    @ResponseBody
+    public BasicResult<JSONObject> resourceUpload(){
+        try{
+            int count = xkrResourceAgent.getResourceTotalCache();
+            JSONObject output = new JSONObject();
+            output.put("count", count);
+            return new BasicResult<>(output);
+        } catch (Exception e) {
+            logger.info("获取数据异常");
+        }
+        return new BasicResult<>(ErrorStatus.ERROR);
+    }
+
     /**
      * 根据分类获取资源
      *

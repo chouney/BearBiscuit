@@ -334,6 +334,50 @@ public class ResourceService {
         return new ResponseDTO<>(success);
     }
 
+    /**
+     * ------------------- 管理员服务 ----------------------
+     */
+    /**
+     * 生成签名，放在Authorization头部
+     *
+     * @param downloadResourceAdmin
+     * @param resourceId
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public FileDownloadResponseDTO downloadResourceAdmin(Long resourceId) {
+        //资源检查1.是否存在,2是否异常
+        XkrResource resource = xkrResourceAgent.getResourceById(resourceId);
+        if (Objects.isNull(resource)) {
+            logger.error("ResourceService downloadResouce resource not found,resouceId:{}", resourceId);
+            return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_NOT_FOUND);
+        }
+
+        //未审核的可以下载供管理员审查
+        if (ResourceStatusEnum.STATUS_FREEZED.getCode() == resource.getStatus().intValue() ||
+                ResourceStatusEnum.STATUS_DELETED.getCode() == resource.getStatus().intValue()) {
+            return new FileDownloadResponseDTO(ErrorStatus.RESOURCE_FREEZED);
+        }
+
+        //生成下载token
+        try {
+            JSONObject ext = JSON.parseObject(resource.getExt());
+            String downloadUrl = resource.getResourceUrl();
+            String date = DateUtil.getGMTRFCUSDate();
+            if (!StringUtils.isEmpty(downloadUrl)) {
+                String fileUri = downloadUrl.substring(0, downloadUrl.lastIndexOf("/"));
+                String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
+                downloadUrl = fileUri + "/" + fileName;
+            }
+            return new FileDownloadResponseDTO(
+//                    "deprecated",
+                    UpYunUtils.sign("GET", date, downloadUrl, fileBucket, optUser, UpYunUtils.md5(optPassword), null),
+                    "/" + fileBucket + downloadUrl, date);
+        } catch (Exception e) {
+            logger.error("ResourceService build response token failed", e);
+            throw new RuntimeException("generate download token failed", e);
+        }
+    }
+
 
     /**
      * ------------------- 用户服务 ----------------------
