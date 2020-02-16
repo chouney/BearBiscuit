@@ -163,7 +163,7 @@ public class XkrUserAgent {
         if(StringUtils.isEmpty(userLogin) || StringUtils.isEmpty(email)){
             return null;
         }
-        XkrUser user = xkrUserMapper.selectByUserName(ImmutableMap.of(
+        XkrUser user = xkrUserMapper.selectByEmailAndUserName(ImmutableMap.of(
                 "userLogin",userLogin,"email",email,"status",UserStatusEnum.USER_STATUS_UNVERIFIED.getCode()
         ));
         return user;

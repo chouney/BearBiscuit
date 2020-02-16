@@ -72,7 +72,7 @@ public class MessageService {
             return result;
         }
         List<XkrMessage> list;
-        Page page = PageHelper.startPage(pageNum,size,true);
+        Page page = PageHelper.startPage(pageNum,size,"create_time desc");
 
         if (MESSAGE_FRONT_TYPE_UNREAD == frontType) {
             list = messageAgent.getUnReadToUserMessage(userId);
