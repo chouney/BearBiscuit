@@ -86,8 +86,8 @@
     <if test="status!=null">
       AND t.status = #{status}
     </if>
-    <if test="updateDate!=null">
-      AND t.update_time > #{updateDate}
+    <if test="updateTime!=null">
+      AND t.update_time > #{updateTime}
     </if>
     <if test="keyword!=null and keyword!=''">
       AND t.content like  concat('%', #{keyword},'%')
